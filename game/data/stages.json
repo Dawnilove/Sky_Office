@@ -1,0 +1,16 @@
+{
+	"_comment": "회사 단계 (PLAN 6-1, 1.0 = 창업 3 · 스타트업 3). days = 문턱 근무일 (v2.8 ×2 임시값, M5 끝 실사용 3일 뒤 다시 정함). unlock = 그 단계에서 새로 생기는 것 (앞 단계 것은 그대로 이어짐). 가구는 같은 모델 + 재질 교체 (looks) 가 원칙 — office.apply_stage 가 읽음. big = 대단계 첫 단계 (간판 교체). company.gd thresholds = days 목록",
+	"stages": [
+		{"group": "창업", "name": "첫 출근", "days": 0, "big": true, "unlock": []},
+		{"group": "창업", "name": "첫 의뢰", "days": 2, "unlock": ["bookshelf"], "say": "책장이 들어왔어요"},
+		{"group": "창업", "name": "첫 결과물", "days": 6, "unlock": ["whiteboard"], "say": "화이트보드 코너가 생겼어요"},
+		{"group": "스타트업", "name": "첫 투자", "days": 10, "big": true, "unlock": ["desk_real", "chair_new", "sign_new"], "say": "진짜 책상 · 새 의자 · 새 간판"},
+		{"group": "스타트업", "name": "서비스 출시", "days": 14, "unlock": ["server_rack"], "say": "서버 랙이 들어왔어요"},
+		{"group": "스타트업", "name": "첫 사용자", "days": 20, "unlock": ["telescope", "personal_shelf"], "say": "망원경 · 개인 소품 칸"}
+	],
+	"_looks": "unlock 전 재질 (재질 이름 → 색). desk_real 전 = 박스 책상 (골판지) · chair_new 전 = 낡은 의자",
+	"looks": {
+		"desk_real": {"KWoodTop": "a0703c", "KWood": "8a5c2e", "KWoodD": "6f4722", "KFront": "966637", "Knob": "5c3d1d"},
+		"chair_new": {"ChairBase": "7d7872", "ChairC": "9a948c", "ChairD": "8a847c", "Chrome": "8f8b85"}
+	}
+}

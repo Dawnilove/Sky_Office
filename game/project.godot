@@ -1,0 +1,42 @@
+; 하늘 오피스 — 본 프로젝트 설정 (정체성 값은 scripts/game/identity.gd 와 같게)
+
+config_version=5
+
+[application]
+
+config/name="하늘 오피스"
+config/description="AI 에이전트가 일하는 모습을 보여 주는 바탕화면 하늘섬 회사"
+config/icon="res://assets/app/overland_icon.png"
+config/version="0.1.0"
+config/use_custom_user_dir=true
+config/custom_user_dir_name="SkyOffice"
+run/main_scene="res://scenes/main.tscn"
+config/features=PackedStringArray("4.7", "C#", "Forward Plus")
+run/max_fps=30
+
+[autoload]
+
+Game="*res://scripts/game/game_state.gd"
+Updater="*res://scripts/game/updater.gd"
+
+[display]
+
+window/size/viewport_width=1080
+window/size/viewport_height=1000
+window/size/borderless=true
+window/size/transparent=true
+window/per_pixel_transparency/allowed=true
+
+[dotnet]
+
+project/assembly_name="DeskTopIsLand"
+
+[rendering]
+
+; Windows에서 Vulkan은 투명 배경이 검게 나옴 → D3D12 사용 (0단계 검증 결과)
+rendering_device/driver.windows="d3d12"
+viewport/transparent_background=true
+anti_aliasing/quality/msaa_3d=2
+lights_and_shadows/directional_shadow/size=4096
+lights_and_shadows/directional_shadow/soft_shadow_filter_quality=3
+lights_and_shadows/positional_shadow/soft_shadow_filter_quality=3

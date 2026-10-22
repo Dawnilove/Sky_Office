@@ -1,0 +1,5 @@
+{"_note": "1.0 저장 견본 (버전 1, 암호화 전 내용). 저장 형식을 바꾸면 save_v2.json 을 더하고 game_state.migrations() 에 1 → 2 이전 함수. 시험 ③ (scenario.gd _m5_save)",
+ "version": 1, "saved_at": 1792000000.0,
+ "settings": {"window_mode": 2, "fps": 30, "bgm": false, "size": 1.0, "size_set": true, "show_project": true},
+ "stats": {"scenario_turns": 12},
+ "company": {"earned_days": 7, "shown_stage": 2, "win_start": 1791990000.0, "early_at": -1.0, "provisional": false, "prev_start": -1.0, "last_t": 1791999000.0}}

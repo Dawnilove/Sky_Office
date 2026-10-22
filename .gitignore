@@ -1,0 +1,14 @@
+# 로컬 보관용 git (push 안 함, 2026-10-16). 비밀 · 빌드 결과 · 큰 바이너리는 빼기
+# 비밀: PCK 암호화 키 (game/.godot/export_credentials.cfg) · 서명 비밀 키 (~/.skyoffice-signing, 폴더 밖)
+game/.godot/
+game/override.cfg
+*.tmp
+# 빌드 결과
+release/
+build/
+m0/bell/bin/
+m0/bell/obj/
+**/__pycache__/
+tools/godot_template/*.exe
+
+tools/logs/

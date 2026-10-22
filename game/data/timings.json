@@ -1,0 +1,17 @@
+{
+	"_note": "시간 값 (초). PLAN 5장 · 결정 9 · M0 결과. agent_state.gd 가 읽음",
+	"turn_walk_s": 15,
+	"turn_remind_s": 180,
+	"turn_limit_s": 1800,
+	"turn_release_after_s": 2,
+	"done_rest_s": 30,
+	"done_check_s": 1800,
+	"long_work_s": 60,
+	"quiet_s": 720,
+	"leave_s": 3600,
+	"watch_active_s": 90,
+	"fail_show_s": 3,
+	"stop_show_s": 4,
+	"forget_off_s": 86400,
+	"staff_leave_days": 14
+}

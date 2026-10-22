@@ -1,0 +1,613 @@
+{"t": 1791998102.309, "event": "jsonl", "mtime": 1791998102.309, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998103.658, "event": "SessionStart", "sess": "e473ed4c922d5193", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791998104.954, "event": "UserPromptSubmit", "sess": "e473ed4c922d5193", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791998106.708, "event": "jsonl", "mtime": 1791998106.708, "sess": "e473ed4c922d5193", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791998108.362, "event": "Stop", "sess": "e473ed4c922d5193", "proj": "1bbf04a8b5c49a23", "bg_running": 0}
+{"t": 1791998108.386, "event": "jsonl", "mtime": 1791998108.386, "sess": "e473ed4c922d5193", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791998109.696, "event": "jsonl", "mtime": 1791998109.696, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998111.52, "event": "jsonl", "mtime": 1791998111.52, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998112.736, "event": "jsonl", "mtime": 1791998112.736, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998114.915, "event": "jsonl", "mtime": 1791998114.915, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998125.01, "event": "jsonl", "mtime": 1791998125.01, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998128.324, "event": "jsonl", "mtime": 1791998128.324, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998129.403, "event": "SessionStart", "sess": "c9f49b59a3d1b7a7", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791998130.658, "event": "UserPromptSubmit", "sess": "c9f49b59a3d1b7a7", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791998132.569, "event": "jsonl", "mtime": 1791998132.569, "sess": "c9f49b59a3d1b7a7", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791998133.211, "event": "PostToolUse", "sess": "c9f49b59a3d1b7a7", "proj": "1bbf04a8b5c49a23", "tool": "Bash"}
+{"t": 1791998133.329, "event": "jsonl", "mtime": 1791998133.329, "sess": "c9f49b59a3d1b7a7", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791998134.46, "event": "PostToolUseFailure", "sess": "c9f49b59a3d1b7a7", "proj": "1bbf04a8b5c49a23", "tool": "Bash", "is_interrupt": false}
+{"t": 1791998134.481, "event": "jsonl", "mtime": 1791998134.481, "sess": "c9f49b59a3d1b7a7", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791998135.891, "event": "SubagentStart", "sess": "c9f49b59a3d1b7a7", "proj": "1bbf04a8b5c49a23", "agent_type": "general-purpose", "aid": "ef7afcc861201ed8"}
+{"t": 1791998135.919, "event": "PostToolUse", "sess": "c9f49b59a3d1b7a7", "proj": "1bbf04a8b5c49a23", "tool": "Agent"}
+{"t": 1791998136.004, "event": "jsonl", "mtime": 1791998136.004, "sess": "c9f49b59a3d1b7a7", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791998137.366, "event": "SubagentStop", "sess": "c9f49b59a3d1b7a7", "proj": "1bbf04a8b5c49a23", "bg_running": 1, "agent_type": "general-purpose", "aid": "ef7afcc861201ed8"}
+{"t": 1791998137.565, "event": "UserPromptSubmit", "sess": "c9f49b59a3d1b7a7", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791998137.65, "event": "jsonl", "mtime": 1791998137.65, "sess": "c9f49b59a3d1b7a7", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791998139.532, "event": "PostToolUse", "sess": "c9f49b59a3d1b7a7", "proj": "1bbf04a8b5c49a23", "tool": "Bash"}
+{"t": 1791998139.609, "event": "jsonl", "mtime": 1791998139.609, "sess": "c9f49b59a3d1b7a7", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791998140.84, "event": "jsonl", "mtime": 1791998140.84, "sess": "c9f49b59a3d1b7a7", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791998142.032, "event": "Stop", "sess": "c9f49b59a3d1b7a7", "proj": "1bbf04a8b5c49a23", "bg_running": 1}
+{"t": 1791998142.035, "event": "jsonl", "mtime": 1791998142.035, "sess": "c9f49b59a3d1b7a7", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791998184.636, "event": "UserPromptSubmit", "sess": "c9f49b59a3d1b7a7", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791998184.644, "event": "jsonl", "mtime": 1791998184.644, "sess": "c9f49b59a3d1b7a7", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791998185.846, "event": "jsonl", "mtime": 1791998185.846, "sess": "c9f49b59a3d1b7a7", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791998187.463, "event": "Stop", "sess": "c9f49b59a3d1b7a7", "proj": "1bbf04a8b5c49a23", "bg_running": 0}
+{"t": 1791998187.485, "event": "jsonl", "mtime": 1791998187.485, "sess": "c9f49b59a3d1b7a7", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791998187.755, "event": "jsonl", "mtime": 1791998187.755, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998194.457, "event": "jsonl", "mtime": 1791998194.457, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998215.529, "event": "jsonl", "mtime": 1791998215.529, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998221.514, "event": "jsonl", "mtime": 1791998221.514, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998223.267, "event": "UserPromptSubmit", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998223.536, "event": "jsonl", "mtime": 1791998223.536, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998223.823, "event": "jsonl", "mtime": 1791998223.823, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998234.165, "event": "jsonl", "mtime": 1791998234.165, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998239.46, "event": "jsonl", "mtime": 1791998239.46, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998240.499, "event": "SessionStart", "sess": "3fcc8e771db95c06", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791998241.676, "event": "UserPromptSubmit", "sess": "3fcc8e771db95c06", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791998243.887, "event": "jsonl", "mtime": 1791998243.887, "sess": "3fcc8e771db95c06", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791998244.589, "event": "PostToolUseFailure", "sess": "3fcc8e771db95c06", "proj": "1bbf04a8b5c49a23", "tool": "Bash", "is_interrupt": false}
+{"t": 1791998244.725, "event": "jsonl", "mtime": 1791998244.725, "sess": "3fcc8e771db95c06", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791998247.114, "event": "jsonl", "mtime": 1791998247.114, "sess": "3fcc8e771db95c06", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791998249.239, "event": "jsonl", "mtime": 1791998249.239, "sess": "3fcc8e771db95c06", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791998249.417, "event": "jsonl", "mtime": 1791998249.417, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998249.974, "event": "jsonl", "mtime": 1791998249.974, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998251.181, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "PowerShell"}
+{"t": 1791998251.287, "event": "jsonl", "mtime": 1791998251.287, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998254.897, "event": "jsonl", "mtime": 1791998254.897, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998255.93, "event": "SessionStart", "sess": "286b6a0afa3e4bab", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791998257.163, "event": "UserPromptSubmit", "sess": "286b6a0afa3e4bab", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791998259.093, "event": "jsonl", "mtime": 1791998259.093, "sess": "286b6a0afa3e4bab", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791998260.916, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Write"}
+{"t": 1791998260.998, "event": "jsonl", "mtime": 1791998260.998, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998264.292, "event": "jsonl", "mtime": 1791998264.292, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998265.301, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "PowerShell"}
+{"t": 1791998265.408, "event": "jsonl", "mtime": 1791998265.408, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998280.955, "event": "jsonl", "mtime": 1791998280.955, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998281.959, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "PowerShell"}
+{"t": 1791998282.066, "event": "jsonl", "mtime": 1791998282.066, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998297.14, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Read"}
+{"t": 1791998297.731, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Grep"}
+{"t": 1791998297.792, "event": "jsonl", "mtime": 1791998297.792, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998300.286, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Read"}
+{"t": 1791998300.4, "event": "jsonl", "mtime": 1791998300.4, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998309.041, "event": "PostToolUse", "sess": "286b6a0afa3e4bab", "proj": "1bbf04a8b5c49a23", "tool": "Bash"}
+{"t": 1791998309.155, "event": "jsonl", "mtime": 1791998309.155, "sess": "286b6a0afa3e4bab", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791998311.054, "event": "jsonl", "mtime": 1791998311.054, "sess": "286b6a0afa3e4bab", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791998312.443, "event": "Stop", "sess": "286b6a0afa3e4bab", "proj": "1bbf04a8b5c49a23", "bg_running": 0}
+{"t": 1791998312.466, "event": "jsonl", "mtime": 1791998312.466, "sess": "286b6a0afa3e4bab", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791998312.753, "event": "jsonl", "mtime": 1791998312.753, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998315.162, "event": "jsonl", "mtime": 1791998315.162, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998322.931, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791998322.971, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791998323.01, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791998323.051, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791998323.09, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791998323.131, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791998323.171, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791998323.213, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791998323.362, "event": "jsonl", "mtime": 1791998323.362, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998330.455, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Read"}
+{"t": 1791998330.563, "event": "jsonl", "mtime": 1791998330.563, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998340.854, "event": "jsonl", "mtime": 1791998340.854, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998349.52, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791998349.562, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791998349.603, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791998349.644, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791998349.686, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791998349.724, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791998349.832, "event": "jsonl", "mtime": 1791998349.832, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998353.114, "event": "jsonl", "mtime": 1791998353.114, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998353.601, "event": "jsonl", "mtime": 1791998353.601, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998374.039, "event": "jsonl", "mtime": 1791998374.039, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998381.866, "event": "jsonl", "mtime": 1791998381.866, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998384.7, "event": "jsonl", "mtime": 1791998384.7, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998386.904, "event": "jsonl", "mtime": 1791998386.904, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998387.235, "event": "jsonl", "mtime": 1791998387.235, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998391.002, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "PowerShell"}
+{"t": 1791998391.108, "event": "jsonl", "mtime": 1791998391.108, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998399.05, "event": "jsonl", "mtime": 1791998399.05, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998403.666, "event": "jsonl", "mtime": 1791998403.666, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998416.915, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791998416.94, "event": "SubagentStart", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "agent_type": "general-purpose", "aid": "bfb9fc322f1beb65"}
+{"t": 1791998416.974, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Agent"}
+{"t": 1791998417.118, "event": "jsonl", "mtime": 1791998417.118, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998420.866, "event": "jsonl", "mtime": 1791998420.866, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998422.466, "event": "Stop", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "bg_running": 1}
+{"t": 1791998422.477, "event": "jsonl", "mtime": 1791998422.477, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998422.803, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Bash", "agent_type": "general-purpose", "aid": "bfb9fc322f1beb65"}
+{"t": 1791998424.821, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Read", "agent_type": "general-purpose", "aid": "bfb9fc322f1beb65"}
+{"t": 1791998426.027, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Bash", "agent_type": "general-purpose", "aid": "bfb9fc322f1beb65"}
+{"t": 1791998430.951, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Bash", "agent_type": "general-purpose", "aid": "bfb9fc322f1beb65"}
+{"t": 1791998431.179, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Bash", "agent_type": "general-purpose", "aid": "bfb9fc322f1beb65"}
+{"t": 1791998436.42, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Bash", "agent_type": "general-purpose", "aid": "bfb9fc322f1beb65"}
+{"t": 1791998443.3, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Bash", "agent_type": "general-purpose", "aid": "bfb9fc322f1beb65"}
+{"t": 1791998448.548, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Bash", "agent_type": "general-purpose", "aid": "bfb9fc322f1beb65"}
+{"t": 1791998448.586, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Bash", "agent_type": "general-purpose", "aid": "bfb9fc322f1beb65"}
+{"t": 1791998477.37, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Bash", "agent_type": "general-purpose", "aid": "bfb9fc322f1beb65"}
+{"t": 1791998477.437, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Bash", "agent_type": "general-purpose", "aid": "bfb9fc322f1beb65"}
+{"t": 1791998489.272, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Bash", "agent_type": "general-purpose", "aid": "bfb9fc322f1beb65"}
+{"t": 1791998529.286, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Bash", "agent_type": "general-purpose", "aid": "bfb9fc322f1beb65"}
+{"t": 1791998533.876, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Bash", "agent_type": "general-purpose", "aid": "bfb9fc322f1beb65"}
+{"t": 1791998538.22, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Bash", "agent_type": "general-purpose", "aid": "bfb9fc322f1beb65"}
+{"t": 1791998560.185, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Bash", "agent_type": "general-purpose", "aid": "bfb9fc322f1beb65"}
+{"t": 1791998566.196, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Bash", "agent_type": "general-purpose", "aid": "bfb9fc322f1beb65"}
+{"t": 1791998612.89, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Bash", "agent_type": "general-purpose", "aid": "bfb9fc322f1beb65"}
+{"t": 1791998650.889, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Write", "agent_type": "general-purpose", "aid": "bfb9fc322f1beb65"}
+{"t": 1791998660.902, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "SubagentHandback", "agent_type": "general-purpose", "aid": "bfb9fc322f1beb65"}
+{"t": 1791998660.911, "event": "SubagentStop", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "bg_running": 1, "agent_type": "general-purpose", "aid": "bfb9fc322f1beb65"}
+{"t": 1791998660.984, "event": "UserPromptSubmit", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998660.993, "event": "jsonl", "mtime": 1791998660.993, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998675.518, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Read"}
+{"t": 1791998675.521, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Read"}
+{"t": 1791998675.609, "event": "jsonl", "mtime": 1791998675.609, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998687.862, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Grep"}
+{"t": 1791998688.7, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Grep"}
+{"t": 1791998688.749, "event": "jsonl", "mtime": 1791998688.749, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998692.032, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Read"}
+{"t": 1791998692.94, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Read"}
+{"t": 1791998694.046, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Read"}
+{"t": 1791998694.171, "event": "jsonl", "mtime": 1791998694.171, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998723.863, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791998723.906, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791998723.948, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791998723.988, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791998724.027, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791998724.066, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791998724.105, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791998724.146, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791998724.185, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791998724.292, "event": "jsonl", "mtime": 1791998724.292, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998731.763, "event": "jsonl", "mtime": 1791998731.763, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998737.131, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791998737.21, "event": "jsonl", "mtime": 1791998737.21, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998738.009, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "PowerShell"}
+{"t": 1791998738.114, "event": "jsonl", "mtime": 1791998738.114, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998755.621, "event": "jsonl", "mtime": 1791998755.621, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998811.508, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Write"}
+{"t": 1791998811.59, "event": "jsonl", "mtime": 1791998811.59, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998815.395, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Grep"}
+{"t": 1791998816.813, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791998816.901, "event": "jsonl", "mtime": 1791998816.901, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998819.028, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Read"}
+{"t": 1791998819.107, "event": "jsonl", "mtime": 1791998819.107, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998824.752, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791998825.507, "event": "jsonl", "mtime": 1791998825.507, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998826.452, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "PowerShell"}
+{"t": 1791998826.557, "event": "jsonl", "mtime": 1791998826.557, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998836.757, "event": "jsonl", "mtime": 1791998836.757, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998840.014, "event": "Stop", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "bg_running": 0}
+{"t": 1791998840.026, "event": "jsonl", "mtime": 1791998840.026, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998876.111, "event": "UserPromptSubmit", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998876.319, "event": "jsonl", "mtime": 1791998876.319, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998882.514, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Write"}
+{"t": 1791998882.6, "event": "jsonl", "mtime": 1791998882.6, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998886.354, "event": "jsonl", "mtime": 1791998886.354, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998890.572, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "PowerShell"}
+{"t": 1791998890.678, "event": "jsonl", "mtime": 1791998890.678, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998901.604, "event": "Stop", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "bg_running": 0}
+{"t": 1791998901.615, "event": "jsonl", "mtime": 1791998901.615, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791998917.615, "event": "UserPromptSubmit", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998917.78, "event": "jsonl", "mtime": 1791998917.78, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998930.244, "event": "jsonl", "mtime": 1791998930.244, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998935.838, "event": "Stop", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "bg_running": 1}
+{"t": 1791998935.848, "event": "jsonl", "mtime": 1791998935.848, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998963.719, "event": "UserPromptSubmit", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998963.869, "event": "jsonl", "mtime": 1791998963.869, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998969.242, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Bash"}
+{"t": 1791998969.347, "event": "jsonl", "mtime": 1791998969.347, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998980.858, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "MCP"}
+{"t": 1791998981.445, "event": "jsonl", "mtime": 1791998981.445, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998982.354, "event": "jsonl", "mtime": 1791998982.354, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998985.165, "event": "Stop", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "bg_running": 1}
+{"t": 1791998985.173, "event": "jsonl", "mtime": 1791998985.173, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998997.563, "event": "UserPromptSubmit", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998997.568, "event": "jsonl", "mtime": 1791998997.568, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791998997.705, "event": "jsonl", "mtime": 1791998997.705, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999002.064, "event": "jsonl", "mtime": 1791999002.064, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999005.106, "event": "Stop", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "bg_running": 1}
+{"t": 1791999005.112, "event": "jsonl", "mtime": 1791999005.112, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999038.741, "event": "UserPromptSubmit", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999038.744, "event": "jsonl", "mtime": 1791999038.744, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999038.876, "event": "jsonl", "mtime": 1791999038.876, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999041.971, "event": "jsonl", "mtime": 1791999041.971, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999044.355, "event": "Stop", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "bg_running": 1}
+{"t": 1791999044.364, "event": "jsonl", "mtime": 1791999044.364, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999069.524, "event": "UserPromptSubmit", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999069.528, "event": "jsonl", "mtime": 1791999069.528, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999069.659, "event": "jsonl", "mtime": 1791999069.659, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999077.865, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "ToolSearch"}
+{"t": 1791999077.978, "event": "jsonl", "mtime": 1791999077.978, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999081.168, "event": "jsonl", "mtime": 1791999081.168, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999082.321, "event": "jsonl", "mtime": 1791999082.321, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999086.64, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "PowerShell"}
+{"t": 1791999086.745, "event": "jsonl", "mtime": 1791999086.745, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999100.925, "event": "jsonl", "mtime": 1791999100.925, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999103.751, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "PowerShell"}
+{"t": 1791999103.857, "event": "jsonl", "mtime": 1791999103.857, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999117.879, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Write"}
+{"t": 1791999117.915, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Write"}
+{"t": 1791999117.971, "event": "jsonl", "mtime": 1791999117.971, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999121.577, "event": "jsonl", "mtime": 1791999121.577, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999132.81, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "PowerShell"}
+{"t": 1791999132.915, "event": "jsonl", "mtime": 1791999132.915, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999161.689, "event": "UserPromptSubmit", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999161.879, "event": "jsonl", "mtime": 1791999161.879, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999166.38, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Grep"}
+{"t": 1791999166.915, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Read"}
+{"t": 1791999167.023, "event": "jsonl", "mtime": 1791999167.023, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999169.785, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Read"}
+{"t": 1791999170.359, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Read"}
+{"t": 1791999170.476, "event": "jsonl", "mtime": 1791999170.476, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999175.367, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Write"}
+{"t": 1791999175.386, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "MCP"}
+{"t": 1791999175.456, "event": "jsonl", "mtime": 1791999175.456, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999177.109, "event": "jsonl", "mtime": 1791999177.109, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999178.058, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "PowerShell"}
+{"t": 1791999178.164, "event": "jsonl", "mtime": 1791999178.164, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999179.314, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Bash"}
+{"t": 1791999179.392, "event": "jsonl", "mtime": 1791999179.392, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999181.39, "event": "jsonl", "mtime": 1791999181.39, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999183.725, "event": "Stop", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "bg_running": 2}
+{"t": 1791999183.736, "event": "jsonl", "mtime": 1791999183.736, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999184.5, "event": "SessionStart", "sess": "5c0370adcd8ac724", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791999191.249, "event": "UserPromptSubmit", "sess": "5c0370adcd8ac724", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791999213.421, "event": "PostToolUse", "sess": "5c0370adcd8ac724", "proj": "1bbf04a8b5c49a23", "tool": "Bash"}
+{"t": 1791999215.833, "event": "Stop", "sess": "5c0370adcd8ac724", "proj": "1bbf04a8b5c49a23", "bg_running": 0}
+{"t": 1791999219.723, "event": "jsonl", "mtime": 1791999219.723, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999223.26, "event": "Stop", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "bg_running": 0}
+{"t": 1791999223.271, "event": "jsonl", "mtime": 1791999223.271, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999292.686, "event": "UserPromptSubmit", "sess": "5c0370adcd8ac724", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791999296.747, "event": "PostToolUse", "sess": "5c0370adcd8ac724", "proj": "1bbf04a8b5c49a23", "tool": "Bash"}
+{"t": 1791999299.906, "event": "PostToolUse", "sess": "5c0370adcd8ac724", "proj": "1bbf04a8b5c49a23", "tool": "Bash"}
+{"t": 1791999301.677, "event": "Stop", "sess": "5c0370adcd8ac724", "proj": "1bbf04a8b5c49a23", "bg_running": 0}
+{"t": 1791999379.407, "event": "UserPromptSubmit", "sess": "5c0370adcd8ac724", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791999379.938, "event": "UserPromptSubmit", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999380.164, "event": "jsonl", "mtime": 1791999380.164, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999385.313, "event": "PostToolUse", "sess": "5c0370adcd8ac724", "proj": "1bbf04a8b5c49a23", "tool": "Bash"}
+{"t": 1791999386.683, "event": "Stop", "sess": "5c0370adcd8ac724", "proj": "1bbf04a8b5c49a23", "bg_running": 0}
+{"t": 1791999410.365, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791999410.411, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791999410.465, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791999410.509, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791999410.553, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791999410.593, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791999410.7, "event": "jsonl", "mtime": 1791999410.7, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999414.022, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Read"}
+{"t": 1791999414.102, "event": "jsonl", "mtime": 1791999414.102, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999419.598, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791999420.123, "event": "jsonl", "mtime": 1791999420.123, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999435.163, "event": "jsonl", "mtime": 1791999435.163, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999437.749, "event": "Stop", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "bg_running": 0}
+{"t": 1791999437.772, "event": "jsonl", "mtime": 1791999437.772, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999446.704, "event": "Notification", "sess": "5c0370adcd8ac724", "proj": "1bbf04a8b5c49a23", "ntype": "idle_prompt"}
+{"t": 1791999450.307, "event": "UserPromptSubmit", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999450.509, "event": "jsonl", "mtime": 1791999450.509, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999454.487, "event": "UserPromptSubmit", "sess": "5c0370adcd8ac724", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791999463.195, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "ToolSearch"}
+{"t": 1791999463.308, "event": "jsonl", "mtime": 1791999463.308, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999466.969, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "MCP"}
+{"t": 1791999467.026, "event": "jsonl", "mtime": 1791999467.026, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999481.741, "event": "jsonl", "mtime": 1791999481.741, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999485.146, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "PowerShell"}
+{"t": 1791999485.25, "event": "jsonl", "mtime": 1791999485.25, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999485.695, "event": "PostToolUse", "sess": "5c0370adcd8ac724", "proj": "1bbf04a8b5c49a23", "tool": "Bash"}
+{"t": 1791999487.145, "event": "Stop", "sess": "5c0370adcd8ac724", "proj": "1bbf04a8b5c49a23", "bg_running": 0}
+{"t": 1791999515.692, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Write"}
+{"t": 1791999515.732, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Write"}
+{"t": 1791999516.129, "event": "jsonl", "mtime": 1791999516.129, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999517.664, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "PowerShell"}
+{"t": 1791999517.77, "event": "jsonl", "mtime": 1791999517.77, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999527.904, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791999527.94, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791999528.404, "event": "jsonl", "mtime": 1791999528.404, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999529.518, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "PowerShell"}
+{"t": 1791999529.624, "event": "jsonl", "mtime": 1791999529.624, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999534.264, "event": "UserPromptSubmit", "sess": "5c0370adcd8ac724", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791999539.8, "event": "PostToolUse", "sess": "5c0370adcd8ac724", "proj": "1bbf04a8b5c49a23", "tool": "AskUserQuestion"}
+{"t": 1791999541.426, "event": "Stop", "sess": "5c0370adcd8ac724", "proj": "1bbf04a8b5c49a23", "bg_running": 0}
+{"t": 1791999542.969, "event": "jsonl", "mtime": 1791999542.969, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999555.302, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Write"}
+{"t": 1791999555.342, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Write"}
+{"t": 1791999555.39, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791999555.908, "event": "jsonl", "mtime": 1791999555.908, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999556.663, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "PowerShell"}
+{"t": 1791999556.769, "event": "jsonl", "mtime": 1791999556.769, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999561.225, "event": "jsonl", "mtime": 1791999561.225, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999571.664, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791999571.705, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Write"}
+{"t": 1791999571.748, "event": "jsonl", "mtime": 1791999571.748, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999579.343, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "PowerShell"}
+{"t": 1791999579.451, "event": "jsonl", "mtime": 1791999579.451, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999594.006, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Read"}
+{"t": 1791999594.038, "event": "jsonl", "mtime": 1791999594.038, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999594.074, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Grep"}
+{"t": 1791999594.179, "event": "jsonl", "mtime": 1791999594.179, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999619.48, "event": "jsonl", "mtime": 1791999619.48, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999642.963, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "PowerShell"}
+{"t": 1791999643.056, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Grep"}
+{"t": 1791999643.095, "event": "jsonl", "mtime": 1791999643.095, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999646.094, "event": "SessionEnd", "sess": "5c0370adcd8ac724", "proj": "1bbf04a8b5c49a23", "reason": "prompt_input_exit"}
+{"t": 1791999655.052, "event": "UserPromptSubmit", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999655.055, "event": "jsonl", "mtime": 1791999655.055, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999667.798, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Grep"}
+{"t": 1791999667.869, "event": "jsonl", "mtime": 1791999667.869, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999676.982, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Bash"}
+{"t": 1791999677.088, "event": "jsonl", "mtime": 1791999677.088, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999679.939, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791999679.978, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791999680.007, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Read"}
+{"t": 1791999680.158, "event": "jsonl", "mtime": 1791999680.158, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999680.376, "event": "jsonl", "mtime": 1791999680.376, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999680.398, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Bash"}
+{"t": 1791999680.507, "event": "jsonl", "mtime": 1791999680.507, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999684.405, "event": "jsonl", "mtime": 1791999684.405, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999694.289, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Bash"}
+{"t": 1791999694.396, "event": "jsonl", "mtime": 1791999694.396, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999696.287, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791999696.334, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791999696.378, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791999696.418, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791999696.456, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791999696.495, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791999696.6, "event": "jsonl", "mtime": 1791999696.6, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999702.146, "event": "jsonl", "mtime": 1791999702.146, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999711.01, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Write"}
+{"t": 1791999711.09, "event": "jsonl", "mtime": 1791999711.09, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999711.592, "event": "jsonl", "mtime": 1791999711.592, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999719.806, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Edit"}
+{"t": 1791999719.851, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Write"}
+{"t": 1791999719.997, "event": "jsonl", "mtime": 1791999719.997, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999723.12, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "PowerShell"}
+{"t": 1791999723.224, "event": "jsonl", "mtime": 1791999723.224, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999724.532, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Bash"}
+{"t": 1791999724.611, "event": "jsonl", "mtime": 1791999724.611, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999726.336, "event": "jsonl", "mtime": 1791999726.336, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999728.168, "event": "Stop", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "bg_running": 2}
+{"t": 1791999728.179, "event": "jsonl", "mtime": 1791999728.179, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999728.904, "event": "SessionStart", "sess": "a56f20ac29539f47", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791999732.418, "event": "jsonl", "mtime": 1791999732.418, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999733.045, "event": "UserPromptSubmit", "sess": "a56f20ac29539f47", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791999735.714, "event": "jsonl", "mtime": 1791999735.714, "sess": "a56f20ac29539f47", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791999741.61, "event": "Notification", "sess": "a56f20ac29539f47", "proj": "1bbf04a8b5c49a23", "ntype": "permission_prompt"}
+{"t": 1791999757.353, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "PowerShell"}
+{"t": 1791999757.458, "event": "jsonl", "mtime": 1791999757.458, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999762.125, "event": "PostToolUse", "sess": "a56f20ac29539f47", "proj": "1bbf04a8b5c49a23", "tool": "Bash"}
+{"t": 1791999762.28, "event": "jsonl", "mtime": 1791999762.28, "sess": "a56f20ac29539f47", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791999765.456, "event": "Stop", "sess": "a56f20ac29539f47", "proj": "1bbf04a8b5c49a23", "bg_running": 0}
+{"t": 1791999765.583, "event": "jsonl", "mtime": 1791999765.583, "sess": "a56f20ac29539f47", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791999776.798, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Grep"}
+{"t": 1791999776.843, "event": "jsonl", "mtime": 1791999776.843, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999778.762, "event": "UserPromptSubmit", "sess": "a56f20ac29539f47", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791999778.869, "event": "jsonl", "mtime": 1791999778.869, "sess": "a56f20ac29539f47", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791999779.515, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Read"}
+{"t": 1791999779.604, "event": "jsonl", "mtime": 1791999779.604, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999786.868, "event": "PostToolUse", "sess": "a56f20ac29539f47", "proj": "1bbf04a8b5c49a23", "tool": "Bash"}
+{"t": 1791999786.996, "event": "jsonl", "mtime": 1791999786.996, "sess": "a56f20ac29539f47", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791999792.405, "event": "PostToolUse", "sess": "a56f20ac29539f47", "proj": "1bbf04a8b5c49a23", "tool": "Bash"}
+{"t": 1791999792.534, "event": "jsonl", "mtime": 1791999792.534, "sess": "a56f20ac29539f47", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791999793.976, "event": "Stop", "sess": "a56f20ac29539f47", "proj": "1bbf04a8b5c49a23", "bg_running": 0}
+{"t": 1791999794.058, "event": "jsonl", "mtime": 1791999794.058, "sess": "a56f20ac29539f47", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791999806.055, "event": "UserPromptSubmit", "sess": "a56f20ac29539f47", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791999806.162, "event": "jsonl", "mtime": 1791999806.162, "sess": "a56f20ac29539f47", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791999807.78, "event": "jsonl", "mtime": 1791999807.78, "sess": "a56f20ac29539f47", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791999811.862, "event": "jsonl", "mtime": 1791999811.862, "sess": "a56f20ac29539f47", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791999814.369, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Write"}
+{"t": 1791999814.412, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Write"}
+{"t": 1791999814.446, "event": "jsonl", "mtime": 1791999814.446, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999814.449, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Write"}
+{"t": 1791999815.239, "event": "jsonl", "mtime": 1791999815.239, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999816.09, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "PowerShell"}
+{"t": 1791999816.195, "event": "jsonl", "mtime": 1791999816.195, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999823.512, "event": "UserPromptSubmit", "sess": "a56f20ac29539f47", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791999823.619, "event": "jsonl", "mtime": 1791999823.619, "sess": "a56f20ac29539f47", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791999829.207, "event": "jsonl", "mtime": 1791999829.207, "sess": "a56f20ac29539f47", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791999833.451, "event": "jsonl", "mtime": 1791999833.451, "sess": "a56f20ac29539f47", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791999834.013, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Write"}
+{"t": 1791999834.087, "event": "jsonl", "mtime": 1791999834.087, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999845.09, "event": "UserPromptSubmit", "sess": "a56f20ac29539f47", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791999845.205, "event": "jsonl", "mtime": 1791999845.205, "sess": "a56f20ac29539f47", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791999851.695, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "PowerShell"}
+{"t": 1791999851.806, "event": "jsonl", "mtime": 1791999851.806, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999852.891, "event": "Notification", "sess": "a56f20ac29539f47", "proj": "1bbf04a8b5c49a23", "ntype": "permission_prompt"}
+{"t": 1791999884.927, "event": "jsonl", "mtime": 1791999884.927, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999885.87, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "PowerShell"}
+{"t": 1791999885.976, "event": "jsonl", "mtime": 1791999885.976, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999891.296, "event": "PostToolUse", "sess": "a56f20ac29539f47", "proj": "1bbf04a8b5c49a23", "tool": "AskUserQuestion"}
+{"t": 1791999891.435, "event": "jsonl", "mtime": 1791999891.435, "sess": "a56f20ac29539f47", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791999892.622, "event": "Stop", "sess": "a56f20ac29539f47", "proj": "1bbf04a8b5c49a23", "bg_running": 0}
+{"t": 1791999892.702, "event": "jsonl", "mtime": 1791999892.702, "sess": "a56f20ac29539f47", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791999906.711, "event": "jsonl", "mtime": 1791999906.711, "sess": "a56f20ac29539f47", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791999906.728, "event": "SessionEnd", "sess": "a56f20ac29539f47", "proj": "1bbf04a8b5c49a23", "reason": "prompt_input_exit"}
+{"t": 1791999915.641, "event": "UserPromptSubmit", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999915.65, "event": "jsonl", "mtime": 1791999915.65, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999920.193, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Bash"}
+{"t": 1791999920.334, "event": "jsonl", "mtime": 1791999920.334, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999924.029, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791999924.065, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Write"}
+{"t": 1791999924.215, "event": "jsonl", "mtime": 1791999924.215, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999928.086, "event": "jsonl", "mtime": 1791999928.086, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999935.334, "event": "jsonl", "mtime": 1791999935.334, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999935.637, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Bash"}
+{"t": 1791999935.743, "event": "jsonl", "mtime": 1791999935.743, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999939.675, "event": "jsonl", "mtime": 1791999939.675, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999941.074, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Bash"}
+{"t": 1791999941.178, "event": "jsonl", "mtime": 1791999941.178, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999942.625, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791999942.667, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Write"}
+{"t": 1791999942.719, "event": "jsonl", "mtime": 1791999942.719, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999943.931, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "PowerShell"}
+{"t": 1791999944.035, "event": "jsonl", "mtime": 1791999944.035, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999947.512, "event": "jsonl", "mtime": 1791999947.512, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999960.361, "event": "jsonl", "mtime": 1791999960.361, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999965.586, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Write"}
+{"t": 1791999965.67, "event": "jsonl", "mtime": 1791999965.67, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1791999969.945, "event": "SessionStart", "sess": "5e16cdf7c15ea16d", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791999972.999, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Write"}
+{"t": 1791999973.037, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1791999973.183, "event": "jsonl", "mtime": 1791999973.183, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999973.821, "event": "UserPromptSubmit", "sess": "5e16cdf7c15ea16d", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791999982.84, "event": "Notification", "sess": "5e16cdf7c15ea16d", "proj": "1bbf04a8b5c49a23", "ntype": "permission_prompt"}
+{"t": 1791999988.399, "event": "jsonl", "mtime": 1791999988.399, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1791999989.712, "event": "PostToolUse", "sess": "5e16cdf7c15ea16d", "proj": "1bbf04a8b5c49a23", "tool": "Bash"}
+{"t": 1791999989.842, "event": "jsonl", "mtime": 1791999989.842, "sess": "5e16cdf7c15ea16d", "proj": "1bbf04a8b5c49a23"}
+{"t": 1791999995.744, "event": "Notification", "sess": "5e16cdf7c15ea16d", "proj": "1bbf04a8b5c49a23", "ntype": "permission_prompt"}
+{"t": 1792000002.918, "event": "PostToolUse", "sess": "5e16cdf7c15ea16d", "proj": "1bbf04a8b5c49a23", "tool": "Bash"}
+{"t": 1792000003.069, "event": "jsonl", "mtime": 1792000003.069, "sess": "5e16cdf7c15ea16d", "proj": "1bbf04a8b5c49a23"}
+{"t": 1792000004.532, "event": "jsonl", "mtime": 1792000004.532, "sess": "5e16cdf7c15ea16d", "proj": "1bbf04a8b5c49a23"}
+{"t": 1792000005.313, "event": "Stop", "sess": "5e16cdf7c15ea16d", "proj": "1bbf04a8b5c49a23", "bg_running": 0}
+{"t": 1792000005.442, "event": "jsonl", "mtime": 1792000005.442, "sess": "5e16cdf7c15ea16d", "proj": "1bbf04a8b5c49a23"}
+{"t": 1792000007.104, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Write"}
+{"t": 1792000007.191, "event": "jsonl", "mtime": 1792000007.191, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1792000016.5, "event": "UserPromptSubmit", "sess": "5e16cdf7c15ea16d", "proj": "1bbf04a8b5c49a23"}
+{"t": 1792000016.606, "event": "jsonl", "mtime": 1792000016.606, "sess": "5e16cdf7c15ea16d", "proj": "1bbf04a8b5c49a23"}
+{"t": 1792000024.347, "event": "Notification", "sess": "5e16cdf7c15ea16d", "proj": "1bbf04a8b5c49a23", "ntype": "permission_prompt"}
+{"t": 1792000028.491, "event": "jsonl", "mtime": 1792000028.491, "sess": "5e16cdf7c15ea16d", "proj": "1bbf04a8b5c49a23"}
+{"t": 1792000038.133, "event": "UserPromptSubmit", "sess": "5e16cdf7c15ea16d", "proj": "1bbf04a8b5c49a23"}
+{"t": 1792000038.239, "event": "jsonl", "mtime": 1792000038.239, "sess": "5e16cdf7c15ea16d", "proj": "1bbf04a8b5c49a23"}
+{"t": 1792000042.939, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "PowerShell"}
+{"t": 1792000043.046, "event": "jsonl", "mtime": 1792000043.046, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1792000046.124, "event": "Notification", "sess": "5e16cdf7c15ea16d", "proj": "1bbf04a8b5c49a23", "ntype": "permission_prompt"}
+{"t": 1792000050.277, "event": "jsonl", "mtime": 1792000050.277, "sess": "5e16cdf7c15ea16d", "proj": "1bbf04a8b5c49a23"}
+{"t": 1792000052.055, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1792000052.118, "event": "jsonl", "mtime": 1792000052.118, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1792000063.584, "event": "jsonl", "mtime": 1792000063.584, "sess": "5e16cdf7c15ea16d", "proj": "1bbf04a8b5c49a23"}
+{"t": 1792000063.598, "event": "SessionEnd", "sess": "5e16cdf7c15ea16d", "proj": "1bbf04a8b5c49a23", "reason": "prompt_input_exit"}
+{"t": 1792000071.197, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Bash"}
+{"t": 1792000071.303, "event": "jsonl", "mtime": 1792000071.303, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1792000075.863, "event": "jsonl", "mtime": 1792000075.863, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1792000076.835, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "PowerShell"}
+{"t": 1792000076.941, "event": "jsonl", "mtime": 1792000076.941, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1792000077.063, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Bash"}
+{"t": 1792000077.168, "event": "jsonl", "mtime": 1792000077.168, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1792000091.969, "event": "jsonl", "mtime": 1792000091.969, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1792000096.342, "event": "jsonl", "mtime": 1792000096.342, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1792000097.962, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Bash"}
+{"t": 1792000098.068, "event": "jsonl", "mtime": 1792000098.068, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1792000107.384, "event": "SubagentStart", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "agent_type": "general-purpose", "aid": "3127b3c9473a0c97"}
+{"t": 1792000107.414, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Agent"}
+{"t": 1792000107.5, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1792000107.58, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1792000107.64, "event": "jsonl", "mtime": 1792000107.64, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1792000111.614, "event": "jsonl", "mtime": 1792000111.614, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1792000112.701, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Bash", "agent_type": "general-purpose", "aid": "3127b3c9473a0c97"}
+{"t": 1792000113.201, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "MCP"}
+{"t": 1792000113.204, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Read"}
+{"t": 1792000113.207, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Read"}
+{"t": 1792000113.787, "event": "jsonl", "mtime": 1792000113.787, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1792000114.86, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Read", "agent_type": "general-purpose", "aid": "3127b3c9473a0c97"}
+{"t": 1792000114.891, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1792000114.938, "event": "jsonl", "mtime": 1792000114.938, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1792000115.243, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Read", "agent_type": "general-purpose", "aid": "3127b3c9473a0c97"}
+{"t": 1792000119.108, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Bash", "agent_type": "general-purpose", "aid": "3127b3c9473a0c97"}
+{"t": 1792000122.415, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Bash", "agent_type": "general-purpose", "aid": "3127b3c9473a0c97"}
+{"t": 1792000128.495, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Bash", "agent_type": "general-purpose", "aid": "3127b3c9473a0c97"}
+{"t": 1792000128.565, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Bash", "agent_type": "general-purpose", "aid": "3127b3c9473a0c97"}
+{"t": 1792000131.573, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Edit"}
+{"t": 1792000131.613, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Edit"}
+{"t": 1792000131.653, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Edit"}
+{"t": 1792000131.692, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Edit"}
+{"t": 1792000131.733, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Edit"}
+{"t": 1792000131.762, "event": "jsonl", "mtime": 1792000131.762, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1792000131.791, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Edit"}
+{"t": 1792000131.9, "event": "jsonl", "mtime": 1792000131.9, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1792000133.095, "event": "jsonl", "mtime": 1792000133.095, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1792000136.354, "event": "jsonl", "mtime": 1792000136.354, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1792000147.287, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Write"}
+{"t": 1792000147.374, "event": "jsonl", "mtime": 1792000147.374, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1792000154.876, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Bash", "agent_type": "general-purpose", "aid": "3127b3c9473a0c97"}
+{"t": 1792000158.591, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Bash", "agent_type": "general-purpose", "aid": "3127b3c9473a0c97"}
+{"t": 1792000159.243, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Edit"}
+{"t": 1792000159.285, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Edit"}
+{"t": 1792000159.323, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Edit"}
+{"t": 1792000159.363, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Edit"}
+{"t": 1792000159.407, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Edit"}
+{"t": 1792000159.47, "event": "jsonl", "mtime": 1792000159.47, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1792000163.647, "event": "jsonl", "mtime": 1792000163.647, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1792000177.996, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Write"}
+{"t": 1792000178.073, "event": "jsonl", "mtime": 1792000178.073, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1792000178.981, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "PowerShell"}
+{"t": 1792000179.088, "event": "jsonl", "mtime": 1792000179.088, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1792000180.242, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Bash", "agent_type": "general-purpose", "aid": "3127b3c9473a0c97"}
+{"t": 1792000189.748, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Edit"}
+{"t": 1792000189.801, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Write"}
+{"t": 1792000189.947, "event": "jsonl", "mtime": 1792000189.947, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1792000197.817, "event": "jsonl", "mtime": 1792000197.817, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1792000202.202, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Edit"}
+{"t": 1792000202.238, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Edit"}
+{"t": 1792000202.27, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Edit"}
+{"t": 1792000202.4, "event": "jsonl", "mtime": 1792000202.4, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1792000208.202, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "MCP"}
+{"t": 1792000208.747, "event": "jsonl", "mtime": 1792000208.747, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1792000209.937, "event": "jsonl", "mtime": 1792000209.937, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1792000212.095, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Write"}
+{"t": 1792000212.142, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1792000212.302, "event": "jsonl", "mtime": 1792000212.302, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1792000212.954, "event": "Stop", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "bg_running": 1}
+{"t": 1792000212.968, "event": "jsonl", "mtime": 1792000212.968, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1792000216.294, "event": "jsonl", "mtime": 1792000216.294, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1792000232.287, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Bash", "agent_type": "general-purpose", "aid": "3127b3c9473a0c97"}
+{"t": 1792000236.066, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Write"}
+{"t": 1792000236.14, "event": "jsonl", "mtime": 1792000236.14, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1792000244.491, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Bash", "agent_type": "general-purpose", "aid": "3127b3c9473a0c97"}
+{"t": 1792000249.464, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "PowerShell"}
+{"t": 1792000249.569, "event": "jsonl", "mtime": 1792000249.569, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1792000258.116, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Edit"}
+{"t": 1792000258.204, "event": "jsonl", "mtime": 1792000258.204, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1792000259.929, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Bash", "agent_type": "general-purpose", "aid": "3127b3c9473a0c97"}
+{"t": 1792000265.412, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "Bash", "agent_type": "general-purpose", "aid": "3127b3c9473a0c97"}
+{"t": 1792000271.024, "event": "PostToolUse", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc", "tool": "PowerShell"}
+{"t": 1792000271.128, "event": "jsonl", "mtime": 1792000271.128, "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1792022339.032, "event": "SessionStart", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1792022361.333, "event": "UserPromptSubmit", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1792022371.208, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "PowerShell"}
+{"t": 1792022384.742, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "MCP"}
+{"t": 1792022389.852, "event": "Stop", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "bg_running": 0}
+{"t": 1792022424.776, "event": "UserPromptSubmit", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1792022430.937, "event": "SessionStart", "sess": "fe28dd8f94e0695a", "proj": "b86c5c3d1afc0adc"}
+{"t": 1792022431.335, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Edit"}
+{"t": 1792022432.546, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Bash"}
+{"t": 1792022439.752, "event": "jsonl", "mtime": 1792022439.752, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1792022442.183, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "MCP"}
+{"t": 1792022442.83, "event": "jsonl", "mtime": 1792022442.83, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1792022444.044, "event": "jsonl", "mtime": 1792022444.044, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1792022446.307, "event": "Stop", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "bg_running": 1}
+{"t": 1792022446.323, "event": "jsonl", "mtime": 1792022446.323, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1792022450.514, "event": "SessionStart", "sess": "b56c793d43039634", "proj": "18526327bdf51fa7"}
+{"t": 1792022450.522, "event": "jsonl", "mtime": 1792022450.522, "sess": "b56c793d43039634", "proj": "18526327bdf51fa7"}
+{"t": 1792022497.828, "event": "UserPromptSubmit", "sess": "b56c793d43039634", "proj": "18526327bdf51fa7"}
+{"t": 1792022498.535, "event": "jsonl", "mtime": 1792022498.535, "sess": "b56c793d43039634", "proj": "18526327bdf51fa7"}
+{"t": 1792022508.5, "event": "jsonl", "mtime": 1792022508.5, "sess": "b56c793d43039634", "proj": "18526327bdf51fa7"}
+{"t": 1792022510.744, "event": "PostToolUse", "sess": "b56c793d43039634", "proj": "18526327bdf51fa7", "tool": "PowerShell"}
+{"t": 1792022510.861, "event": "jsonl", "mtime": 1792022510.861, "sess": "b56c793d43039634", "proj": "18526327bdf51fa7"}
+{"t": 1792022514.018, "event": "UserPromptSubmit", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1792022514.172, "event": "jsonl", "mtime": 1792022514.172, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1792022528.294, "event": "jsonl", "mtime": 1792022528.294, "sess": "b56c793d43039634", "proj": "18526327bdf51fa7"}
+{"t": 1792022529.961, "event": "Stop", "sess": "b56c793d43039634", "proj": "18526327bdf51fa7", "bg_running": 0}
+{"t": 1792022529.98, "event": "jsonl", "mtime": 1792022529.98, "sess": "b56c793d43039634", "proj": "18526327bdf51fa7"}
+{"t": 1792022530.595, "event": "jsonl", "mtime": 1792022530.595, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1792022530.629, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "MCP"}
+{"t": 1792022530.738, "event": "jsonl", "mtime": 1792022530.738, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1792022531.343, "event": "SessionStart", "sess": "cf208fa8e1c2b572", "proj": "9fbad7fd412ffb85"}
+{"t": 1792022531.701, "event": "SubagentStop", "sess": "b56c793d43039634", "proj": "18526327bdf51fa7", "bg_running": 0, "agent_type": "", "aid": "dbfd84623cf853ca"}
+{"t": 1792022532.046, "event": "UserPromptSubmit", "sess": "cf208fa8e1c2b572", "proj": "9fbad7fd412ffb85"}
+{"t": 1792022534.017, "event": "jsonl", "mtime": 1792022534.017, "sess": "cf208fa8e1c2b572", "proj": "9fbad7fd412ffb85"}
+{"t": 1792022535.836, "event": "jsonl", "mtime": 1792022535.836, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1792022538.073, "event": "Stop", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "bg_running": 1}
+{"t": 1792022538.083, "event": "jsonl", "mtime": 1792022538.083, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1792022539.905, "event": "Notification", "sess": "cf208fa8e1c2b572", "proj": "9fbad7fd412ffb85", "ntype": "permission_prompt"}
+{"t": 1792022559.848, "event": "PostToolUse", "sess": "cf208fa8e1c2b572", "proj": "9fbad7fd412ffb85", "tool": "Bash"}
+{"t": 1792022559.966, "event": "jsonl", "mtime": 1792022559.966, "sess": "cf208fa8e1c2b572", "proj": "9fbad7fd412ffb85"}
+{"t": 1792022561.053, "event": "jsonl", "mtime": 1792022561.053, "sess": "cf208fa8e1c2b572", "proj": "9fbad7fd412ffb85"}
+{"t": 1792022564.039, "event": "Stop", "sess": "cf208fa8e1c2b572", "proj": "9fbad7fd412ffb85", "bg_running": 0}
+{"t": 1792022564.049, "event": "jsonl", "mtime": 1792022564.049, "sess": "cf208fa8e1c2b572", "proj": "9fbad7fd412ffb85"}
+{"t": 1792022564.142, "event": "UserPromptSubmit", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1792022564.301, "event": "jsonl", "mtime": 1792022564.301, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1792022568.267, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Bash"}
+{"t": 1792022568.373, "event": "jsonl", "mtime": 1792022568.373, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1792022573.253, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "Bash"}
+{"t": 1792022573.359, "event": "jsonl", "mtime": 1792022573.359, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1792022580.87, "event": "jsonl", "mtime": 1792022580.87, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1792022581.177, "event": "jsonl", "mtime": 1792022581.177, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}
+{"t": 1792022586.615, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "PowerShell"}
+{"t": 1792022586.631, "event": "PostToolUse", "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85", "tool": "ToolSearch"}
+{"t": 1792022586.722, "event": "jsonl", "mtime": 1792022586.722, "sess": "f8ca9a9064e0001a", "proj": "9fbad7fd412ffb85"}

@@ -1,0 +1,9 @@
+{
+  "name": "skyoffice-bell",
+  "displayName": "Sky Office Bell",
+  "version": "0.1.0",
+  "description": "Writes redacted hook events to ~/.skyoffice/inbox for the Sky Office game. No output, no network, no decisions.",
+  "author": {
+    "name": "Sky Office"
+  }
+}

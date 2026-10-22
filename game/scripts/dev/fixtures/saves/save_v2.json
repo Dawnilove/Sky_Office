@@ -1,0 +1,9 @@
+{"_note": "저장 견본 버전 2 (M5 3세션째, 암호화 전 내용): firm 칸 = 회사 이름 · 창업 화면 봄 · 솔트 · 명패 · 오늘 · 결재함. 폴더 이름은 없음. 시험 (scenario.gd _m5_firm)",
+ "version": 2, "saved_at": 1792100000.0,
+ "settings": {"window_mode": 2, "fps": 30, "bgm": false, "size": 1.0, "size_set": true, "show_project": false},
+ "stats": {"scenario_turns": 12},
+ "company": {"earned_days": 8, "shown_stage": 3, "win_start": 1792090000.0, "early_at": -1.0, "provisional": false, "prev_start": 1791990000.0, "last_t": 1792099000.0},
+ "firm": {"name": "구름상사", "founded": true, "salt": "0123456789abcdef0123456789abcdef",
+  "plates": {"0": {"name": "", "team": "기획팀"}, "1": {"name": "봄이", "team": ""}},
+  "today": {"day": 1792090000.0, "staff": [0, 1], "done": 3, "turn": 1},
+  "ledger": [{"day": 7, "t": 1791990000.0, "staff": ["서연", "봄이"], "done": 5, "turn": 2}]}}

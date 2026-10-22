@@ -1,0 +1,13 @@
+{
+  "name": "skyoffice",
+  "owner": {
+    "name": "Sky Office"
+  },
+  "plugins": [
+    {
+      "name": "skyoffice-bell",
+      "source": "./bell",
+      "description": "Sky Office phone line: redacted hook events to ~/.skyoffice/inbox"
+    }
+  ]
+}

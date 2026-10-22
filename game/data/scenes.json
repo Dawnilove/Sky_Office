@@ -1,0 +1,27 @@
+{
+	"_note": "하루 빨리 보기 (PLAN 5-7 C42 + C47, M5 5세션째): 녹화 재생 → 장면 로그. scripts/dev/fast_day.gd 가 읽음. 신호 → 장면 표 · 상한 (넘으면 종료 코드 1). 난수 seed · 시각 = 녹화 시각 그대로 (PC 시각 안 씀)",
+	"step_s": 5,
+	"seed": 7,
+	"desks": 4,
+	"scenes": {
+		"staff": "출근",
+		"work": "일 시작",
+		"turn": "내 차례",
+		"turn15": "창구 부르기",
+		"done0": "끝 보고",
+		"unknown": "소식 없음",
+		"off": "퇴근",
+		"plane": "일 받기 (종이비행기)",
+		"big": "큰 움직임",
+		"quirk": "일하다 버릇"
+	},
+	"report_long_try_s": [60, 180, 300],
+	"report_long_s": 60,
+	"limits": {
+		"big_max": 3,
+		"big_gap_s": 600,
+		"big_during_turn": 0,
+		"big_per_hour": 30,
+		"long_reports_per_hour": 8
+	}
+}
