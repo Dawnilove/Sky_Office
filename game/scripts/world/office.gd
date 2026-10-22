@@ -181,6 +181,16 @@ func build(isl: Node3D, lay: Layout) -> void:
 		elif a.begins_with("--guests="):
 			for k in int(a.get_slice("=", 1)):
 				set_state(add_guest(), "wait")
+		elif a.begins_with("--spec="):   # 전문가 그림 (M6-1): `--spec=Explore,summarizer` 역할 이름표를 단 대기 의자 손님
+			for nm in a.get_slice("=", 1).split(","):
+				var gi := add_guest()
+				set_staff_name(gi, "민준")
+				set_staff_role(gi, "전문가 주임")
+				set_staff_project(gi, nm)
+				set_state(gi, "wait")
+				set_hover(gi, true)
+			set_staff_role(0, "PM")
+			set_hover(0, true)
 		elif a.begins_with("--hire="):   # 짐 상자 그림 · 실화면 (M5): `--hire=0` 2초 뒤 그 책상 직원이 상자 들고 출근 (입사)
 			var k := int(a.get_slice("=", 1))
 			get_tree().create_timer(2.0).timeout.connect(func() -> void:
@@ -256,9 +266,12 @@ func tag_text(s: Dictionary) -> String:
 	var label := str(s.get("project", ""))
 	if label.length() > TAG_MAX_CHARS:
 		label = label.left(TAG_MAX_CHARS - 1) + "…"
+	var who := str(s.name)
+	if str(s.get("role", "")) != "" and bool(s.get("hover", false)):
+		who += " · " + str(s.role)   # PM · 전문가 (M6-4 R1)
 	if label == "":
-		return str(s.name)
-	return "%s\n%s" % [s.name, label] if bool(s.get("hover", false)) else label
+		return who
+	return "%s\n%s" % [who, label] if bool(s.get("hover", false)) else label
 
 
 func _refresh_tag(s: Dictionary) -> void:
@@ -302,6 +315,27 @@ func set_sign_text(t: String) -> void:
 		return
 	sign_text.text = t
 	sign_text.pixel_size = 0.16 / 64.0 * minf(1.0, 6.0 / maxf(1.0, float(t.length())))
+
+
+## 역할 표기 (마우스 올림 첫 줄 '이름 · PM' · '이름 · 전문가 대리', M6-4 R1 · R3, "" = 없음)
+func set_staff_role(i: int, role: String) -> void:
+	if str(staff[i].get("role", "")) == role:
+		return
+	staff[i].role = role
+	_refresh_tag(staff[i])
+
+
+## 손님 전문가의 고정 머리색 · 장신구 (M6-4 R2, 조끼는 그대로) — 빈 값 = 원래 손님 모습으로
+func set_guest_look(i: int, lk: Dictionary) -> void:
+	var s: Dictionary = staff[i]
+	if not s.guest:
+		return
+	var key := "" if lk.is_empty() else "%d/%d" % [int(lk.hair), int(lk.acc)]
+	if str(s.get("guest_look", "")) == key:
+		return
+	s.guest_look = key
+	_paint_staff(s.model, C_GUEST_SHIRT, HAIRS[int(lk.hair) % HAIRS.size()] if key != "" else HAIRS[int(s.id) % HAIRS.size()])
+	_wear_acc(s.model, ACCESSORIES[int(lk.acc) % ACCESSORIES.size()] if key != "" else "")
 
 
 ## 프로젝트 이름 ("" = 숨김)
@@ -1606,7 +1640,7 @@ func _bubble_texture() -> ImageTexture:
 			var q := Vector2(clampf(x + 0.5, r + 1, 127 - r), clampf(y + 0.5, r + 1, 35 - r))
 			var d := Vector2(x + 0.5, y + 0.5).distance_to(q)
 			if d <= r:
-				img.set_pixel(x, y, Color("fffdf8") if d <= r - 3.0 else Color("4a433c"))
+				img.set_pixel(x, y, Color("fffdf8") if d <= r - 2.0 else Color("9a8f84"))
 	_bubble = ImageTexture.create_from_image(img)
 	return _bubble
 
@@ -1622,7 +1656,7 @@ func _tail_texture() -> ImageTexture:
 		for x in 16:
 			var dx := absf(x + 0.5 - 8.0)
 			if dx <= half:
-				img.set_pixel(x, y, Color("fffdf8") if (dx <= half - 2.5 or y < 3) else Color("4a433c"))
+				img.set_pixel(x, y, Color("fffdf8") if (dx <= half - 1.8 or y < 3) else Color("9a8f84"))
 	_tail = ImageTexture.create_from_image(img)
 	return _tail
 
@@ -1921,6 +1955,26 @@ func _workroom() -> void:
 	var room := layout.room_rect()
 	_plant(Vector2(room.position.x + 0.35, room.end.y - 0.35))
 	_plant(Vector2(room.end.x - 0.35, room.end.y - 0.35))
+	_wall_props()
+
+
+## 뒷벽 안쪽 벽 소품 (M6-2): 호출 보드 양옆 빈 벽에 액자 · 달력 — 얇은 상자 + 글씨, 부딪힘 없음 (밝은 사무실 비교 · 벽 소품)
+func _wall_props() -> void:
+	var z := layout.building_rect().position.y + 0.03
+	_block(Vector2(-1.05, z), Vector2(0.4, 0.06), 1.0, 1.55, "b08a63").name = "WallFrame"
+	_block(Vector2(-1.05, z + 0.005), Vector2(0.32, 0.06), 1.07, 1.48, "cfe3ef").name = "WallFramePic"
+	_block(Vector2(1.03, z), Vector2(0.36, 0.06), 1.0, 1.45, "fbf8f2").name = "WallCalendar"
+	_block(Vector2(1.03, z + 0.005), Vector2(0.36, 0.06), 1.31, 1.45, "e07a5f").name = "WallCalendarTop"
+	var l := Label3D.new()
+	l.name = "WallCalendarText"
+	l.text = "%d월" % int(Time.get_date_dict_from_system().month)
+	l.font = _glyph_font()
+	l.font_size = 48
+	l.pixel_size = 0.15 * layout.unit_m / 48.0
+	l.modulate = Color("3a3f4a")
+	l.outline_size = 0
+	l.position = Vector3(1.03 * layout.unit_m, 1.13 * layout.unit_m, (z + 0.05) * layout.unit_m)
+	add_child(l)
 
 
 func _plant(p: Vector2) -> void:

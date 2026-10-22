@@ -15,7 +15,7 @@ const AgentState := preload("res://scripts/world/agent_state.gd")
 
 
 static func empty() -> Dictionary:
-	return {"v": VERSION, "next": 0, "staff": []}
+	return {"v": VERSION, "next": 0, "staff": [], "roles": {}}
 
 
 ## 휴직 기준 (초): timings.json staff_leave_days (14일)
@@ -84,6 +84,26 @@ static func _free_desk(used: Dictionary, desks: int, home: int) -> int:
 	return -1
 
 
+## 전문가 (서브에이전트 역할) 근속 (M6-4 R3): 같은 (프로젝트, 역할) 이 일한 날 수 — day = 지역 시각 기준 날 번호 (같은 날 여러 번은 1일)
+static func touch_role(reg: Dictionary, proj: String, role: String, day: int) -> Dictionary:
+	if proj == "" or role == "":
+		return reg
+	var nr := reg.duplicate(true)
+	var roles: Dictionary = nr.get("roles", {})
+	var k := proj + "|" + role
+	var r: Dictionary = roles.get(k, {"days": 0, "day": -1})
+	if int(r.day) != day:
+		r.days = int(r.days) + 1
+		r.day = day
+	roles[k] = r
+	nr.roles = roles
+	return nr
+
+
+static func role_days(reg: Dictionary, proj: String, role: String) -> int:
+	return int(reg.get("roles", {}).get(proj + "|" + role, {}).get("days", 0))
+
+
 ## 지금 열린 세션 → {세션 id: {"staff": 직원 id, "temp": 임시 파견인지}} (입사 안 한 조합의 세션은 빠짐)
 ##   같은 조합 동시 세션: 먼저 연 세션이 그 직원, 나머지는 임시 파견 (회색 조끼, 4-1 예외)
 static func assign(reg: Dictionary, state: Dictionary, now: float) -> Dictionary:
@@ -133,6 +153,8 @@ static func migrate(data: Variant) -> Dictionary:
 	if not d.has("next"):
 		d.next = d.staff.reduce(func(m, s): return maxi(m, int(s.id) + 1), 0)
 	d.next = int(d.next)
+	if typeof(d.get("roles")) != TYPE_DICTIONARY:
+		d.roles = {}   # M6-4 전 저장 (SAVE_VERSION 그대로)
 	for s in d.staff:   # JSON 은 숫자를 소수로 읽음 → id · 책상은 정수로
 		for k in ["id", "desk", "home"]:
 			s[k] = int(s.get(k, -1))

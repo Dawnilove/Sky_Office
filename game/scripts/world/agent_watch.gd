@@ -273,6 +273,9 @@ func _apply(e: Dictionary, now: float) -> void:
 	var s: Dictionary = snap.agent.sessions.get(str(e.get("sess", "")), {})
 	if not s.is_empty():   # 세션 → 프로젝트는 첫 신호에서 고정 (7-3)
 		snap.staff = StaffRegistry.touch(snap.staff, str(s.agent), str(s.proj), float(e.t), now)
+		if str(e.get("event", "")) == "SubagentStart" and str(e.get("agent_type", "")) != "" and str(e.get("aid", "")) != "":
+			var bias := int(Time.get_time_zone_from_system().get("bias", 0))
+			snap.staff = StaffRegistry.touch_role(snap.staff, str(s.proj), str(e.agent_type), int(floor((float(e.t) + bias * 60.0) / 86400.0)))
 
 
 ## 관찰 모드: 수정 시각이 바뀐 .jsonl 만 이벤트로. 처음 보는 오래된 파일은 기억만 (하루 넘으면 세션도 안 만듦)

@@ -48,6 +48,7 @@ static func _new_session(e: Dictionary) -> Dictionary:
 		"jsonl": -1.0, "end_at": -1.0, "closed": false,   # closed = .jsonl 로 본 꺼짐 (다시 열면 풀림)
 		"agent_types": [],   # 서브에이전트 역할 이름 — 1.0 은 기록만 (5-1)
 		"subagents": 0, "envelopes": [],   # 끝난 서브에이전트 시각 (봉투 연출용, 최근 4개)
+		"subs": {},          # 지금 일하는 서브에이전트 {aid: {type, t, tool, tool_at}} — 역할 이름 있는 것만 (M6-1 전문가 직원)
 		"prompt_at": -1.0,   # 마지막으로 일을 준 시각 (UserPromptSubmit → 종이비행기 연출, v2.8 C4)
 	}
 
@@ -64,6 +65,8 @@ static func reduce(state: Dictionary, e: Dictionary) -> Dictionary:
 	if not ns.sessions.has(sid):
 		ns.sessions[sid] = _new_session(e)
 	var s: Dictionary = ns.sessions[sid]
+	if not s.has("subs"):
+		s.subs = {}   # M6-1 전의 저장 스냅샷
 	if ev == "jsonl":
 		var mt := float(e.get("mtime", t))
 		s.jsonl = maxf(float(s.jsonl), mt)
@@ -74,6 +77,7 @@ static func reduce(state: Dictionary, e: Dictionary) -> Dictionary:
 			s.last = maxf(float(s.last), mt)
 			s.bg = 0
 			s.subagents = 0
+			s.subs = {}
 			s.turn_at = -1.0
 			return ns
 		if bool(s.get("closed", false)) and s.phase == "off" and mt > float(s.end_at):
@@ -109,6 +113,10 @@ static func reduce(state: Dictionary, e: Dictionary) -> Dictionary:
 		"PostToolUse", "PostToolUseFailure":
 			s.tool = str(e.get("tool", ""))
 			s.tool_at = t
+			var sub_id := str(e.get("aid", ""))
+			if s.subs.has(sub_id):
+				s.subs[sub_id].tool = str(e.get("tool", ""))
+				s.subs[sub_id].tool_at = t
 			if ev == "PostToolUseFailure" and not bool(e.get("is_interrupt", false)):
 				s.fail_at = t
 			elif ev == "PostToolUseFailure":
@@ -146,8 +154,11 @@ static func reduce(state: Dictionary, e: Dictionary) -> Dictionary:
 			if at != "" and not (at in s.agent_types):
 				s.agent_types.append(at)
 			s.subagents = int(s.subagents) + 1
+			if at != "" and str(e.get("aid", "")) != "":   # 역할 이름 없는 것은 전문가로 안 보임 (실측: 빈 이름 Stop 38건)
+				s.subs[str(e.aid)] = {"type": at, "t": t, "tool": "", "tool_at": -1.0}
 		"SubagentStop":
 			s.subagents = maxi(0, int(s.subagents) - 1)
+			s.subs.erase(str(e.get("aid", "")))
 			s.envelopes.append(t)
 			if s.envelopes.size() > 4:
 				s.envelopes = s.envelopes.slice(-4)
@@ -158,6 +169,7 @@ static func reduce(state: Dictionary, e: Dictionary) -> Dictionary:
 			s.end_at = t
 			s.last = t
 			s.bg = 0
+			s.subs = {}
 	if ev in RELEASE and float(s.turn_at) >= 0.0:
 		_release(s, "signal", t)
 	return ns

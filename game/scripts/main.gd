@@ -457,9 +457,10 @@ func _setup_lights() -> void:
 	sun.rotation_degrees = Vector3(-38, 35, 0)
 	sun.light_color = Color("ffe1b8")
 	sun.light_energy = 1.35
-	sun.light_angular_distance = 1.2
+	sun.light_angular_distance = 2.5   # 해가 퍼져 보이는 정도 — 클수록 그림자 가장자리가 흐림 (M6-3)
 	sun.shadow_enabled = true
-	sun.shadow_blur = 1.5
+	sun.shadow_blur = 2.5
+	sun.shadow_opacity = 0.7   # 낮 그림자는 연하게 (밝은 사무실 비교, M6-3)
 	sun.directional_shadow_max_distance = 40.0
 	_sun = sun
 	_world.add_child(sun)

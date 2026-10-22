@@ -986,6 +986,31 @@ func _m3_routine(check: Callable) -> void:
 	check.call("M4 팀원 = 메인 세션 (먼저 연 a, 쉬어도 고정) · 인턴 = b · 인턴 내 차례 → 팀원이 대신 창구 (인턴은 대기)", str(vw.get("s:0", {}).get("sess", "")) == "a"
 			and vw.has("t:b") and vr["s:0"].state == "turn" and vr["s:0"].get("relay", "") == "b" and int(vr["s:0"].stage) == 1
 			and R.look_of(vr["s:0"]) == "turn15" and R.look_of(vr["t:b"], true, 1020.0) == "wait", str(vw.keys()))
+	var sp := [_ev(1000, "SessionStart", "a"), _ev(1001, "UserPromptSubmit", "a"), _ev(1002, "SubagentStart", "a", {"agent_type": "Explore", "aid": "x1"}),
+			_ev(1003, "SubagentStart", "a", {"agent_type": "", "aid": "x2"}), _ev(1004, "PostToolUse", "a", {"tool": "Read", "aid": "x1"})]
+	var vsp: Dictionary = R.views(AgentState.replay(sp), reg0, 1010.0)
+	var vsp_end: Dictionary = R.views(AgentState.replay(sp + [_ev(1011, "SubagentStop", "a", {"agent_type": "Explore", "aid": "x1"})]), reg0, 1012.0)
+	var tsp: Dictionary = R.targets(AgentState.replay(sp), reg0, 1010.0)
+	check.call("M6-1 전문가 직원: 역할 이름 있는 서브에이전트 = 손님 'x:aid' (이름 = 역할 · 도구 따라감 · 팀원은 부모) · 빈 이름은 안 보임 · 끝나면 사라짐 · 끝 신호 놓치면 무소식 뒤 사라짐",
+			vsp.has("x:x1") and not vsp.has("x:x2") and vsp["x:x1"].spec == "Explore" and vsp["x:x1"].tool == "Read" and int(vsp["x:x1"].staff) == 0
+			and vsp.has("s:0") and tsp["x:x1"].name == "Explore" and tsp["x:x1"].guest and R.look_of(vsp["x:x1"], true, 1010.0) == "wait"
+			and not vsp_end.has("x:x1") and not R.views(AgentState.replay(sp), reg0, 1004.0 + 1.0e5).has("x:x1"), str(vsp.keys()))
+	var wsp: Dictionary = R.targets(AgentState.replay(sp), reg0, 1010.0)
+	R.spec_looks(wsp, reg0, "salt1")
+	var wsp2: Dictionary = R.targets(AgentState.replay(sp), reg0, 1010.0)
+	R.spec_looks(wsp2, reg0, "salt1")
+	var wsp3: Dictionary = R.targets(AgentState.replay(sp), reg0, 1010.0)
+	R.spec_looks(wsp3, reg0, "salt2")
+	var rg := reg0
+	for d in [10, 10, 11, 12, 13, 14, 15]:   # 같은 날은 1일 · 서로 다른 날 6일 → 직급
+		rg = StaffRegistry.touch_role(rg, "p1", "Explore", d)
+	var wsp4: Dictionary = R.targets(AgentState.replay(sp), rg, 1010.0)
+	R.spec_looks(wsp4, rg, "salt1")
+	check.call("M6-4 전문가 고정 얼굴 (같은 솔트 = 같은 이름 · 모습, 다른 솔트 = 다름) · 명패 역할 줄 (PM · 전문가) · 역할 근속 5일 → 직급 · 옛 저장 호환",
+			wsp["x:x1"].hash == wsp2["x:x1"].hash and wsp["x:x1"].name == wsp2["x:x1"].name and str(wsp["x:x1"].role) == "전문가"
+			and wsp["s:0"].role == "PM" and not wsp["x:x1"].hash.is_empty() and StaffRegistry.role_days(rg, "p1", "Explore") == 6
+			and str(wsp4["x:x1"].role) == "전문가 주임" and wsp3["x:x1"].hash != wsp["x:x1"].hash
+			and StaffRegistry.migrate({"v": 1, "next": 0, "staff": []}).roles == {} and R.role_label("Explore") == "탐색" and R.role_label("mine") == "mine", str(wsp4["x:x1"].get("role")) + " " + str(StaffRegistry.role_days(rg, "p1", "Explore")))
 	check.call("M3 일과: 모든 표시 이름이 office LOOK 에 있음", table.all(func(t): return Office.LOOK.has(t)))
 	# 3초 유지 · 내 차례 즉시 · 끼어들기는 바로 (순수)
 	var sh := {"k": {"look": "work", "at": 10.0, "stage": 0}}
