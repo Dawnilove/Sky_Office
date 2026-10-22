@@ -22,6 +22,7 @@ const HOLD_S := 3.0           ## 깜빡임 방지: 한 번 바뀌면 3초 유지
 const DING_GAP_S := 30.0      ## '딩' 은 30초에 1번까지 (5-6)
 const ENVELOPE_MAX := 2       ## 봉투 동시 2개 (5-1)
 const INTERN_IDLE_S := 60.0   ## 인턴 (손님) 이 쉬면 1분 뒤 숨김 — 짧은 쉼에 깜빡이지 않게 (M3 4세션째 사용자 결정)
+const FAV_DAYS := 5           ## 전문가 단골 자리: 역할 근속 이만큼부터 늘 같은 책상을 먼저 (R5-lite, 직급이 붙는 날과 같음)
 const SPEC_MAX := 3           ## 한 세션에서 한꺼번에 보이는 전문가 (서브에이전트) 최대 (M6-1)
 const INTERN_MAX := 2        ## 대기 의자에 보이는 인턴 최대 (넘치면 '+N'). 내 차례 인턴은 상한 없이 창구로
 ## 프로젝트 색 (이름판 왼쪽 줄, M3 5세션째) — 상태 색 (노랑 · 초록 · 하늘색 · 회색) 과 안 헷갈리는 차분한 6색, 직원 id 순서
@@ -65,6 +66,7 @@ var hover_i := -1
 var _acc := 0.0
 var _hover_acc := 0.0
 var _started := false
+var _bound := {}              ## 세션 → 맡은 직원 id (살아 있는 동안 유지, 저장 안 함 — 1.1 풀 B)
 var _reg := {}                ## 마지막 직원 기록 (이름판 프로젝트 이름 찾기)
 var borrowed := {}            ## 인턴 키 → 빌린 책상 번호 (M3 5세션째)
 var known := {}               ## 직원 id → {"leave", "desk"} — 짐 상자 (입사 · 송별, M5) 판단용
@@ -105,9 +107,9 @@ func refresh() -> void:
 ##   팀원 (책상 직원) = 그 조합의 메인 세션 = 살아 있는 세션 중 먼저 연 것 (assign, 고정 — 급한 순으로 안 바뀜). 메인이 퇴근하면 다음 세션이 승격
 ##   인턴 = 같은 조합의 나머지 세션 (데스크톱 하위 세션 포함 — 훅에 부모 정보가 없어 같은 프로젝트로 묶음). M4 사용자 결정:
 ##   "팀원은 메인 세션을 맡고, 인턴은 그 하위 세션. 하위 세션은 팀원을 통해서만 보고" → 인턴 '내 차례' 는 팀원이 창구로 (relay = 인턴 세션)
-static func views(agent: Dictionary, reg: Dictionary, now: float) -> Dictionary:
+static func views(agent: Dictionary, reg: Dictionary, now: float, prev := {}) -> Dictionary:
 	var dec := AgentState.decide(agent, now)
-	var asg := StaffRegistry.assign(reg, agent, now)
+	var asg := StaffRegistry.assign(reg, agent, now, prev)
 	var out := {}
 	for sid in asg:
 		var a: Dictionary = asg[sid]
@@ -115,7 +117,12 @@ static func views(agent: Dictionary, reg: Dictionary, now: float) -> Dictionary:
 		var v: Dictionary = dec[sid].duplicate()
 		v.staff = int(a.staff)
 		v.temp = bool(a.temp)
+		v.solo = bool(a.solo)      # 직원 없는 인턴 (책상 직원이 모자람): 보고할 팀원이 없어 내 차례면 직접 창구로
+		v.cover = bool(a.cover)    # 지원 근무: 단골이 아닌 프로젝트를 맡은 책상 직원
 		v.sess = str(sid)
+		v.agent = str(agent.sessions[sid].agent)
+		v.proj = str(agent.sessions[sid].proj)
+		v.model = str(agent.sessions[sid].get("model", ""))
 		out[key] = v
 	for sid in asg:   # 전문가 (M6-1): 일하는 서브에이전트 = 손님 직원 "x:aid" (이름 = 역할, 인턴과 같은 대기 의자 · 빈 책상 빌리기). 무소식 12분이면 끝 신호를 놓친 것으로 봄
 		var sess: Dictionary = agent.sessions[sid]
@@ -126,7 +133,7 @@ static func views(agent: Dictionary, reg: Dictionary, now: float) -> Dictionary:
 		ids.sort_custom(func(a, b): return float(subs[a].t) < float(subs[b].t))
 		for aid in ids.slice(0, SPEC_MAX):
 			var sv := {"state": "work", "since": float(subs[aid].t), "stage": 0, "tool": str(subs[aid].tool), "fail": false, "stop": false,
-					"check": false, "long": false, "guess": false, "staff": int(asg[sid].staff), "temp": true, "sess": str(sid), "spec": str(subs[aid].type)}
+					"check": false, "long": false, "guess": false, "staff": int(asg[sid].staff), "temp": true, "sess": str(sid), "spec": str(subs[aid].type), "proj": str(sess.proj)}
 			out["x:" + str(aid)] = sv
 	for key in out:   # 인턴 보고 → 팀원: 인턴이 내 차례면 팀원이 대신 창구로 (둘 다면 먼저 부른 쪽 시각)
 		var v: Dictionary = out[key]
@@ -158,7 +165,7 @@ static func look_of(v: Dictionary, guest := false, now := -1.0) -> String:
 			look = "done0"   # 끝 0~30초: 자리에서 기지개 + ✓
 		"rest":
 			look = "done" if bool(v.check) else "rest"   # 30초 뒤 휴게 코너 (✓ 는 30분까지)
-	if guest and bool(v.get("temp", false)) and look in TURN_LOOKS:
+	if guest and bool(v.get("temp", false)) and not bool(v.get("solo", false)) and look in TURN_LOOKS:
 		look = "wait"   # 인턴은 창구에 안 감 — 팀원이 대신 (views relay)
 	elif guest and not (look in TURN_LOOKS or look == "off"):
 		var idle := not (look in BUSY)
@@ -191,7 +198,8 @@ static func cap_interns(want: Dictionary, cur: Dictionary) -> int:
 
 ## 인턴 책상 빌려 앉기 (M3 5세션째 사용자 결정): 주인이 퇴근한 빈 책상 (free) 을 인턴에게 → {키: 책상 번호}.
 ##   이미 빌린 책상이 아직 비어 있으면 그대로 (자리 안 바뀌게), 새로 빌리는 건 일하는 인턴만 (일함 · 내 차례 먼저, 그다음 키 순)
-static func borrow_plan(want: Dictionary, free: Array, cur: Dictionary) -> Dictionary:
+##   단골 자리 (1.1 R5-lite): 근속 5일 넘은 전문가 (fav_key) 는 새로 빌릴 때 늘 같은 책상 (fav_key % 책상 수) 이 비었으면 그 자리 먼저 — 주인 아님, 저장 안 함
+static func borrow_plan(want: Dictionary, free: Array, cur: Dictionary, n_desks := 0) -> Dictionary:
 	var out := {}
 	var left := free.duplicate()
 	var can := func(k) -> bool: return want.has(k) and bool(want[k].get("guest", false)) and not (str(want[k].look) in ["off", "hide"])
@@ -207,13 +215,18 @@ static func borrow_plan(want: Dictionary, free: Array, cur: Dictionary) -> Dicti
 	for k in ks:
 		if left.is_empty():
 			break
-		out[k] = left.pop_front()
+		var fav: int = int(want[k].get("fav_key", -1)) % n_desks if n_desks > 0 and int(want[k].get("fav_key", -1)) >= 0 else -1
+		if fav in left:
+			out[k] = fav
+			left.erase(fav)
+		else:
+			out[k] = left.pop_front()
 	return out
 
 
 ## 모든 직원의 바라는 표시: {키: {look, stage, guest, desk, staff, name, sess, v}}. 휴직 직원 빼고, 세션 없으면 off (퇴근)
 ##   lks = staff_hash.staff_looks 결과 (없으면 예전 이름 목록)
-static func targets(agent: Dictionary, reg: Dictionary, now: float, lks := {}) -> Dictionary:
+static func targets(agent: Dictionary, reg: Dictionary, now: float, lks := {}, prev := {}) -> Dictionary:
 	var out := {}
 	for st in reg.staff:
 		if st.leave:
@@ -222,7 +235,7 @@ static func targets(agent: Dictionary, reg: Dictionary, now: float, lks := {}) -
 		var lk: Dictionary = lks.get(id, {})
 		out["s:%d" % id] = {"look": "off", "stage": 0, "guest": int(st.desk) < 0, "desk": int(st.desk), "staff": id,
 				"name": str(lk.get("name", Office.name_of(id))), "team": str(lk.get("team", "")), "hash": lk.get("look", {}), "sess": "", "v": {}}
-	var vs := views(agent, reg, now)
+	var vs := views(agent, reg, now, prev)
 	for key in vs:
 		var v: Dictionary = vs[key]
 		var st := StaffRegistry.staff_by_id(reg, int(v.staff))
@@ -255,15 +268,17 @@ static func spec_looks(want: Dictionary, reg: Dictionary, salt: String) -> void:
 		var w: Dictionary = want[k]
 		var is_spec: bool = (w.get("v", {}) as Dictionary).has("spec")
 		if is_spec:
-			var proj := str(StaffRegistry.staff_by_id(reg, int(w.staff)).get("proj", ""))
+			var proj := str(w.v.get("proj", StaffRegistry.staff_by_id(reg, int(w.staff)).get("proj", "")))
 			var role := str(w.v.spec)
 			var lk := StaffHash.look(salt, "spec:" + role, proj)
 			w.hash = lk
 			w.name = StaffHash.NAMES[int(lk.name)]
-			var title: String = Office.rank_title(StaffRegistry.role_days(reg, proj, role))
-			w.role = "전문가" if title in ["", "사원"] else "전문가 " + title
+			var days := StaffRegistry.role_days(reg, proj, role)
+			if days >= FAV_DAYS:
+				w.fav_key = absi((proj + "|" + role).hash())   # 단골 자리 (R5-lite)
+			w.role = role_label(role) + " 전문가"   # 직책 = 전문가 (직급 주임 등은 안 붙임, 이름도 안 넣음 — 사용자 2026-10-22). 근속일은 저장만
 		elif not bool(w.get("guest", true)) and int(w.get("desk", -1)) >= 0:
-			w.role = "PM"
+			w.role = "PM (지원)" if bool(w.get("v", {}).get("cover", false)) else "PM"
 
 
 ## 3초 유지 (결정 7): 바뀐 지 3초가 안 됐으면 그대로. 내 차례 · 끼어들기 · 출근은 바로.
@@ -362,8 +377,13 @@ func apply(agent: Dictionary, reg: Dictionary, now: float) -> void:
 	_reg = reg
 	staff_moves(reg)
 	looks = StaffHash.staff_looks(reg, str(Game.firm.salt), Game.firm.plates)
-	var want := targets(agent, reg, now, looks)
+	var want := targets(agent, reg, now, looks, _bound)
 	spec_looks(want, reg, str(Game.firm.salt))
+	_bound = {}
+	for k in want:   # 붙은 배정 (살아 있는 세션 동안 직원을 안 바꿈, 저장 안 함)
+		var wv: Dictionary = want[k].get("v", {})
+		if wv.has("sess") and not bool(wv.temp) and not wv.has("spec"):
+			_bound[str(wv.sess)] = int(wv.staff)
 	var free := []   # 주인이 퇴근한 책상 (주인도 off 로 바라고, 화면에서도 off · 걷는 중 아님)
 	for j in office.desk_count:
 		var owner_off := true
@@ -372,7 +392,7 @@ func apply(agent: Dictionary, reg: Dictionary, now: float) -> void:
 				owner_off = false
 		if owner_off and office.staff[j].state == "off" and not office.is_leaving(j):
 			free.append(j)
-	borrowed = borrow_plan(want, free, borrowed)
+	borrowed = borrow_plan(want, free, borrowed, office.desk_count)
 	for k in borrowed:
 		want[k].borrow = borrowed[k]
 		if str(want[k].v.get("state", "")) in ["work", "watch", "unknown"]:
@@ -474,7 +494,10 @@ func _bind(want: Dictionary) -> void:
 		if not (w.get("hash", {}) as Dictionary).is_empty() and i < office.desk_count:
 			office.set_look(i, w.hash)
 		office.set_staff_project(i, _project_of(w))
-		office.set_staff_color(i, PROJECT_COLORS[int(w.staff) % PROJECT_COLORS.size()])
+		var wv2: Dictionary = w.get("v", {})
+		var ckey: int = StaffRegistry.color_key(_reg, str(wv2.agent), str(wv2.proj)) if wv2.has("proj") and wv2.has("agent") else int(w.staff)
+		office.set_staff_color(i, PROJECT_COLORS[ckey % PROJECT_COLORS.size()])
+		office.set_staff_agent(i, str(wv2.get("agent", "")))
 		if i >= office.desk_count:
 			office.set_borrow(i, int(w.get("borrow", -1)))
 
@@ -486,7 +509,7 @@ func _project_of(w: Dictionary) -> String:
 	if watch == null or not bool(Game.settings.get("show_project", true)):
 		return ""
 	var st := StaffRegistry.staff_by_id(_reg, int(w.staff))
-	return str(watch.labels.get(str(st.get("proj", "")), ""))
+	return str(watch.labels.get(str(w.get("v", {}).get("proj", st.get("proj", ""))), ""))
 
 
 func _free_guest() -> int:
@@ -515,7 +538,7 @@ func _envelopes(agent: Dictionary, want: Dictionary) -> void:
 			continue   # 전문가 (M6-1) 의 봉투 · 종이비행기 · 보고는 부모 키가 맡음
 		var s: Dictionary = agent.sessions[sid]
 		var to := str(k)
-		if bool(want[k].get("v", {}).get("temp", false)):
+		if bool(want[k].get("v", {}).get("temp", false)) and not bool(want[k].get("v", {}).get("solo", false)):
 			to = "s:%d" % int(want[k].staff)
 		var news := []
 		var last := float(seen_env.get(sid, -1.0))

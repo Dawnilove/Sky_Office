@@ -34,6 +34,15 @@ static func stage_days() -> Array:
 	return stage_data().stages.map(func(s) -> int: return int(s.days))
 
 
+## 단계 번호 → 사무실 크기 (지름). stages.json 의 diameter 중 그 단계까지 가장 큰 값, 없으면 10 (1.1 증축 — 켤 때 적용)
+static func diameter_for(stage: int) -> int:
+	var d := 10
+	var st: Array = stage_data().stages
+	for i in mini(stage + 1, st.size()):
+		d = maxi(d, int(st[i].get("diameter", 10)))
+	return d
+
+
 ## 단계 번호 → 그때까지 생긴 것 (unlock 누적)
 static func unlocked(stage: int) -> Array:
 	var out: Array = []

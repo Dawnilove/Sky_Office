@@ -30,6 +30,8 @@ const FirmUI := preload("res://scripts/ui/firm_ui.gd")
 const Phone := preload("res://scripts/world/phone.gd")
 const PhoneUI := preload("res://scripts/ui/phone_ui.gd")
 const BoardUI := preload("res://scripts/ui/board_ui.gd")
+const CommandRunner := preload("res://scripts/world/command_runner.gd")
+const CommandUI := preload("res://scripts/ui/command_ui.gd")
 ## 높이: 섬은 창 위쪽 645 까지만 그려져서 아래 빈 하늘을 잘라 1000 → 740 (M5: 회사 크기가 1080p 에서 134% 에 걸리던 것 → 180%)
 const BASE_SIZE := Vector2i(1080, 740)
 const CAM_V_SHIFT := 130.0   ## 잘라 낸 높이의 절반 (px) → 카메라를 그만큼 올려 섬이 창 위에서 예전 자리에
@@ -88,6 +90,14 @@ func _ready() -> void:
 	_setup_lights()
 
 	var diameter := 10
+	var stage_arg := -1   # 개발 `--stage=N`: 그 단계의 크기로 (증축 그림 · 확인용)
+	for a in Game.dev_args():
+		if a.begins_with("--stage="):
+			stage_arg = int(a.get_slice("=", 1))
+	if stage_arg >= 0:
+		diameter = Company.diameter_for(stage_arg)
+	elif not ("--offscreen" in Game.dev_args() or "--demo" in Game.dev_args()):
+		diameter = Company.diameter_for(int(Game.company.get("shown_stage", 0)))   # 1.1 증축: 저장된 단계의 크기로 켬 (다음에 켤 때 적용)
 	for a in Game.dev_args():
 		if a.begins_with("--diameter="):
 			diameter = int(a.get_slice("=", 1))
@@ -219,7 +229,7 @@ func _ready() -> void:
 		if not "--demo" in Game.dev_args():   # 개발용 `--demo`: 실제 신호를 안 봄 → --states · --act 로 정한 모습 그대로 (실화면 확인, M4 4세션째)
 			watch = AgentWatch.new()   # inbox · 관찰 모드 → %USERPROFILE%\.skyoffice\state.json
 			watch.name = "AgentWatch"
-			watch.setup(AgentWatch.home().path_join(".skyoffice"), AgentWatch.home().path_join(".claude/projects"), layout.desks().size())
+			watch.setup(AgentWatch.home().path_join(".skyoffice"), AgentWatch.home().path_join(".claude/projects"), layout.desks().size(), AgentWatch.load_tools(AgentWatch.home()))
 			add_child(watch)
 			company = Company.new()   # 근무일 · 게임 하루 (5시간 창 추정 + 훅 보정, M5)
 			company.name = "Company"
@@ -255,7 +265,20 @@ func _ready() -> void:
 	add_child(board_ui)
 	board_ui.setup(ui, office, routine)
 	window_ctl.click_handler = func(p: Vector2) -> bool: return phone_ui.click(p) or board_ui.click(p)
-	firm_ui.close_section = phone_ui.close_section
+	command_runner = CommandRunner.new()   # 게임 안 한 줄 명령 (로드맵 ⑤) — 설정에서 켜기 전엔 아무것도 안 보임
+	command_runner.name = "CommandRunner"
+	add_child(command_runner)
+	command_runner.setup(watch)
+	command_ui = CommandUI.new()
+	command_ui.name = "CommandUI"
+	add_child(command_ui)
+	command_ui.setup(ui, command_runner, firm_ui)
+	ui.register_panel("phone", "전화 · 연결 상태", func(body: VBoxContainer) -> void:
+		phone_ui.panel(body)
+		command_ui.entry(body))
+	firm_ui.close_section = func(body: VBoxContainer) -> void:
+		command_ui.settings_section(body)
+		phone_ui.close_section(body)
 	for a in Game.dev_args():
 		if a.begins_with("--phone="):   # 개발용: 전화기 모습 (none · on · broken) — 그림
 			var ps := a.get_slice("=", 1)
@@ -279,6 +302,10 @@ func _ready() -> void:
 		var sc: Node = load("res://scripts/dev/scenario.gd").new()
 		sc.main = self
 		add_child(sc)
+	if "--command-check" in Game.dev_args() or "--command-real" in Game.dev_args():   # 개발용: 게임 안 한 줄 명령 점검 (가짜 claude, 토큰 0 — scripts/dev/command_check.gd)
+		var cc: Node = load("res://scripts/dev/command_check.gd").new()
+		cc.main = self
+		add_child(cc)
 	for a in Game.dev_args():   # 개발용: 하루 빨리 보기 (`--fast-day[=녹화.jsonl]`, scripts/dev/fast_day.gd, M5 5세션째)
 		if a == "--fast-day" or a.begins_with("--fast-day="):
 			var fd: Node = load("res://scripts/dev/fast_day.gd").new()
@@ -325,6 +352,8 @@ var firm_ui: Node             ## 창업 화면 · 입사식 · 결재함 · 돌�
 var phone: Node               ## 전화 = 플러그인 · 무결성 · 연결 상태 (phone.gd, M5 4세션째)
 var phone_ui: Node            ## 연결 상태 패널 · 개통 안내 · 폐업 정리 카드 (phone_ui.gd)
 var board_ui: Node            ## 게시판 큰 창 (board_ui.gd)
+var command_runner: Node      ## 게임 안 한 줄 명령 (로드맵 ⑤, 선택 기능 · 기본 꺼짐)
+var command_ui: Node
 
 
 ## 창 크기 = 기본 + 확장 섬 여백 (섬 크기 설정 반영, 모니터보다 넓으면 줄임)

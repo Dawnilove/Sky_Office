@@ -130,6 +130,19 @@
         ]
       }
     ],
+    "PostModelSwitch": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/bell.exe",
+            "args": [],
+            "async": true,
+            "timeout": 5
+          }
+        ]
+      }
+    ],
     "SessionEnd": [
       {
         "hooks": [

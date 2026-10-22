@@ -23,6 +23,9 @@ static class Bell
         try { tStart = Process.GetCurrentProcess().StartTime.ToUniversalTime().Ticks; } catch { }
 
         bool record = Array.IndexOf(args, "--record") >= 0;
+        // --agent codex : Codex 훅 입력 (필드가 Claude 와 거의 같음). 직원 키 = 도구 이름 (관찰 모드와 같음)
+        int ai = Array.IndexOf(args, "--agent");
+        string agent = ai >= 0 && ai + 1 < args.Length ? Clean(args[ai + 1]).ToLowerInvariant() : "";
         byte[] input = ReadAll(Console.OpenStandardInput());
 
         var buf = new ArrayBufferWriter<byte>(1024);
@@ -39,7 +42,7 @@ static class Bell
             try
             {
                 using var doc = JsonDocument.Parse(input);
-                WriteAllowed(j, doc.RootElement);
+                WriteAllowed(j, doc.RootElement, agent);
                 if (record) WriteShape(j, doc.RootElement);
             }
             catch
@@ -52,6 +55,9 @@ static class Bell
         }
 
         string dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".skyoffice", "inbox");
+#if TESTINBOX   // 시험 빌드 전용 (배포 빌드에는 없음): 실제 inbox 를 건드리지 않고 시험
+        dir = Environment.GetEnvironmentVariable("SKYOFFICE_TEST_INBOX") ?? dir;
+#endif
         Directory.CreateDirectory(dir);
         string name = DateTime.UtcNow.Ticks.ToString("D19") + "-" + Environment.ProcessId;
         string tmp = Path.Combine(dir, "." + name + ".tmp");
@@ -67,11 +73,17 @@ static class Bell
     }
 
     // 허용한 필드만 (PLAN 7-2). 나머지(프롬프트·명령·파일 내용 등)는 읽지 않고 버린다.
-    static void WriteAllowed(Utf8JsonWriter j, JsonElement r)
+    static void WriteAllowed(Utf8JsonWriter j, JsonElement r, string agent)
     {
         if (r.ValueKind != JsonValueKind.Object) return;
 
-        PutEnum(j, r, "hook_event_name", "event");
+        bool interrupt = agent == "codex" && Str(r, "hook_event_name") == "Interrupt";
+        if (interrupt) j.WriteString("event", "Stop");   // Esc 중단 = 끝 + is_interrupt (게임 상태기계는 그대로)
+        else PutEnum(j, r, "hook_event_name", "event");
+        if (agent.Length > 0) j.WriteString("agent", agent);
+        // 모델 칩: Codex 는 모든 이벤트의 model, Claude 는 SessionStart 의 model · PostModelSwitch 의 to_model
+        if ((Str(r, "model") ?? Str(r, "to_model")) is string mdl && CleanModel(mdl) is { Length: > 0 } cm)
+            j.WriteString("model", cm);
         PutEnum(j, r, "notification_type", "ntype");
         PutEnum(j, r, "source", "source");          // SessionStart
         PutEnum(j, r, "reason", "reason");          // SessionEnd
@@ -85,7 +97,8 @@ static class Bell
         if (Str(r, "tool_name") is string tool)
             j.WriteString("tool", tool.StartsWith("mcp__", StringComparison.Ordinal) ? "MCP" : Clean(tool));
 
-        if (Str(r, "session_id") is string sid) j.WriteString("sid", Hash(sid));
+        string? sidRaw = Str(r, "session_id");
+        if (sidRaw is not null) j.WriteString("sid", Hash(sidRaw));
         if (Str(r, "agent_id") is string aid) j.WriteString("aid", Hash(aid));
 
         // 직원 키 (7-3): 프로젝트 = transcript 부모 폴더 이름 해시, 세션 = 파일 이름 해시
@@ -93,9 +106,15 @@ static class Bell
         {
             string trimmed = tp.TrimEnd('\\', '/');
             string? parent = Path.GetDirectoryName(trimmed);
-            j.WriteString("proj", Hash(parent is null ? "" : Path.GetFileName(parent)));
+            j.WriteString("proj", agent.Length > 0 ? Hash(agent) : Hash(parent is null ? "" : Path.GetFileName(parent)));
             j.WriteString("sess", Hash(Path.GetFileNameWithoutExtension(trimmed)));
             j.WriteBoolean("tp_in_claude_projects", trimmed.Replace('\\', '/').Contains("/.claude/projects/", StringComparison.OrdinalIgnoreCase));
+        }
+
+        else if (agent.Length > 0 && sidRaw is not null)
+        {
+            j.WriteString("proj", Hash(agent));
+            j.WriteString("sess", Hash(sidRaw));   // transcript_path 가 null 이면 session_id 로 (관찰 모드 키와 어긋나도 직원 1명은 같음)
         }
 
         // 표시용 작업 폴더 끝 이름 (한글 확인용)
@@ -105,7 +124,8 @@ static class Bell
             j.WriteString("folder", last.Length > 80 ? last[..80] : last);
         }
 
-        if (r.TryGetProperty("is_interrupt", out var ii) && ii.ValueKind is JsonValueKind.True or JsonValueKind.False)
+        if (interrupt) j.WriteBoolean("is_interrupt", true);
+        else if (r.TryGetProperty("is_interrupt", out var ii) && ii.ValueKind is JsonValueKind.True or JsonValueKind.False)
             j.WriteBoolean("is_interrupt", ii.GetBoolean());
         if (r.TryGetProperty("stop_hook_active", out var sha) && sha.ValueKind is JsonValueKind.True or JsonValueKind.False)
             j.WriteBoolean("stop_hook_active", sha.GetBoolean());
@@ -184,6 +204,18 @@ static class Bell
         {
             if (sb.Length >= 64) break;
             if (c is (>= 'a' and <= 'z') or (>= 'A' and <= 'Z') or (>= '0' and <= '9') or '_' or '-') sb.Append(c);
+        }
+        return sb.ToString();
+    }
+
+    // 모델 이름: 영문·숫자·_ - . : / 만, 40자 (gpt-5.1 같은 이름의 '.' 을 지우지 않으려고 Clean 과 따로)
+    static string CleanModel(string s)
+    {
+        var sb = new StringBuilder(Math.Min(s.Length, 40));
+        foreach (char c in s)
+        {
+            if (sb.Length >= 40) break;
+            if (c is (>= 'a' and <= 'z') or (>= 'A' and <= 'Z') or (>= '0' and <= '9') or '_' or '-' or '.' or ':' or '/') sb.Append(c);
         }
         return sb.ToString();
     }

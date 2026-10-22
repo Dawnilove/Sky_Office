@@ -6,7 +6,10 @@
 		{"group": "창업", "name": "첫 결과물", "days": 6, "unlock": ["whiteboard"], "say": "화이트보드 코너가 생겼어요"},
 		{"group": "스타트업", "name": "첫 투자", "days": 10, "big": true, "unlock": ["desk_real", "chair_new", "sign_new"], "say": "진짜 책상 · 새 의자 · 새 간판"},
 		{"group": "스타트업", "name": "서비스 출시", "days": 14, "unlock": ["server_rack"], "say": "서버 랙이 들어왔어요"},
-		{"group": "스타트업", "name": "첫 사용자", "days": 20, "unlock": ["telescope", "personal_shelf"], "say": "망원경 · 개인 소품 칸"}
+		{"group": "스타트업", "name": "첫 사용자", "days": 20, "unlock": ["telescope", "personal_shelf"], "say": "망원경 · 개인 소품 칸"},
+		{"group": "중소기업", "name": "법인 성장", "days": 28, "big": true, "diameter": 11, "unlock": [], "say": "다음에 켤 때 사무실이 커져요"},
+		{"group": "중소기업", "name": "탕비실 정비", "days": 36, "unlock": ["pantry_upgrade", "table4"], "say": "탕비실이 새로 꾸며졌어요"},
+		{"group": "중소기업", "name": "야근 문화", "days": 44, "unlock": ["sleep_pod"], "say": "수면 캡슐이 들어왔어요"}
 	],
 	"_looks": "unlock 전 재질 (재질 이름 → 색). desk_real 전 = 박스 책상 (골판지) · chair_new 전 = 낡은 의자",
 	"looks": {

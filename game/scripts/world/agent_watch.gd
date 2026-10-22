@@ -16,10 +16,12 @@ const AgentState := preload("res://scripts/world/agent_state.gd")
 const StaffRegistry := preload("res://scripts/world/staff_registry.gd")
 const VERSION := 1
 const TICKS_UNIX := 621355968000000000   ## 1970-01-01 의 .NET 틱 (bell 파일 이름 · t_start)
+const TOOLS_JSON := "res://data/watch_tools.json"
+static var _styles := {}
 const MAX_FILES := 200
 const MAX_AGE_S := 86400.0
 ## bell 줄에서 꺼내는 필드 (tools/replay_fixture.py 와 같음). 폴더 이름 · 모양 정보 (_shape) 는 버림
-const KEEP := ["event", "sess", "proj", "ntype", "tool", "bg_running", "is_interrupt", "agent_type", "aid", "reason", "error_kind"]
+const KEEP := ["event", "sess", "proj", "ntype", "tool", "bg_running", "is_interrupt", "agent_type", "aid", "reason", "error_kind", "agent", "model"]
 ## 직원이 아닌 프로젝트 폴더 (Claude 임시 폴더: claude -p · 스크래치 작업 공간) — ~/.claude/projects 폴더 이름 안 글자
 const SKIP_DIRS := ["-AppData-Local-Temp", "-AppData-Roaming-Claude-scratch-workspaces-"]
 const WORKTREE := "--claude-worktrees-"   ## <프로젝트>\.claude\worktrees\<이름> → 원래 프로젝트 직원
@@ -30,6 +32,7 @@ const RECENT_MAX := 10   ## 연결 상태 패널 '최근 신호' (이벤트 이�
 
 var base := ""             ## %USERPROFILE%\.skyoffice (inbox · state.json)
 var projects := ""         ## ~/.claude/projects ("" = 관찰 모드 끔)
+var tools: Array = []      ## 다른 도구 감시 목록 [{agent, glob, sess_by}] (load_tools, [] = 끔). 도구별 직원 1명 · 수정 시각만
 var desks := 4             ## 책상 수 (layout.desks().size())
 var paused := false        ## true = inbox 처리 멈춤 (무결성 경고, M5)
 var snap := {}
@@ -134,9 +137,59 @@ static func to_event(line: Variant) -> Dictionary:
 	return e
 
 
-func setup(base_dir: String, projects_dir := "", desk_count := 4) -> void:
+## 다른 도구 목록 (data/watch_tools.json): glob 의 ~ 를 home 으로 바꿔 돌려줌. 파일이 없거나 깨졌으면 []
+static func load_tools(home_dir: String) -> Array:
+	var data = JSON.parse_string(FileAccess.get_file_as_string(TOOLS_JSON))
+	var out := []
+	if typeof(data) == TYPE_DICTIONARY and typeof(data.get("tools")) == TYPE_ARRAY:
+		for t in data.tools:
+			if typeof(t) == TYPE_DICTIONARY and t.has("agent") and t.has("glob"):
+				out.append({"agent": str(t.agent), "sess_by": str(t.get("sess_by", "path")), "glob": str(t.glob).replace("~", home_dir.replace("\\", "/"))})
+	return out
+
+
+## 도구 이름 → {icon, chair} (명패 기호 · 의자 색, Claude 는 {}). office 가 부름
+static func tool_style(agent: String) -> Dictionary:
+	if _styles.is_empty():
+		var data = JSON.parse_string(FileAccess.get_file_as_string(TOOLS_JSON))
+		_styles = {"": {}}
+		if typeof(data) == TYPE_DICTIONARY and typeof(data.get("tools")) == TYPE_ARRAY:
+			for t in data.tools:
+				if typeof(t) == TYPE_DICTIONARY and t.has("agent"):
+					_styles[str(t.agent)] = {"icon": str(t.get("icon", "")), "chair": str(t.get("chair", ""))}
+	return _styles.get(agent, {})
+
+
+## glob (/ 로 나눈 칸마다 * 가능) 에 맞는 파일 경로. 글자만 있는 칸은 목록 없이 바로 내려감 (.system_generated 같은 숨김 폴더도 됨)
+static func glob_files(dir: String, segs: PackedStringArray) -> Array:
+	var out := []
+	if segs.is_empty():
+		return out
+	var seg := segs[0]
+	if segs.size() == 1:
+		if "*" in seg:
+			for f in DirAccess.get_files_at(dir):
+				if f.match(seg):
+					out.append(dir.path_join(f))
+		elif FileAccess.file_exists(dir.path_join(seg)):
+			out.append(dir.path_join(seg))
+		return out
+	var subs := []
+	if "*" in seg:
+		for d in DirAccess.get_directories_at(dir):
+			if d.match(seg):
+				subs.append(d)
+	else:
+		subs.append(seg)
+	for d in subs:
+		out.append_array(glob_files(dir.path_join(d), segs.slice(1)))
+	return out
+
+
+func setup(base_dir: String, projects_dir := "", desk_count := 4, tool_list := []) -> void:
 	base = base_dir
 	projects = projects_dir
+	tools = tool_list
 	desks = desk_count
 	DirAccess.make_dir_recursive_absolute(inbox_dir())
 	snap = _load()
@@ -168,10 +221,10 @@ func tick(now: float) -> bool:
 		_build_alias()
 	if not paused:
 		done = _read_inbox(now)
-	if scan:
+	if scan or not tools.is_empty():
 		_scan_projects(now)
 	snap.agent = AgentState.prune(snap.agent, now)
-	snap.staff = StaffRegistry.sync(snap.staff, desks, now)
+	snap.staff = StaffRegistry.sync(snap.staff, desks, now, StaffRegistry.serving(snap.staff, snap.agent, now))
 	if not done.is_empty():
 		snap.batch = done
 	var changed: bool = snap != before
@@ -272,7 +325,7 @@ func _apply(e: Dictionary, now: float) -> void:
 		activity.emit(kind, float(e.t))
 	var s: Dictionary = snap.agent.sessions.get(str(e.get("sess", "")), {})
 	if not s.is_empty():   # 세션 → 프로젝트는 첫 신호에서 고정 (7-3)
-		snap.staff = StaffRegistry.touch(snap.staff, str(s.agent), str(s.proj), float(e.t), now)
+		snap.staff = StaffRegistry.touch(snap.staff, str(s.agent), str(s.proj), float(e.t), now, desks)
 		if str(e.get("event", "")) == "SubagentStart" and str(e.get("agent_type", "")) != "" and str(e.get("aid", "")) != "":
 			var bias := int(Time.get_time_zone_from_system().get("bias", 0))
 			snap.staff = StaffRegistry.touch_role(snap.staff, str(s.proj), str(e.agent_type), int(floor((float(e.t) + bias * 60.0) / 86400.0)))
@@ -282,7 +335,17 @@ func _apply(e: Dictionary, now: float) -> void:
 func _scan_projects(now: float) -> void:
 	var seen := {}
 	var fresh := []   # 이번에 수정 시각이 바뀐 파일 → 한꺼번에 바뀐 것인지 본 뒤 적용
-	for folder in DirAccess.get_directories_at(projects):
+	for tl in tools:   # 다른 도구: 직원 키 = 도구 이름 (프로젝트 구분 없음), 세션 키 = 파일 경로 해시, 꺼짐 확인 없음 (내용 안 읽음)
+		var segs: PackedStringArray = str(tl.glob).split("/")
+		var agent := str(tl.agent)
+		for path in glob_files(segs[0], segs.slice(1)):
+			var sess_id := hash16(path.get_file().get_basename() if str(tl.get("sess_by", "path")) == "name" else path)   # name = 훅 (bell) 과 같은 키: 파일 이름 해시
+			var key := agent + "/" + sess_id
+			var mt := float(FileAccess.get_modified_time(path))
+			seen[key] = mt
+			if mt > float(snap.seen.get(key, -1.0)):
+				fresh.append({"t": mt, "event": "jsonl", "mtime": mt, "sess": sess_id, "proj": hash16(agent), "agent": agent, "closed": false})
+	for folder in (DirAccess.get_directories_at(projects) if DirAccess.dir_exists_absolute(projects) else PackedStringArray()):
 		var proj := hash16(folder)
 		var canon := canon_folder(folder)
 		var dir := projects.path_join(folder)
@@ -305,7 +368,7 @@ func _scan_projects(now: float) -> void:
 		if now - float(e.t) < float(AgentState.timings().forget_off_s):
 			_apply(e, now)
 		else:
-			snap.staff = StaffRegistry.touch(snap.staff, "claude", e.proj, e.t, now)   # 첫 실행: 최근 2주 조합만 입사
+			snap.staff = StaffRegistry.touch(snap.staff, str(e.get("agent", "claude")), e.proj, e.t, now, desks)   # 첫 실행: 최근 2주 조합만 입사
 	snap.seen = seen   # 지워진 파일은 잊음
 
 

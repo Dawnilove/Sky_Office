@@ -16,9 +16,9 @@ const PRIORITY := ["turn", "unknown", "work", "watch", "done", "rest", "off"]
 const RELEASE := ["UserPromptSubmit", "Stop", "StopFailure", "SessionEnd"]
 ## 하는 일이 있다는 신호 (무소식 시계를 다시 맞춤)
 const ACTIVE := ["UserPromptSubmit", "PostToolUse", "PostToolUseFailure", "SubagentStart", "SubagentStop", "PreCompact"]
-## 처리하는 이벤트 (7-4 등록 훅 11개 + 관찰 모드). 나머지는 무시
+## 처리하는 이벤트 (7-4 등록 훅 11개 + PostModelSwitch (모델 칩) + 관찰 모드). 나머지는 무시
 const KNOWN := ["SessionStart", "UserPromptSubmit", "PostToolUse", "PostToolUseFailure", "Notification", "Stop", "StopFailure",
-		"SubagentStart", "SubagentStop", "PreCompact", "SessionEnd", "jsonl"]
+		"SubagentStart", "SubagentStop", "PreCompact", "SessionEnd", "PostModelSwitch", "jsonl"]
 
 static var _tm := {}
 
@@ -49,6 +49,7 @@ static func _new_session(e: Dictionary) -> Dictionary:
 		"agent_types": [],   # 서브에이전트 역할 이름 — 1.0 은 기록만 (5-1)
 		"subagents": 0, "envelopes": [],   # 끝난 서브에이전트 시각 (봉투 연출용, 최근 4개)
 		"subs": {},          # 지금 일하는 서브에이전트 {aid: {type, t, tool, tool_at}} — 역할 이름 있는 것만 (M6-1 전문가 직원)
+		"model": "",         # 모델 이름 (bell 의 model 필드: Claude = SessionStart · PostModelSwitch, Codex = 모든 훅). 관찰 모드는 모름 = ""
 		"prompt_at": -1.0,   # 마지막으로 일을 준 시각 (UserPromptSubmit → 종이비행기 연출, v2.8 C4)
 	}
 
@@ -93,6 +94,8 @@ static func reduce(state: Dictionary, e: Dictionary) -> Dictionary:
 			_release(s, "jsonl", mt)   # 거절 · Esc 는 훅 신호가 없고 .jsonl 만 바뀜 (M0) → '처리됨 (추정)'
 		return ns
 	s.hooked = true
+	if str(e.get("model", "")) != "":
+		s.model = str(e.model)
 	if ev in ACTIVE:
 		s.last = t
 		if s.phase in ["idle", "done", "off"] and ev != "SubagentStop":

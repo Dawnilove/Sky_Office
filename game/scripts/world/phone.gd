@@ -10,7 +10,7 @@ extends Node
 signal changed   ## 상태가 바뀜 (전화기 불빛 · 패널)
 signal job_done(kind: String, ok: bool, msg: String)   ## 개통 · 폐업 명령이 끝남 (스레드 → call_deferred)
 
-const PLUGIN_VER := "0.1.0"   ## 플러그인 버전 (게임 버전과 따로 — 바꿀 땐 다시 개통 = 다시 동의, 7-5)
+const PLUGIN_VER := "0.2.0"   ## 플러그인 버전 (게임 버전과 따로 — 바꿀 땐 다시 개통 = 다시 동의, 7-5)
 const BUNDLE := "res://plugin/"
 const MARKET := "skyoffice"
 const PLUGIN_ID := "skyoffice-bell@skyoffice"
@@ -135,6 +135,36 @@ static func judge(files: Dictionary, side: Dictionary, root_dir: String, sig: Di
 	if jt > 0.0 and now - jt < QUIET_S and jt - hook_t > QUIET_S:
 		return {"state": "broken", "reason": "신호가 안 와요. Claude Code 를 다시 켜 보세요.", "paused": false}
 	return {"state": "on", "reason": "정상이에요.", "paused": false}
+
+
+# ------------------------------------------------------------------ Codex 연결 (복사 안내, 7-5 같은 철학: 게임이 ~/.codex/hooks.json 을 직접 안 고침)
+const CODEX_EVENTS := ["SessionStart", "UserPromptSubmit", "PostToolUse", "Stop", "Interrupt", "SessionEnd"]   ## PreToolUse · PermissionRequest 는 영구 금지, notify 안 씀
+
+
+static func codex_home() -> String:
+	var c := OS.get_environment("CODEX_HOME")
+	return c if c != "" else home().path_join(".codex")
+
+
+## Codex hooks.json 에 붙일 내용 (사용자가 직접). bell 경로는 따옴표로 감쌈 (한글 · 띄어쓰기). Interrupt · SessionEnd 는 제한 3초라 timeout 2
+static func codex_snippet(bell_exe: String) -> String:
+	var cmd := "\"%s\" --agent codex" % bell_exe.replace("/", "\\")
+	var hooks := {}
+	for e in CODEX_EVENTS:
+		hooks[e] = [{"hooks": [{"type": "command", "command": cmd, "commandWindows": cmd, "async": true, "timeout": 2 if e in ["Interrupt", "SessionEnd"] else 5}]}]
+	return JSON.stringify({"hooks": hooks}, "  ", false)
+
+
+## Codex 쪽 (읽기만): hooks.json 이 있는지 · 그 안에 우리 bell 이 있는지 (내용은 저장 안 함)
+static func codex_side(dir: String) -> Dictionary:
+	var p := dir.path_join("hooks.json")
+	return {"file": FileAccess.file_exists(p), "bell": FileAccess.file_exists(p) and FileAccess.get_file_as_string(p).contains("bell.exe")}
+
+
+## Codex 훅 신호를 받은 적이 있나 (세션 중 agent == codex 이고 hooked)
+func codex_hooked() -> bool:
+	var ss: Dictionary = (watch.snap.get("agent", {}) as Dictionary).get("sessions", {}) if watch else {}
+	return ss.values().any(func(s) -> bool: return str(s.get("agent", "")) == "codex" and bool(s.get("hooked", false)))
 
 
 # ------------------------------------------------------------------ 상태 갱신

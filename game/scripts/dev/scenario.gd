@@ -324,6 +324,7 @@ func _m4(check: Callable) -> void:
 # ------------------------------------------------------------------ M2 구역 배치
 func _m2(check: Callable) -> void:
 	var l10 := Layout.new(10)
+	var l11 := Layout.new(11)   # 1.1 증축
 	var l14 := Layout.new(14)
 	# 1) 신호: 호출 보드 · 깃대 = 고정 좌표, 창구 = 오른벽에서 같은 거리 (v2.6) · 1.0 책상 4개는 증축해도 같은 자리
 	for n in ["board", "flagpole"]:
@@ -335,8 +336,13 @@ func _m2(check: Callable) -> void:
 	var d14 := l14.desks()
 	check.call("책상 수 4 → 12", d10.size() == 4 and d14.size() == 12)
 	check.call("1.0 책상 4개 자리 그대로 (지름 14)", range(4).all(func(i): return d10[i].pos == d14[i].pos), str(d10.map(func(d): return d.pos)))
+	var d11 := l11.desks()
+	check.call("1.1 증축: 지름 11 = 책상 6 · 기존 4개 자리 그대로 · 신호 고정", d11.size() == 6 and range(4).all(func(i): return d10[i].pos == d11[i].pos)
+			and l10.signal_pos("board") == l11.signal_pos("board") and l10.signal_pos("flagpole") == l11.signal_pos("flagpole"), str(d11.map(func(d): return d.pos)))
+	check.call("1.1 증축: 단계 → 지름 (28 전 10 · 28부터 11) · 모르는 값은 10", Company.diameter_for(0) == 10 and Company.diameter_for(5) == 10
+			and Company.diameter_for(6) == 11 and Company.diameter_for(99) == 11, str(Company.diameter_for(6)))
 	check.call("책상 마주보기 (뒷줄 = 카메라 쪽 · 앞줄 = 뒤쪽)", d10.all(func(d): return d.rot == (180.0 if d.row == 0 else 0.0)))
-	for l: Layout in [l10, l14]:
+	for l: Layout in [l10, l11, l14]:
 		var tag := "지름 %d" % l.diameter
 		# 2) 건물 하나 안에 작업실 · 창구 · 휴게, 부두는 밖. 구역 긴 변 3칸 (150px) · 짧은 변 2칸 (100px) 이상 · 서로 안 겹침
 		#    (v2.6 가로 4:3 · 앞뒤 2단: 앞줄 깊이가 크기 10 에서 2.15칸이라 '3×3칸' 대신 이 기준)
@@ -678,8 +684,33 @@ func _m3_staff(check: Callable) -> void:
 	var st := AgentState.replay([_ev(0, "SessionStart", "a"), _ev(5, "SessionStart", "b"), _ev(6, "SessionStart", "c", {"proj": "p2"}),
 			_ev(7, "SessionStart", "z", {"proj": "모름"}), _ev(8, "SessionStart", "x"), _ev(9, "SessionEnd", "x")])
 	var asg := StaffRegistry.assign(r, st, 10)
-	check.call("M3 같은 조합 두 창: 먼저 연 세션 = 그 직원, 두 번째 = 임시 파견 · 퇴근 세션 · 미입사 조합 빠짐", asg.size() == 3
-			and asg.a == {"staff": 0, "temp": false} and asg.b == {"staff": 0, "temp": true} and asg.c == {"staff": 1, "temp": false}, str(asg))
+	check.call("M3 같은 조합 두 창: 먼저 연 세션 = 그 직원, 두 번째 = 인턴 · 퇴근 세션 빠짐 · 미입사 조합 (z) = 놀고 있는 직원이 지원 근무 (1.1 풀 B)", asg.size() == 4
+			and asg.a.staff == 0 and not asg.a.temp and not asg.a.cover and asg.b.staff == 0 and asg.b.temp and not asg.b.solo
+			and asg.c.staff == 1 and not asg.c.cover and asg.z.cover and not asg.z.temp and not [0, 1].has(asg.z.staff), str(asg))
+	# 1.1 풀 B: 책상이 다 차면 입사 중단 · 지원 근무 · 직원 없는 인턴 · 붙으면 안 놓음 · 색 줄 · 휴직 방지
+	var pr := StaffRegistry.sync(StaffRegistry.touch(StaffRegistry.touch(StaffRegistry.empty(), "claude", "p1", 10, 10, 2), "claude", "p2", 10, 10, 2), 2, 10)
+	var pr3 := StaffRegistry.touch(pr, "claude", "p3", 10, 10, 2)
+	check.call("1.1 풀 B 입사: 책상 수만큼 차면 새 조합은 입사 안 함 (파견 안 만듦) · 책상 수를 안 넘기면 예전처럼 입사", pr3.staff.size() == 2
+			and StaffRegistry.touch(pr, "claude", "p3", 10, 10).staff.size() == 3 and StaffRegistry.touch(pr, "claude", "p1", 11, 11, 2).staff.size() == 2)
+	var ps := AgentState.replay([_ev(0, "SessionStart", "s3", {"proj": "p3"}), _ev(1, "SessionStart", "s4", {"proj": "p4"}), _ev(2, "SessionStart", "s5", {"proj": "p5"})])
+	var pa := StaffRegistry.assign(pr3, ps, 10)
+	check.call("1.1 풀 B 지원 근무: 단골 없는 프로젝트 3곳 · 직원 2명 → 2곳은 지원 근무 (조끼 없음), 셋째는 직원 없는 인턴 (solo)",
+			pa.s3.cover and pa.s4.cover and not pa.s3.temp and pa.s3.staff != pa.s4.staff and pa.s5.solo and pa.s5.temp and pa.s5.staff == -1, str(pa))
+	var ps2 := AgentState.replay([_ev(0, "SessionStart", "s3", {"proj": "p3"}), _ev(1, "SessionStart", "h1", {"proj": "p1"})])
+	var pa0 := StaffRegistry.assign(pr3, ps2, 10)
+	var pa1 := StaffRegistry.assign(pr3, ps2, 10, {"s3": 0})
+	check.call("1.1 풀 B 붙으면 안 놓음: 단골 p1 (직원 0) 이 나중에 와도 직원 0 을 맡은 s3 는 그대로 · p1 은 다른 직원 · 안 붙였으면 p1 = 직원 0",
+			pa0.h1.staff == 0 and not pa0.h1.cover and pa1.s3.staff == 0 and pa1.h1.staff == 1 and pa1.h1.cover, str(pa1))
+	var vw2: Dictionary = OfficeRoutine.views(ps2, pr3, 10.0, {"s3": 0})
+	check.call("1.1 풀 B 보이기: 키 = 직원 id · 세션 프로젝트 (명패 폴더 · 전문가 근속) · 지원 근무 표시 · 색 = 단골 직원 id 또는 프로젝트 해시",
+			vw2["s:0"].proj == "p3" and vw2["s:0"].cover and vw2["s:1"].proj == "p1" and StaffRegistry.color_key(pr3, "claude", "p2") == 1
+			and StaffRegistry.color_key(pr3, "claude", "p9") == absi("p9".hash()) and StaffRegistry.color_key(pr3, "claude", "p9") == StaffRegistry.color_key(pr3, "claude", "p9"))
+	var old := pr3.duplicate(true)
+	for q in old.staff:
+		q.last = 10.0 - 20 * 86400.0
+	check.call("1.1 풀 B 휴직: 세션을 맡은 직원은 2주 넘게 안 일했어도 휴직 안 함 (맡지 않은 직원은 휴직)",
+			StaffRegistry.sync(old, 2, 10.0, [0]).staff[0].leave == false and StaffRegistry.sync(old, 2, 10.0, [0]).staff[1].leave == true
+			and StaffRegistry.serving(pr3, ps2, 10).size() == 2)
 	# 저장 = 버전 번호 + 책상 슬롯 id · 직원 id, 연쇄 이전, 순수 함수
 	var v0 := {"staff": [{"id": 2, "agent": "claude", "proj": "p", "desk": 3, "hired": 1.0, "last": 1.0, "leave": false}]}
 	var m := StaffRegistry.migrate(JSON.parse_string(JSON.stringify(v0)))
@@ -870,7 +901,66 @@ func _m3_watch(check: Callable) -> void:
 	check.call("M3 관찰 모드: 프로젝트 6곳 파일이 한꺼번에 바뀜 → 입사 · 세션 없음 (기억만)", o4.snap.staff.staff.is_empty()
 			and o4.snap.agent.sessions.is_empty() and o4.snap.seen.size() == 6)
 	o4.free()
-	var deep := tmp.path_join("내 프로젝트").path_join("my-app_v2")
+	# 다른 도구 (Codex · Antigravity): 가짜 폴더 · 수정 시각만, 도구별 직원 1명 (프로젝트 구분 없음)
+	var tl_root := tmp.path_join("tools")
+	_jsonl(tl_root.path_join("codex/2026/10/22"), "rollout-a")
+	_jsonl(tl_root.path_join("codex/2026/10/21"), "rollout-b")
+	_jsonl(tl_root.path_join("codex/2026/10/21"), "other")
+	_jsonl(tl_root.path_join("agy/brain/c1/.system_generated/logs"), "transcript")
+	_jsonl(tl_root.path_join("agy/brain/c1/.system_generated/logs"), "other")
+	var tl := [{"agent": "codex", "glob": tl_root + "/codex/*/*/*/rollout-*.jsonl"},
+			{"agent": "agy", "glob": tl_root + "/agy/brain/*/.system_generated/logs/transcript.jsonl"}]
+	var o5 := AgentWatch.new()
+	o5.setup(tmp.path_join("watch5"), "", 4, tl)
+	o5.tick(now)
+	var ag_staff: Array = o5.snap.staff.staff.map(func(s): return str(s.agent))
+	ag_staff.sort()
+	var cx: Dictionary = o5.snap.agent.sessions.get(AgentWatch.hash16(tl_root + "/codex/2026/10/22/rollout-a.jsonl"), {})
+	var text5 := FileAccess.get_file_as_string(o5.state_path())
+	check.call("다른 도구 관찰: 파일 목록 규칙 (* 한 칸 · 숨김 폴더 · 이름 규칙) 대로 3세션 · 도구별 직원 1명 (codex · agy) · 활동 중 (추정) · 경로는 해시만",
+			o5.snap.agent.sessions.size() == 3 and ag_staff == ["agy", "codex"] and not cx.is_empty() and str(cx.agent) == "codex"
+			and cx.proj == AgentWatch.hash16("codex") and AgentState.view(cx, now).state == "watch" and AgentState.view(cx, now).guess
+			and not ("rollout" in text5) and not (tl_root in text5))
+	check.call("다른 도구 관찰: 수정 시각 그대로 = 새 이벤트 없음 · 90초 뒤 = 쉼 · 도구 직원 둘이 책상에",
+			not o5.tick(now + 1) and AgentState.view(cx, now + 200).state == "rest"
+			and o5.snap.staff.staff.all(func(s): return int(s.desk) >= 0))
+	o5.free()
+	var o6 := AgentWatch.new()
+	o6.setup(tmp.path_join("watch6"), projects, 4, tl)
+	o6.tick(now)
+	var kinds6: Array = o6.snap.staff.staff.map(func(s): return str(s.agent))
+	kinds6.sort()
+	check.call("다른 도구 관찰: Claude 와 같이 켜도 Claude 직원 그대로 (agent = claude) · 도구 둘 따로", kinds6 == ["agy", "claude", "codex"]
+			and o6.snap.agent.sessions[AgentWatch.hash16("abc")].agent == "claude")
+	o6.free()
+	var o7 := AgentWatch.new()
+	o7.setup(tmp.path_join("watch7"), "", 4, [{"agent": "x", "glob": tl_root + "/없는폴더/*/a.jsonl"}])
+	check.call("다른 도구 관찰: 폴더가 없으면 조용히 없음", not o7.tick(now) and o7.snap.agent.sessions.is_empty())
+	o7.free()
+	# Codex 훅 (bell --agent codex): 관찰 모드와 같은 직원 · 같은 세션, model 기록. 모델 바꾸면 PostModelSwitch 가 이어받음
+	var tl_n := [{"agent": "codex", "sess_by": "name", "glob": tl_root + "/codex/*/*/*/rollout-a.jsonl"}]
+	var o8 := AgentWatch.new()
+	o8.setup(tmp.path_join("watch8"), "", 4, tl_n)
+	o8.tick(now)
+	var sid_n := AgentWatch.hash16("rollout-a")
+	var hs := {"agent": "codex", "proj": AgentWatch.hash16("codex"), "sess": sid_n, "model": "gpt-5.1-codex"}
+	_bell(o8.inbox_dir(), hs.merged({"t": now + 1, "event": "UserPromptSubmit"}), 1)
+	_bell(o8.inbox_dir(), hs.merged({"t": now + 2, "event": "Stop", "is_interrupt": true}), 2)
+	o8.tick(now + 3)
+	var cn: Dictionary = o8.snap.agent.sessions.get(sid_n, {})
+	_bell(o8.inbox_dir(), {"agent": "codex", "proj": hs.proj, "sess": sid_n, "model": "gpt-5.2", "t": now + 4, "event": "PostModelSwitch"}, 3)
+	o8.tick(now + 5)
+	var cn2: Dictionary = o8.snap.agent.sessions.get(sid_n, {})
+	check.call("Codex 훅: 관찰 모드와 같은 세션 · 같은 직원 (1명) · 훅 신호 받음 · 끝 · model 기록 · PostModelSwitch 가 model 만 바꿈",
+			o8.snap.agent.sessions.size() == 1 and o8.snap.staff.staff.size() == 1 and cn.hooked and cn.agent == "codex"
+			and cn.phase == "done" and cn.model == "gpt-5.1-codex" and cn2.model == "gpt-5.2" and cn2.phase == "done")
+	o8.free()
+	var real := AgentWatch.load_tools("C:\\Users\\me")
+	check.call("다른 도구 목록 (data/watch_tools.json): codex · agy · ~ 를 사용자 폴더로 · 명패 기호 ◆ ▲ · Claude 는 기호 없음",
+			real.size() == 2 and real[0].agent == "codex" and real[0].glob.begins_with("C:/Users/me/.codex/") and real[1].agent == "agy"
+			and "~" not in real[1].glob and AgentWatch.tool_style("codex").icon == "◆" and AgentWatch.tool_style("agy").icon == "▲"
+			and AgentWatch.tool_style("claude").is_empty())
+	var deep :=tmp.path_join("내 프로젝트").path_join("my-app_v2")
 	DirAccess.make_dir_recursive_absolute(deep)
 	var enc_deep := AgentWatch.encode_path(deep.replace("/", "\\"))
 	check.call("M3 이름판 프로젝트 이름: projects 폴더 이름 → 디스크에서 실제 이름 ('-' · '_' · 한글 섞여도) · 없는 폴더는 ''",
@@ -978,6 +1068,11 @@ func _m3_routine(check: Callable) -> void:
 	var plan2: Dictionary = R.borrow_plan(wb, [3], {"t:c": 3, "t:b": 2})
 	check.call("M3 책상 빌리기 (순수): 일하는 인턴만 새로 빌림 · 주인 직원은 안 빌림 · 빌린 책상은 비어 있으면 그대로 · 주인이 오면 (빈 책상에서 빠지면) 내놓음",
 			plan1 == {"t:a": 2, "t:c": 3} and plan2 == {"t:c": 3}, "%s / %s" % [plan1, plan2])
+	var wf := {"x:1": {"guest": true, "look": "wait", "v": {"state": "work"}, "fav_key": 9}, "x:2": {"guest": true, "look": "wait", "v": {"state": "work"}, "fav_key": 9}}
+	var pf: Dictionary = R.borrow_plan(wf, [2, 3, 4], {}, 6)
+	var pf0: Dictionary = R.borrow_plan({"x:1": {"guest": true, "look": "wait", "v": {"state": "work"}}}, [2, 3, 4], {}, 6)
+	check.call("1.1 R5-lite 단골 자리: 단골 전문가는 늘 같은 책상 (9 % 6 = 3) 이 비면 그 자리 · 이미 차면 다른 빈 책상 · 단골 아니면 예전처럼 앞 번호",
+			pf["x:1"] == 3 and pf["x:2"] == 2 and pf0["x:1"] == 2, str(pf))
 	var reg0 := StaffRegistry.sync(StaffRegistry.touch(StaffRegistry.empty(), "claude", "p1", 1000.0, 1000.0), 4, 1000.0)
 	var ag := AgentState.replay([_ev(1000, "SessionStart", "a"), _ev(1001, "SessionStart", "b"), _ev(1002, "UserPromptSubmit", "b")])
 	var vw: Dictionary = R.views(ag, reg0, 1003.0)
@@ -1007,9 +1102,9 @@ func _m3_routine(check: Callable) -> void:
 	var wsp4: Dictionary = R.targets(AgentState.replay(sp), rg, 1010.0)
 	R.spec_looks(wsp4, rg, "salt1")
 	check.call("M6-4 전문가 고정 얼굴 (같은 솔트 = 같은 이름 · 모습, 다른 솔트 = 다름) · 명패 역할 줄 (PM · 전문가) · 역할 근속 5일 → 직급 · 옛 저장 호환",
-			wsp["x:x1"].hash == wsp2["x:x1"].hash and wsp["x:x1"].name == wsp2["x:x1"].name and str(wsp["x:x1"].role) == "전문가"
+			wsp["x:x1"].hash == wsp2["x:x1"].hash and wsp["x:x1"].name == wsp2["x:x1"].name and str(wsp["x:x1"].role) == "탐색 전문가"
 			and wsp["s:0"].role == "PM" and not wsp["x:x1"].hash.is_empty() and StaffRegistry.role_days(rg, "p1", "Explore") == 6
-			and str(wsp4["x:x1"].role) == "전문가 주임" and wsp3["x:x1"].hash != wsp["x:x1"].hash
+			and str(wsp4["x:x1"].role) == "탐색 전문가" and wsp3["x:x1"].hash != wsp["x:x1"].hash
 			and StaffRegistry.migrate({"v": 1, "next": 0, "staff": []}).roles == {} and R.role_label("Explore") == "탐색" and R.role_label("mine") == "mine", str(wsp4["x:x1"].get("role")) + " " + str(StaffRegistry.role_days(rg, "p1", "Explore")))
 	check.call("M3 일과: 모든 표시 이름이 office LOOK 에 있음", table.all(func(t): return Office.LOOK.has(t)))
 	# 3초 유지 · 내 차례 즉시 · 끼어들기는 바로 (순수)
@@ -1172,8 +1267,8 @@ func _m3_routine(check: Callable) -> void:
 	rt.set_hover(picked)
 	office.staff[0].say_text = ""
 	office._show_bubble(0)
-	check.call("M3 마우스 올림 (ray_pick): 직원 머리 → 그 직원 · 이름판 + 말풍선 '고치는 중' · 빈 곳은 없음", picked == 0 and office.staff[0].tagbox.visible
-			and office.staff[0].bubble.visible and office.staff[0].bubble.text == "고치는 중" and rt.pick_at(Vector2(2, 2)) == -1, "picked %d" % picked)
+	check.call("M3 마우스 올림 (ray_pick): 직원 머리 → 그 직원 · 명패 'PM · 고치는 중' 한 줄 (이름 없음, 말풍선은 명패가 대신해서 숨김) · 빈 곳은 없음", picked == 0 and office.staff[0].tagbox.visible
+			and office.staff[0].tag.text == "PM · 고치는 중" and not office.staff[0].bubble.visible and rt.pick_at(Vector2(2, 2)) == -1, "picked %d %s" % [picked, office.staff[0].tag.text])
 	rt.set_hover(-1)
 	check.call("M3 마우스 내리면 이름판 · 말풍선 숨김 (일하는 중)", not office.staff[0].tagbox.visible and not office.staff[0].bubble.visible)
 	# 큰 아이콘 최소 크기 · 관리인
@@ -1340,9 +1435,10 @@ func _m5_save(check: Callable) -> void:
 func _m5_show(check: Callable) -> void:
 	var sd: Dictionary = Company.stage_data()
 	var groups: Array = sd.stages.map(func(s): return s.group)
-	check.call("M5 단계 데이터: stages.json 6단계 (창업 3 · 스타트업 3) · 문턱 = v2.8 ×2 · company.gd 가 여기서 읽음",
-			Company.stage_days() == [0, 2, 6, 10, 14, 20] and Company.thresholds == Company.stage_days()
-			and groups == ["창업", "창업", "창업", "스타트업", "스타트업", "스타트업"] and Company.stage_for(9) == 2 and Company.stage_for(20) == 5,
+	check.call("M5 단계 데이터: stages.json 9단계 (창업 3 · 스타트업 3 · 중소기업 ① 법인 성장 = 증축 · ② 탕비실 정비 · ③ 야근 문화) · 문턱 = v2.8 ×2 · company.gd 가 여기서 읽음",
+			Company.stage_days() == [0, 2, 6, 10, 14, 20, 28, 36, 44] and Company.thresholds == Company.stage_days()
+			and groups == ["창업", "창업", "창업", "스타트업", "스타트업", "스타트업", "중소기업", "중소기업", "중소기업"] and Company.stage_for(9) == 2 and Company.stage_for(20) == 5 and Company.stage_for(28) == 6
+			and Company.stage_for(36) == 7 and Company.stage_for(44) == 8,
 			str(Company.thresholds))
 	var all := ["bookshelf", "whiteboard", "desk_real", "chair_new", "sign_new", "server_rack", "telescope", "personal_shelf"]
 	check.call("M5 단계 가구: 첫 출근 = 새로 생긴 것 없음 · 첫 사용자 = 8가지 모두 · 재질 교체 2가지 (박스 책상 · 낡은 의자)",
@@ -1379,6 +1475,18 @@ func _m5_show(check: Callable) -> void:
 	var s3 := [(sign.find_child("SignNew", true, false) as Node3D).visible, box_mat.call(), vis.call("Whiteboard"), vis.call("ServerShelf")]
 	check.call("M5 단계 가구 적용: 0 = 손글씨 간판 · 서버 선반 · 박스 책상 (책장 · 화이트보드 · 망원경 · 랙 · 개인 칸 없음) → 3 = 남색 간판 · 진짜 책상",
 			s0 == [false, false, false, false, true, true, false, false, true] and s3 == [true, false, true, true], "%s %s 재질 %d" % [s0, s3, office._look_mats.size()])
+	# kArchive 가구 (② 가구 모델): 6 = 정수기 상자 · 의자 3 → 7 = 나무 장 + 냉온수기 + 캡슐 커피 · 4번째 의자 → 8 = 수면 캡슐
+	var ka := func(st: int) -> Array:
+		office.apply_stage(st)
+		return [vis.call("WaterOld"), vis.call("PantryNew"), vis.call("Chair4"), vis.call("SleepPod")]
+	var k6: Array = ka.call(6)
+	var k7: Array = ka.call(7)
+	var k8: Array = ka.call(8)
+	var kfrom: Vector2 = main.layout.slot("rest_spots")
+	var kreach: bool = main.layout.slots("rest_spots").all(func(sp: Dictionary) -> bool: return not main.island.find_path(main.layout.m(kfrom), main.layout.m(sp.pos)).is_empty())
+	var kin: bool = ["extra_seat", "sleep_pod"].all(func(n: String) -> bool: return main.layout.building_rect().has_point(main.layout.slots(n)[0].pos))
+	check.call("M5 kArchive 가구: 단계 6 = 정수기 상자 · 7 = 냉온수기 + 캡슐 커피 (정수기 상자 사라짐) + 4번째 의자 · 8 = 수면 캡슐 · 쉬는 자리 모두 걸어갈 수 있음 · 건물 안",
+			k6 == [true, false, false, false] and k7 == [false, true, true, false] and k8 == [false, true, true, true] and kreach and kin, "%s %s %s %s %s" % [k6, k7, k8, kreach, kin])
 	office.apply_stage(1)
 	var at1: String = office.gather_spot().at
 	var pts1: Array = office.gather_points(4)
@@ -1606,6 +1714,20 @@ func _m5_firm(check: Callable) -> void:
 	check.call("M5 해시 겉모습: 셔츠 색 · 장신구 · 의자 등받이 · 성격 (버릇) 이 해시 번호대로",
 			s3.shirt == Office.SHIRTS[4] and acc_vis == [Office.ACCESSORIES[2]] and chair_col.is_equal_approx(Color(Office.SHIRTS[4]))
 			and office.person_of(s3) == str(office.idle_cfg.personalities[3]), "%s %s" % [s3.get("shirt", ""), str(acc_vis)])
+	var nm3: String = s3.name
+	office.set_staff_agent(3, "codex")
+	var tag_cx: String = (s3.tag as Label3D).text
+	var chair_cx: Color = ((office.desk_parts[3].chair_back as MeshInstance3D).material_override as StandardMaterial3D).albedo_color
+	office.set_staff_agent(3, "agy")
+	var tag_ag: String = (s3.tag as Label3D).text
+	office.set_look(3, {"shirt": 5, "hair": 1, "acc": 2, "person": 3})   # 겉모습이 바뀌어도 도구 의자 색 유지
+	var chair_ag: Color = ((office.desk_parts[3].chair_back as MeshInstance3D).material_override as StandardMaterial3D).albedo_color
+	office.set_staff_agent(3, "claude")
+	var chair_back_c: Color = ((office.desk_parts[3].chair_back as MeshInstance3D).material_override as StandardMaterial3D).albedo_color
+	check.call("다른 도구 겉모습: 명패 기호 (Codex ◆ · Antigravity ▲ · Claude 없음) + 의자 색 (보조, 도구마다 다름 · 셔츠 바뀌어도 유지 · Claude 로 돌아오면 셔츠 색)",
+			tag_cx == "◆ " + nm3 and tag_ag == "▲ " + nm3 and (s3.tag as Label3D).text == nm3
+			and chair_cx.is_equal_approx(Color("#8fa3b8")) and chair_ag.is_equal_approx(Color("#b39ac8")) and chair_back_c.is_equal_approx(Color(Office.SHIRTS[5])))
+	office.set_look(3, {"shirt": 4, "hair": 1, "acc": 2, "person": 3})
 	# 일과 → 셈 (결재함 · 돌아오면 요약)
 	var rt: Node = OfficeRoutine.new()
 	rt.setup(office, null, null, main.camera)
@@ -1638,11 +1760,8 @@ func _m5_firm(check: Callable) -> void:
 	check.call("M5 창업 화면: 첫 실행 카드 (이름 입력 · 창업하기 · 건너뛰기) · 건너뛰면 기본 이름 간판 · 창업 표시",
 			card_ok and fu.found_card == null and bool(Game.firm.founded) and office.sign_text.text == "하늘 오피스")
 	fu._process(1.0)
-	var hire_ok: bool = fu.hire_card != null and fu.hire_id == 0 and _btn(fu.hire_card, "자동") != null
-	if hire_ok:
-		_btn(fu.hire_card, "자동").pressed.emit()
-	check.call("M5 입사식: 창업 뒤 명패 없는 직원 카드 (팀 이름 쓰기 · 자동) · 자동 = 빈 팀 칸 (해시 팀 이름) · 다시 안 뜸",
-			hire_ok and fu.hire_card == null and Game.firm.plates.has("0") and str(Game.firm.plates["0"].team) == "" and Firm.need_ceremony(Game.firm, reg2).is_empty())
+	check.call("M5 입사식: 직원 이름을 안 쓰기로 해서 (사용자 2026-10-22) 창업 뒤에도 입사 카드가 안 뜸 · 명패 기록 없음",
+			fu.get("hire_card") == null and not Game.firm.plates.has("0"))
 	fu.on_away_started()
 	fu.on_counted("done", 0)
 	fu.on_counted("done", 0)
@@ -1688,13 +1807,34 @@ func _m5_phone(check: Callable) -> void:
 	# 묶음 (게임 안 원본)
 	var hj = JSON.parse_string(FileAccess.get_file_as_string(Phone.BUNDLE + "hooks.json"))
 	var ev: Dictionary = hj.hooks if typeof(hj) == TYPE_DICTIONARY else {}
-	var hooks_ok := ev.size() == 11 and not ev.has("PreToolUse") and not ev.has("PermissionRequest")
+	var hooks_ok := ev.size() == 12 and not ev.has("PreToolUse") and not ev.has("PermissionRequest")
 	for k in ev:
 		var h: Dictionary = ev[k][0].hooks[0]
 		hooks_ok = hooks_ok and h.command == "${CLAUDE_PLUGIN_ROOT}/bell.exe" and (h.args as Array).is_empty() and bool(h.async) == (k != "SessionEnd")
 	var pj = JSON.parse_string(FileAccess.get_file_as_string(Phone.BUNDLE + "plugin.json"))
-	check.call("M5 플러그인 묶음: 파일 4개 · 훅 11개 (PreToolUse · PermissionRequest 없음 · --record 없음 · SessionEnd 만 동기) · 버전 = PLUGIN_VER",
+	check.call("M5 플러그인 묶음: 파일 4개 · 훅 12개 (PostModelSwitch 포함 · PreToolUse · PermissionRequest 없음 · --record 없음 · SessionEnd 만 동기) · 버전 = PLUGIN_VER",
 			hooks_ok and Phone.expected().values().all(func(x): return str(x).length() == 64) and str(pj.version) == Phone.PLUGIN_VER, str(ev.keys()))
+	# Codex 복사 안내: 6개 훅 · 금지 훅 없음 · 경로는 따옴표 + 백슬래시 · --agent codex · 게임이 파일을 안 씀 (읽기만)
+	var cj = JSON.parse_string(Phone.codex_snippet("C:/Users/한글 이름/.skyoffice/plugin/0.2.0/bell/bell.exe"))
+	var cxh: Dictionary = cj.hooks if typeof(cj) == TYPE_DICTIONARY else {}
+	check.call("Codex 복사 안내: 훅 6개 (PreToolUse · PermissionRequest 없음) · 명령 = 따옴표 경로 + --agent codex · async · Interrupt/SessionEnd 제한 2초",
+			cxh.keys().size() == 6 and not cxh.has("PreToolUse") and not cxh.has("PermissionRequest")
+			and cxh.Stop[0].hooks[0].commandWindows == "\"C:\\Users\\한글 이름\\.skyoffice\\plugin\\0.2.0\\bell\\bell.exe\" --agent codex"
+			and cxh.Stop[0].hooks[0].command == cxh.Stop[0].hooks[0].commandWindows and bool(cxh.Stop[0].hooks[0].async)
+			and int(cxh.Interrupt[0].hooks[0].timeout) == 2 and int(cxh.SessionEnd[0].hooks[0].timeout) == 2 and int(cxh.Stop[0].hooks[0].timeout) == 5)
+	var cdir := OS.get_user_data_dir().path_join("codex_probe")
+	DirAccess.make_dir_recursive_absolute(cdir)
+	var c0 := Phone.codex_side(cdir)
+	var cf := FileAccess.open(cdir.path_join("hooks.json"), FileAccess.WRITE)
+	cf.store_string("{\"hooks\": {}}")
+	cf.close()
+	var c1 := Phone.codex_side(cdir)
+	cf = FileAccess.open(cdir.path_join("hooks.json"), FileAccess.WRITE)
+	cf.store_string("x bell.exe --agent codex")
+	cf.close()
+	var c2 := Phone.codex_side(cdir)
+	DirAccess.remove_absolute(cdir.path_join("hooks.json"))
+	check.call("Codex 쪽 확인 (읽기만): 파일 없음 → 있음 (bell 없음) → bell 있음", not c0.file and c1.file and not c1.bell and c2.bell)
 	# 판단 (순수)
 	var R := "C:/u/.skyoffice/plugin/0.1.0"
 	var ok4 := {"a": "ok", "b": "ok"}

@@ -45,6 +45,7 @@ var settings := {
 	"idle_detect": true,       # 자리 비움 감지
 	"idle_minutes": 5,
 	"language": "ko",
+	"claude_command": false,  # 게임 안 한 줄 명령 (로드맵 ⑤, 선택 기능) — 기본 꺼짐, 설정 > 회사. 명령 · 결과는 저장 안 함 (켜짐 값만)
 }
 
 var stats := {}                     ## 통계 (최고 기록 등)

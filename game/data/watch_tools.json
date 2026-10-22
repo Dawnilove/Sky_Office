@@ -1,0 +1,7 @@
+{
+	"_설명": "Claude 말고 관찰 모드로만 보는 도구 목록. 새 도구 = 줄 하나. glob 의 ~ = 사용자 폴더, * = 폴더/파일 이름 한 칸. 수정 시각만 보고 내용은 안 읽음. 도구별 직원 1명 (프로젝트 구분 없음). sess_by = name 이면 세션 키를 파일 이름 해시로 (bell 훅과 같은 키, 같은 직원·세션), 아니면 경로 해시. icon = 명패 앞 기호, chair = 의자 등받이 색 (브랜드 색 · 로고 금지)",
+	"tools": [
+		{"agent": "codex", "glob": "~/.codex/sessions/*/*/*/rollout-*.jsonl", "sess_by": "name", "icon": "◆", "chair": "#8fa3b8"},
+		{"agent": "agy", "glob": "~/.gemini/antigravity-cli/brain/*/.system_generated/logs/transcript.jsonl", "icon": "▲", "chair": "#b39ac8"}
+	]
+}

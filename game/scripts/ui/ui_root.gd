@@ -729,7 +729,7 @@ func _settings_panel(body: VBoxContainer) -> void:
 			section(body, "명패에 폴더 이름")
 			body.add_child(segment([["보이기", true], ["숨기기", false]], bool(Game.settings.get("show_project", true)),
 					func(v) -> void: Game.set_setting("show_project", v)))
-			body.add_child(_note("명패 = '이름 · 폴더'. 화면 공유 땐 끄기 (이름만). 파일에는 저장하지 않아요."))
+			body.add_child(_note("부를 때 뜨는 명패에 폴더 이름이 보여요. 화면 공유 땐 끄기 (직무만). 파일에는 저장하지 않아요."))
 			group(body, "비켜 줄 때")
 			section(body, "다른 프로그램이 전체 화면일 때 (게임·영상)")
 			body.add_child(segment([["회사 숨기고 쉬기", true], ["계속 보이기", false]], Game.settings.pause_fullscreen,
@@ -758,6 +758,7 @@ func _settings_panel(body: VBoxContainer) -> void:
 			body.add_child(title)
 			body.add_child(_note("버전 %s" % ProjectSettings.get_setting("application/config/version", "1.0.0")))
 			body.add_child(_note("AI 에이전트가 일하는 모습을 보여 주는 바탕화면 하늘 회사. 게임은 지켜보기만 하고, 결정은 늘 터미널에서 해요."))
+			body.add_child(_note("가구 일부 — 자료: kArchive · 출처: 쓰레드 dogfooter (자세히는 README)"))
 			_update_section(body)
 			group(body, "단축키 · 도구")
 			for k in [["H", "UI 숨기기 / 보이기 (회사 오른쪽 클릭도 같아요)"], ["P", "사진 찍기 — 사진 폴더에 투명 배경 PNG"],

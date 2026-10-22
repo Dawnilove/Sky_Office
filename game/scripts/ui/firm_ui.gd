@@ -1,7 +1,7 @@
 extends Node
 ## 회사 옷 화면 (PLAN 5-7 · 6-2 · 6-4 · 8장, M5 3세션째) — 창업 화면 · 입사식 · 결재함 · 돌아오면 요약 · 설정 '회사' 탭
 ##   상태 = Game.firm (firm.gd 순수 함수로 바꿈). 간판 · 이름판은 Game.firm_changed 로 다시 그림
-##   개발 인자: `--found` (창업 화면) · `--hire-card` (입사식 카드) · `--ledger` (결재함 견본 장 + 패널) · `--back` (돌아오면 요약 카드) · `--hashed` (데모 직원도 해시 직원)
+##   개발 인자: `--found` (창업 화면) · `--ledger` (결재함 견본 장 + 패널) · `--back` (돌아오면 요약 카드) · `--hashed` (데모 직원도 해시 직원)
 
 const Firm := preload("res://scripts/game/firm.gd")
 const StaffHash := preload("res://scripts/world/staff_hash.gd")
@@ -14,10 +14,7 @@ var office: Node3D
 var routine: Node            ## office_routine (없으면 직원 기록 없음 — 데모 · 화면 밖)
 var company: Node            ## company.gd (없으면 하루 마감 없음)
 var found_card: PanelContainer
-var hire_card: PanelContainer
 var away_card: PanelContainer
-var hire_queue: Array = []   ## 입사식 기다리는 직원 id
-var hire_id := -1            ## 지금 카드의 직원
 var away := false
 var away_done := 0
 var away_turn := 0
@@ -49,8 +46,6 @@ func setup(u: CanvasLayer, o: Node3D, r: Node, c: Node) -> void:
 	if "--ledger" in dev:
 		_demo_ledger()
 		ui.open_panel.call_deferred("tray")
-	if "--hire-card" in dev:
-		get_tree().create_timer(0.5).timeout.connect(func() -> void: show_hire(0, "서연"))
 	if "--back" in dev:
 		get_tree().create_timer(0.5).timeout.connect(func() -> void: show_away(Firm.away_text(2, 1)))
 	if "--found" in dev or (not Game.firm.founded and not Game.is_test_run() and not "--demo" in dev):
@@ -62,12 +57,6 @@ func _process(delta: float) -> void:
 	if _acc < 1.0:
 		return
 	_acc = 0.0
-	if Game.firm.founded and routine and not routine._reg.is_empty() and found_card == null:   # 입사식: 명패가 없는 책상 직원 (창업 화면 다음)
-		for id in Firm.need_ceremony(Game.firm, routine._reg):
-			if id != hire_id and not (id in hire_queue):
-				hire_queue.append(id)
-		if hire_card == null and not hire_queue.is_empty():
-			_next_hire()
 	if away_text != "" and not away and not _calling():   # 내 차례 중엔 미룸 (5-3)
 		show_away(away_text)
 		away_text = ""
@@ -238,45 +227,6 @@ func _big_buttons(v: VBoxContainer, items: Array) -> void:
 		(b as Button).add_theme_font_size_override("font_size", 17)
 
 
-# ------------------------------------------------------------------ 입사식 (5-7 C29 · 8장): 직원 이름 정하기, 비우면 자동 (팀 이름 없음, M5 5세션째 사용자)
-func _next_hire() -> void:
-	while not hire_queue.is_empty():
-		var id: int = hire_queue.pop_front()
-		if Game.firm.plates.has(str(id)) or not routine.looks.has(id):
-			continue
-		show_hire(id, str(routine.looks[id].name))
-		return
-
-
-func show_hire(id: int, auto_name: String) -> void:
-	if hire_card:
-		_close(hire_card)
-	hire_id = id
-	var cv := _float_card("새 직원 입사")
-	hire_card = cv[0]
-	var v: VBoxContainer = cv[1]
-	_big_card(hire_card, v)
-	v.add_child(_big_note("%s 님이 짐 상자를 들고 첫 출근해요.\n이름을 정해 주세요." % auto_name, FOUND_TEXT))
-	var inp := _big_input(Firm.PLATE_MAX, auto_name)
-	v.add_child(inp)
-	var done := func(nm: String) -> void:
-		Game.set_firm(Firm.set_plate(Game.firm, id, nm, ""))
-		_close(hire_card)
-		hire_card = null
-		hire_id = -1
-	inp.text_submitted.connect(func(t: String) -> void: done.call(t))
-	var items := [["정하기", func() -> void: done.call(inp.get_text())], ["자동 (%s)" % auto_name, func() -> void: done.call("")]]
-	if hire_queue.size() > 0:
-		items.append(["모두 자동", func() -> void:
-			for q in hire_queue:
-				Game.firm = Firm.set_plate(Game.firm, int(q), "", "")
-			hire_queue.clear()
-			done.call("")])
-	_big_buttons(v, items)
-	v.add_child(_big_note("명패 = 이름 · 작업 폴더. 나중에 설정에서도 바꿀 수 있어요.", 14))
-	_place(hire_card, 0.74)
-
-
 # ------------------------------------------------------------------ 돌아오면 요약 (6-4): 카드 1장, 10초 뒤 사라짐
 func show_away(text: String) -> void:
 	if text == "":
@@ -369,50 +319,6 @@ func firm_tab(body: VBoxContainer) -> void:
 	row.add_child(ui.button("바꾸기", save_name))
 	body.add_child(row)
 	body.add_child(ui._note("비우면 '%s'. 간판에 %d글자까지." % [Firm.DEFAULT_NAME, Firm.NAME_MAX]))
-	ui.group(body, "명패 (직원 이름)")
-	var lks: Dictionary = routine.looks if routine else demo_looks
-	if lks.is_empty():
-		body.add_child(ui._note("아직 직원이 없어요. Claude Code 로 일을 시작하면 입사해요."))
-	var ids := lks.keys()
-	ids.sort()
-	for id in ids:
-		var lk: Dictionary = lks[id]
-		if _editing == int(id):
-			var pl: Dictionary = Game.firm.plates.get(str(id), {})
-			var n_in := _input_box(Firm.PLATE_MAX, StaffHash.NAMES[int(lk.look.name)], str(pl.get("name", "")))
-			ui.section(body, "직원 이름")
-			body.add_child(n_in)
-			var h := HBoxContainer.new()
-			h.add_theme_constant_override("separation", 6)
-			for it in [["저장", func() -> void:
-						Game.set_firm(Firm.set_plate(Game.firm, int(id), n_in.get_text(), ""))
-						_editing = -1
-						ui.refresh_panel()],
-					["자동으로", func() -> void:
-						Game.set_firm(Firm.set_plate(Game.firm, int(id), "", ""))
-						_editing = -1
-						ui.refresh_panel()],
-					["취소", func() -> void:
-						_editing = -1
-						ui.refresh_panel()]]:
-				var b: Button = ui.button(it[0], it[1])
-				b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-				h.add_child(b)
-			body.add_child(h)
-			continue
-		var r := HBoxContainer.new()
-		r.add_theme_constant_override("separation", 6)
-		var l := Label.new()
-		l.text = str(lk.name)
-		l.add_theme_font_size_override("font_size", 14)
-		l.add_theme_color_override("font_color", ui.TEXT)
-		l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		r.add_child(l)
-		r.add_child(ui.button("바꾸기", func() -> void:
-			_editing = int(id)
-			ui.refresh_panel()))
-		body.add_child(r)
-	body.add_child(ui._note("비우면 자동 이름. 명패 = '이름 · 작업 폴더' ('화면' 탭에서 폴더 끄면 이름만)."))
 	if close_section.is_valid():
 		close_section.call(body)
 
