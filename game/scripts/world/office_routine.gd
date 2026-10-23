@@ -199,22 +199,30 @@ static func cap_interns(want: Dictionary, cur: Dictionary) -> int:
 ## 인턴 책상 빌려 앉기 (M3 5세션째 사용자 결정): 주인이 퇴근한 빈 책상 (free) 을 인턴에게 → {키: 책상 번호}.
 ##   이미 빌린 책상이 아직 비어 있으면 그대로 (자리 안 바뀌게), 새로 빌리는 건 일하는 인턴만 (일함 · 내 차례 먼저, 그다음 키 순)
 ##   단골 자리 (1.1 R5-lite): 근속 5일 넘은 전문가 (fav_key) 는 새로 빌릴 때 늘 같은 책상 (fav_key % 책상 수) 이 비었으면 그 자리 먼저 — 주인 아님, 저장 안 함
-static func borrow_plan(want: Dictionary, free: Array, cur: Dictionary, n_desks := 0) -> Dictionary:
+##   전문가석 (1.4 단계 160, spec = 빈 전문가석 번호): 근속 5일 넘은 전문가 (fav_key) 가 먼저 앉음, 나머지 손님은 안 앉음 — 주인 아님, 저장 안 함
+static func borrow_plan(want: Dictionary, free: Array, cur: Dictionary, n_desks := 0, spec := []) -> Dictionary:
 	var out := {}
 	var left := free.duplicate()
+	var sp := spec.duplicate()
 	var can := func(k) -> bool: return want.has(k) and bool(want[k].get("guest", false)) and not (str(want[k].look) in ["off", "hide"])
 	for k in cur:
 		if can.call(k) and int(cur[k]) in left:
 			out[k] = int(cur[k])
 			left.erase(int(cur[k]))
+		elif can.call(k) and int(cur[k]) in sp:
+			out[k] = int(cur[k])
+			sp.erase(int(cur[k]))
 	var ks := []
 	for k in want:
 		if not out.has(k) and can.call(k) and str(want[k].get("v", {}).get("state", "")) in ["work", "watch", "unknown", "turn"]:
 			ks.append(k)
 	ks.sort()
 	for k in ks:
+		if not sp.is_empty() and int(want[k].get("fav_key", -1)) >= 0 and want[k].get("v", {}).has("spec"):
+			out[k] = sp.pop_front()
+			continue
 		if left.is_empty():
-			break
+			continue
 		var fav: int = int(want[k].get("fav_key", -1)) % n_desks if n_desks > 0 and int(want[k].get("fav_key", -1)) >= 0 else -1
 		if fav in left:
 			out[k] = fav
@@ -392,7 +400,7 @@ func apply(agent: Dictionary, reg: Dictionary, now: float) -> void:
 				owner_off = false
 		if owner_off and office.staff[j].state == "off" and not office.is_leaving(j):
 			free.append(j)
-	borrowed = borrow_plan(want, free, borrowed, office.desk_count)
+	borrowed = borrow_plan(want, free, borrowed, office.desk_count, office.spec_seat_ids())
 	for k in borrowed:
 		want[k].borrow = borrowed[k]
 		if str(want[k].v.get("state", "")) in ["work", "watch", "unknown"]:
@@ -422,6 +430,8 @@ func apply(agent: Dictionary, reg: Dictionary, now: float) -> void:
 		office.set_bubble(i, bubble_text(look, want.get(k, {}).get("v", {}), bias))
 		office.set_fail(i, look in ["work", "watch", "unknown"] and bool(want.get(k, {}).get("v", {}).get("fail", false)))   # 머리 긁기 + 땀방울 3초 (M4)
 		office.set_tool(i, str(want.get(k, {}).get("v", {}).get("tool", "")) if look == "work" else "")   # ② 도구별 책상 동작 + 아이콘 (M4 5세션째)
+		var wv3: Dictionary = want.get(k, {}).get("v", {})
+		office.set_tool_spot(i, str(wv3.get("spot", "")) if look == "work" else "", int(wv3.get("spot_n", 0)))   # 도구별 장소 이동 (1.3): 같은 소품 종류 3번 연속 = 그 소품 앞으로
 		office.set_stop(i, look == "work" and bool(want.get(k, {}).get("v", {}).get("stop", false)))   # 멈춤 손 (Esc, C16)
 	for k in slot.keys():   # 다 퇴근한 임시 파견 · 사라진 직원 → 자리 반납
 		if not shown.has(k):
@@ -498,6 +508,7 @@ func _bind(want: Dictionary) -> void:
 		var ckey: int = StaffRegistry.color_key(_reg, str(wv2.agent), str(wv2.proj)) if wv2.has("proj") and wv2.has("agent") else int(w.staff)
 		office.set_staff_color(i, PROJECT_COLORS[ckey % PROJECT_COLORS.size()])
 		office.set_staff_agent(i, str(wv2.get("agent", "")))
+		office.set_staff_model(i, str(wv2.get("model", "")) if bool(Game.settings.get("show_model", true)) else "")
 		if i >= office.desk_count:
 			office.set_borrow(i, int(w.get("borrow", -1)))
 
@@ -608,6 +619,14 @@ func pick(origin: Vector3, dir: Vector3) -> int:
 	return who
 
 
+## 화면 직원 번호 → 직원 기록 id (인턴 · 전문가 = -1)
+func staff_id_at(i: int) -> int:
+	for k in slot:
+		if int(slot[k]) == i and str(k).begins_with("s:"):
+			return int(str(k).substr(2))
+	return -1
+
+
 func pick_at(screen: Vector2) -> int:
 	return pick(camera.project_ray_origin(screen), camera.project_ray_normal(screen))
 
@@ -629,3 +648,7 @@ func _hover_tick() -> void:
 	var m := vp.get_mouse_position()
 	var inside := Rect2(Vector2.ZERO, vp.get_visible_rect().size).has_point(m)
 	set_hover(pick_at(m) if inside else -1)
+	var fr := office.get_node_or_null("HistoryFrame") as Node3D
+	office.set_history_hover(inside and fr != null and fr.visible and RayPick.distance(fr, camera.project_ray_origin(m), camera.project_ray_normal(m)) < INF)
+	var hw := office.get_node_or_null("HonorWall") as Node3D
+	office.set_honor_hover(inside and hw != null and hw.visible and RayPick.distance(hw, camera.project_ray_origin(m), camera.project_ray_normal(m)) < INF)

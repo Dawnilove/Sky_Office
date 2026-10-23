@@ -7,7 +7,7 @@ extends RefCounted
 ##   ④ 조용히 모드 (C36): 큰 움직임 · 버릇 · 아침 조회 · 점심 · 단계 모임을 끔. 말 거는 장면 (내 차례 · 딩 · 일 받기 · 보고 · 출퇴근) 은 그대로
 ## 값은 data/idle_weights.json (big_max · big_gap_s) — '하루 빨리 보기' (scripts/dev/fast_day.gd) 재생으로 조정
 
-const BIG_ACTS := ["coffee", "sofa", "chat", "pier", "quirk"]
+const BIG_ACTS := ["coffee", "sofa", "chat", "pier", "quirk", "read", "doodle", "pet"]
 
 
 ## 쉬는 행동 하나 허락: 바라는 act → 실제 act ("stand" = 그 자리에서 쉼)

@@ -5,12 +5,17 @@
 		"sofa": {"w": 15, "느긋": 2},
 		"chat": {"w": 10, "수다": 2},
 		"pier": {"w": 10},
-		"quirk": {"w": 30, "부지런": 2}
+		"read": {"w": 10, "조용": 2},
+		"doodle": {"w": 5},
+		"pet": {"w": 5},
+		"quirk": {"w": 25, "부지런": 2}
 	},
 	"personalities": ["부지런", "느긋", "수다", "조용"],
 	"quirks": {"부지런": "SitWipe", "느긋": "swivel", "수다": "SitLook", "조용": "SitPen"},
 	"act_s": [30, 180],
 	"big_max": 3,
+	"cat": {"acts": {"sleep": 70, "sit": 15, "stroll": 10, "eat": 5}, "walk_gap_s": 300, "sleep_s": [60, 240]},
 	"big_gap_s": 600,
+	"tool_gap_s": 90,
 	"work_quirk_s": [90, 240]
 }

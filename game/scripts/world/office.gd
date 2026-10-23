@@ -36,7 +36,7 @@ const NAMES := ["민준", "서연", "도윤", "하은", "지호", "수아", "예
 const C_WALL := "f4f0e8"
 const C_WALL_LOW := "e9e3d7"
 ## 바닥 (v2.5): 작업실 회청색 카펫 · 휴게 나무 · 창구 차가운 타일 (v2.6) · 복도 밝은 나무
-const C_FLOOR := {"building": "d8c3a0", "workroom": "dcc6a2", "counter": "dde1e4", "rest": "d3b98f", "pier": "b49c7c"}
+const C_FLOOR := {"building": "d8c3a0", "workroom": "dcc6a2", "counter": "dde1e4", "rest": "d3b98f", "lounge": "dcc7a0", "pier": "b49c7c"}
 const C_TILE_LINE := "a9b2b9"   ## 창구 타일 줄눈
 const C_WALL_CAP := "a8916f"    ## 낮은 벽 위 덮개 (나무, M4)
 const C_WALL_BASE := "8f877c"   ## 벽 걸레받이
@@ -51,7 +51,16 @@ const DESK_PARTS := [
 	{"A": preload("res://assets/models/desk/chair_a.glb"), "B": preload("res://assets/models/desk/chair_b.glb"), "C": preload("res://assets/models/desk/chair_c.glb")},
 ]
 ## 자리 (책상 id) 마다 정해진 조합 = 책상 · 모니터 · 의자. 이웃끼리 겹치지 않게 고른 6가지를 돌려 씀 (사용자: '다 채택해서 개성 있게')
-const DESK_COMBOS := ["AAA", "BBB", "ACC", "ABA", "BCB", "AAC"]
+const CEIL_LIGHT_Y := 2.0                                      ## 단계 90 천장 불 높이 (칸)
+const CEIL_LIGHT_ENERGY := 0.75                               ## 천장 불 세기 (밤에 day_night 가 키움)
+const DESK_LAMP_BOOST := 1.4                                 ## 단계 90 책상 스탠드 배율
+const SIGN_BIG_K := 1.4                                       ## 대형 간판 (단계 140) 배율
+const SIGN_BIG_SHIFT := 0.7                                   ## 대형 간판이 시계와 안 겹치게 왼쪽으로 옮기는 칸 수
+const HONOR_LIST_MAX := 6                                    ## 명예의 벽 마우스 올림 목록 줄 수 (최근 순)
+const MONITOR_HALF_W := {"A": 0.27, "B": 0.47, "C": 0.39}   ## 모니터 모델 반폭 (책상 로컬)
+const DESK_MODEL_W := 1.2                                     ## 책상 모델 가로 (칸)
+const MONITOR_PAIR_X := 0.33                                  ## 모니터 2대일 때 가운데에서 좌우로 벌리는 거리
+const DESK_COMBOS :=["AAA", "BBB", "ACC", "ABA", "BAB", "AAC"]   # 화면 3개짜리 모니터 (C) 는 ACC 책상만 = 12개 중 2명
 const PANTRY := preload("res://assets/models/pantry.glb")
 const SERVICE := preload("res://assets/models/station/service_counter.glb")   ## 결재 창구: 높은 카운터 + 유리 틀 (손님 쪽 = +x), v2.6 · M4 남색 은행 창구 C
 ## 창구 · 승강장 나머지 (M4 3세션째, build_counter_kit.py --station-export) — 크기 단위 칸, 앞면 = +z
@@ -85,12 +94,15 @@ const ROCK_BASE := preload("res://assets/models/rock_base.glb")   ## 윗면 1 ×
 ## kArchive 가구 (자료: kArchive · 출처: 쓰레드 dogfooter — LICENSES.md · README · 설정 크레딧) — 단계 36 탕비실 정비 · 44 야근 문화. 모델 단위 = 칸 (원본에서 크기만 줄임, tools/blender/build_karchive.py)
 const KA_COFFEE := preload("res://assets/models/karchive/capsule_coffee.glb")
 const KA_WATER := preload("res://assets/models/karchive/water_dispenser.glb")
-const KA_POD := preload("res://assets/models/karchive/sleep_pod.glb")
+const KA_FRIDGE := preload("res://assets/models/karchive/snack_fridge.glb")
+const KA_TV := preload("res://assets/models/karchive/tv_console.glb")
+const KIT_ARMCHAIR := preload("res://assets/models/kit/kit_armchair.glb")
 const KIT_SOFA := preload("res://assets/models/kit/kit_sofa.glb")
 const KIT_RUG := preload("res://assets/models/kit/kit_rug.glb")
 const KIT_TABLE := preload("res://assets/models/kit/kit_table_round.glb")
 const KIT_CHAIR := preload("res://assets/models/kit/kit_chair.glb")
 const KIT_PLANTS := [preload("res://assets/models/kit/kit_plant_monstera.glb"), preload("res://assets/models/kit/kit_plant_pothos.glb")]
+const CatScript := preload("res://scripts/world/cat.gd")
 const STAFF_MODEL := preload("res://assets/models/staff.glb")   ## 2등신 직원 (재질 Shirt · Hair 를 직원마다 다시 칠함), 크기 단위 m
 const STAFF_HEAD := 0.875    ## 직원 머리 중심 높이 (칸) — 서도 앉아도 같음 (앉으면 엉덩이가 의자 높이)
 const DESK_TOP := 0.48       ## desk_set 상판 높이 (칸)
@@ -104,6 +116,9 @@ var island: Node3D
 var staff: Array = []          ## [{node, body, head, icon, plate, label, tag, name, state, desk}]
 var board_cells: Array = []    ## 책상 id 순서의 램프칸 MeshInstance3D (덮개 칸은 빼고)
 var desk_parts: Array = []     ## [{screen, bulb}]
+var spec_parts: Array = []     ## 전문가석 (1.4) 책상 부품, 번호 = Layout.SPEC_BASE + 순서
+var _cafe_nodes: Array = []   ## 라운지 카페 코너 (1.2 단계 76) 노드들 — _stage_setup 이 "cafe" 로 등록
+var cat: Node3D                ## 사무실 고양이 (1.2 단계 64, cat.gd) — 단계 전엔 숨김
 var boss: Dictionary = {}      ## 사장 자리 부품 {chair, chair_pos, bulb, note, light} (v2.8 C15)
 var flag: MeshInstance3D
 var sign_text: Label3D         ## 간판 글자 = 회사 이름 (set_sign_text, M5 3세션째 창업 화면)
@@ -144,6 +159,7 @@ func build(isl: Node3D, lay: Layout) -> void:
 	_walls()
 	_workroom()
 	_counter()
+	_boss_room()
 	_rest()
 	_pier()
 	_bus_build()
@@ -174,6 +190,11 @@ func build(isl: Node3D, lay: Layout) -> void:
 		if a.begins_with("--folder="):
 			for i in desk_count:
 				set_staff_project(i, a.get_slice("=", 1))
+	for a in Game.dev_args():   # 개발용 (1.1 ①): `--models=claude-opus-4-7,gpt-5.1-codex` 책상 순서대로 모델 칩
+		if a.begins_with("--models="):
+			var mn := a.get_slice("=", 1).split(",")
+			for i in mini(mn.size(), desk_count):
+				set_staff_model(i, mn[i])
 	more_label = _label(48, 3)   # 넘친 인턴 수 '+N' (대기 의자 인턴 머리 위, 회색 글자 + 흰 테)
 	more_label.name = "InternMore"
 	more_label.modulate = Color(C_GUEST).darkened(0.25)
@@ -188,6 +209,12 @@ func build(isl: Node3D, lay: Layout) -> void:
 		if a.begins_with("--fail="):
 			for k in a.get_slice("=", 1).split(","):
 				set_fail(int(k), true)
+		elif a.begins_with("--honor="):   # 개발용 (1.3): 명예의 벽 기념사진 n장 (그림 · 저장 안 함)
+			var fake: Array = []
+			for hi in int(a.get_slice("=", 1)):
+				fake.append({"date": "2026-10-%02d" % (hi % 28 + 1), "days": hi + 3, "look": {"shirt": hi, "hair": hi, "acc": 0, "person": 0}})
+			Game.company.honor = fake
+			refresh_honor()
 		elif a.begins_with("--guests="):
 			for k in int(a.get_slice("=", 1)):
 				set_state(add_guest(), "wait")
@@ -239,6 +266,8 @@ func build(isl: Node3D, lay: Layout) -> void:
 				var go := func() -> void:
 					if act == "tidy":
 						set_state(k, "done", true)
+					elif act.begins_with("spot_"):   # 도구별 장소 이동 (1.3) 그림 · 실화면: `0:spot_search@3,1:spot_run@3,2:spot_web@3` (search · run · web · plan)
+						set_tool_spot(k, act.substr(5), TOOL_SPOT_N)
 					elif TOOL_KIND.has(act):   # ② 도구 (M4 5세션째): `0:Read@3,0:Edit@8,0:Bash@13`
 						staff[k].tool_since = -1.0e9
 						set_tool(k, act)
@@ -372,6 +401,16 @@ func set_guest_look(i: int, lk: Dictionary) -> void:
 	_wear_acc(s.model, ACCESSORIES[int(lk.acc) % ACCESSORIES.size()] if key != "" else "")
 
 
+## 모델 칩 글자 (원래 모델 이름, "" = 숨김)
+func set_staff_model(i: int, model_name: String) -> void:
+	var chip: Label3D = staff[i].chip
+	var txt := AgentWatch.model_short(model_name)
+	if chip.text == txt:
+		return
+	chip.text = txt
+	_refresh_tag(staff[i])
+
+
 ## 프로젝트 이름 ("" = 숨김)
 func set_staff_project(i: int, label: String) -> void:
 	if str(staff[i].get("project", "")) == label:
@@ -395,8 +434,13 @@ func set_borrow(i: int, j: int, move := true) -> void:
 		return
 	var old := int(s.borrow_j)
 	s.borrow_j = j
-	s.borrow = staff[j].desk if j >= 0 else {}
-	if old >= 0:
+	s.borrow = borrow_desk(j) if j >= 0 else {}
+	if old >= Layout.SPEC_BASE:   # 전문가석은 주인이 없음: 떠나면 스탠드 · 화면을 끔
+		var sp: Dictionary = spec_parts[old - Layout.SPEC_BASE]
+		_set_glow(sp.bulb, Color("cfcac2"), false)
+		(sp.light as Node3D).visible = false
+		_set_glow(sp.screen, Color("3a3a3c"), false)
+	elif old >= 0:
 		_apply_look(old)
 	if move and (s.node as Node3D).visible:
 		set_state(i, str(s.state), true)
@@ -441,6 +485,8 @@ func set_state(i: int, state: String, move := false, delay := 0.0) -> void:
 	if move and state.begins_with("done") and not str(s.state).begins_with("done"):
 		boss_read()   # 일이 끝나면 사장이 보고서를 읽음 (M4, 끝 보고 연출 전 임시)
 	var prev: String = str(s.state)
+	if state != "work" and str(s.get("act", "")) in ["tool_spot", "tool_back"]:
+		s.act = ""   # 일이 끝나면 · 내 차례면 · 퇴근이면 소품 앞에서 바로 그 자리로 (아래 걷기가 자리로 데려감)
 	var thumbs: bool = move and prev == "turn15" and look.where == "seat" and was_visible   # ⑨ 사장이 답함: 창구에서 엄지척 → 자리로
 	if thumbs:
 		delay = maxf(delay, THUMB_S)
@@ -552,6 +598,8 @@ func _settle(i: int) -> void:
 
 ## 서 있거나 앉은 기본 동작 — 실패 중이면 머리 긁기 (앉아서 / 서서)
 func _pose_anim(s: Dictionary) -> String:
+	if str(s.get("act", "")) == "tool_spot":
+		return "Idle"   # 소품 앞에 서 있음 (앉는 동작 아님)
 	var look: Dictionary = LOOK.get(s.state, LOOK.off)
 	var sit: bool = look.pose == "sit"
 	if sit and s.state == "work" and s.get("stop", false):
@@ -663,7 +711,11 @@ const TOOL_ANIM := {"edit": "SitTypeFast", "read": "SitFlip", "run": "SitWatch"}
 const TOOL_MIN_S := 1.5      ## '방금 쓴 도구' 는 최소 1.5초 (5-1) — 빨리 바뀌면 다음 확인 때 바꿈
 const PAPER_STACK_MAX := 3   ## 고치기: 책상 위 종이 더미 (고칠 때마다 1장, 일이 끝나면 치움)
 const THUMB_S := 1.2         ## ⑨ 창구에서 엄지척 시간 → 그 뒤 자리로
-const BIG_ACTS := ["coffee", "sofa", "chat", "pier", "quirk"]
+const BIG_ACTS := ["coffee", "sofa", "chat", "pier", "quirk", "read", "doodle", "pet", "tool_spot"]
+## 도구별 장소 이동 (1.3): 소품 종류 → 작업실 가구 슬롯 · 그 가구가 들어온 단계 (unlock)
+const TOOL_PROP := {"search": "bookshelf", "run": "rack", "web": "telescope", "plan": "whiteboard"}
+const PROP_UNLOCK := {"bookshelf": "bookshelf", "rack": "server_rack", "telescope": "telescope", "whiteboard": "whiteboard"}
+const TOOL_SPOT_N := 3   ## 같은 종류가 이만큼 연속이면 소품 앞으로
 const DRINK_TURN := 60.0   ## 커피 마실 땐 탕비에서 카메라 쪽으로 반쯤 돌아섬 (컵이 보이게)
 var idle_cfg := {}
 var _life_acc := 0.0
@@ -721,11 +773,13 @@ func life_tick(now: float) -> void:
 	if idle_cfg.is_empty():
 		return
 	var ctx := {"turn": any_turn(), "quiet": bool(Game.settings.get("quiet", false)), "now": now}
+	if cat != null and cat.visible:
+		cat.tick(now, {"turn": ctx.turn, "quiet": ctx.quiet, "off": off_duty, "big_now": big_movers()})
 	for i in staff.size():
 		var s: Dictionary = staff[i]
 		if not (s.node as Node3D).visible or s.tween != null:
 			continue
-		if s.state == "work" and float(s.get("quirk_at", 0.0)) > 0.0 and now >= float(s.quirk_at):
+		if s.state == "work" and float(s.get("quirk_at", 0.0)) > 0.0 and now >= float(s.quirk_at) and not str(s.get("act", "")) in ["tool_spot", "tool_back"]:
 			var span: Array = idle_cfg.get("work_quirk_s", [90, 240])
 			s.quirk_at = now + randf_range(float(span[0]), float(span[1]))
 			if Director.work_quirk(ctx):
@@ -737,6 +791,16 @@ func life_tick(now: float) -> void:
 
 
 ## 지금 크게 움직이는 (커피 · 소파 · 수다 · 부두 · 버릇) 다른 직원 수
+## 쉬는 직원이 고양이를 쓰다듬을 수 있나: 고양이가 보이고 · 침대에서 자는 중 · 다른 직원이 쓰다듬는 중이 아님
+func can_pet() -> bool:
+	return cat != null and cat.visible and cat.act == "sleep" and cat.at_bed() and not staff.any(func(s): return str(s.get("act", "")) == "pet")
+
+
+## 쓰다듬는 자리: 침대 왼쪽 (밥그릇 쪽) — 소파 · 수다 자리와 떨어져 있음
+func cat_pet_spot() -> Vector2:
+	return cat.bed + Vector2(-0.5, 0.2)
+
+
 func big_movers(except := -1) -> int:
 	var n := 0
 	for j in staff.size():
@@ -745,15 +809,20 @@ func big_movers(except := -1) -> int:
 	return n
 
 
-## 쉬는 행동 시작 (act = coffee · sofa · chat · pier · quirk · stand). 시험 · 개발 인자에서도 부름
+## 쉬는 행동 시작 (act = coffee · sofa · chat · pier · quirk · read · doodle · stand). 시험 · 개발 인자에서도 부름
 func rest_act(i: int, act: String, now := -1.0) -> void:
 	var s: Dictionary = staff[i]
 	if now < 0.0:
 		now = _now()
 	var span: Array = idle_cfg.get("act_s", [30, 180])
 	s.act_until = now + randf_range(float(span[0]), float(span[1]))
+	if act == "pet" and not can_pet():
+		act = "coffee"   # 고양이가 침대에서 자는 중이 아니면 (아직 없음 · 걷는 중 · 다른 직원이 쓰다듬는 중) 평소 쉬기
 	if act in BIG_ACTS and big_movers(i) + (2 if act == "chat" else 1) > int(idle_cfg.get("big_max", 3)):
 		act = "stand"   # 잔잔 예산: 크게 움직이는 직원 3명까지 (5-4)
+	var prop_slot := {"read": "bookshelf", "doodle": "whiteboard"}   # 소품 앞 자리 하나 = 한 명 · 안 들어왔거나 아침 조회 중이면 안 감
+	if prop_slot.has(act) and (not has_unlock(prop_slot[act]) or _prop_busy(prop_slot[act], i) or staff.any(func(o) -> bool: return o != s and str(o.get("act", "")) == act)):
+		act = "stand"
 	var partner := -1
 	if act == "chat":
 		for j in staff.size():
@@ -771,23 +840,38 @@ func rest_act(i: int, act: String, now := -1.0) -> void:
 			staff[partner].big_at = now
 	var rs: Array = layout.slots("rest_spots")
 	match act:
+		"coffee" when layout.front_extra > 0.0 and has_unlock("cafe") and i % 2 == 0:   # 라운지 카페 카운터 (1.2 단계 76): 짝수 번호 직원은 거기서 커피
+			var cf: Dictionary = layout.slots("lounge_cafe")[0]
+			_act_go(i, cf.pos + Vector2(0, 0.6), 0.0 + DRINK_TURN, func() -> void:
+				hold(i, "cup")
+				(s.anim as AnimationPlayer).play("Drink", 0.2))
 		"coffee":
 			var k := _free_rest_spot(i, true)
 			_act_go(i, rs[k].pos, float(rs[k].rot) + DRINK_TURN, func() -> void:
 				hold(i, "cup")
 				(s.anim as AnimationPlayer).play("Drink", 0.2))
 		"sofa":
+			var lseats: Array = layout.slots("lounge_seats") if layout.front_extra > 0.0 and has_unlock("welfare") else []
 			var so: Dictionary = layout.slots("sofa")[0]
-			var side := 0.3 if i % 2 == 0 else -0.3
-			var face := Vector2(-sin(deg_to_rad(so.rot)), -cos(deg_to_rad(so.rot)))   # 소파가 보는 쪽
-			var along := Vector2(face.y, -face.x) * side
-			var seat: Vector2 = so.pos + along + face * 0.04
-			var front: Vector2 = so.pos + along + face * 0.45
-			s.act_exit = layout.m3(front)
-			_act_go(i, front, float(so.rot), func() -> void:
-				var tw := (s.node as Node3D).create_tween()
-				tw.tween_property(s.node, "position", layout.m3(seat), 0.35)
-				tw.tween_callback((s.anim as AnimationPlayer).play.bind("SitRest", 0.25)))
+			if not lseats.is_empty() and i % 2 == 1:   # 라운지 안락의자 (복지, 1.2): 홀수 번호 직원은 TV 보며 앉음
+				var ch: Dictionary = lseats[(i / 2) % lseats.size()]
+				var out: Vector2 = ch.pos + Vector2(0.55, 0.0)
+				s.act_exit = layout.m3(out)
+				_act_go(i, out, 0.0, func() -> void:
+					var tw := (s.node as Node3D).create_tween()
+					tw.tween_property(s.node, "position", layout.m3(ch.pos + Vector2(0, 0.04)), 0.35)
+					tw.tween_callback((s.anim as AnimationPlayer).play.bind("SitRest", 0.25)))
+			else:
+				var side := 0.3 if i % 2 == 0 else -0.3
+				var face := Vector2(-sin(deg_to_rad(so.rot)), -cos(deg_to_rad(so.rot)))   # 소파가 보는 쪽
+				var along := Vector2(face.y, -face.x) * side
+				var seat: Vector2 = so.pos + along + face * 0.04
+				var front: Vector2 = so.pos + along + face * 0.45
+				s.act_exit = layout.m3(front)
+				_act_go(i, front, float(so.rot), func() -> void:
+					var tw := (s.node as Node3D).create_tween()
+					tw.tween_property(s.node, "position", layout.m3(seat), 0.35)
+					tw.tween_callback((s.anim as AnimationPlayer).play.bind("SitRest", 0.25)))
 		"chat":
 			var p0: Vector2 = rs[2 % rs.size()].pos
 			var p1: Vector2 = rs[3 % rs.size()].pos
@@ -796,8 +880,18 @@ func rest_act(i: int, act: String, now := -1.0) -> void:
 			staff[partner].act_until = s.act_until
 			_act_go(i, p0, rad_to_deg(atan2(-d.x, -d.y)), (s.anim as AnimationPlayer).play.bind("Talk", 0.2))
 			_act_go(partner, p1, rad_to_deg(atan2(d.x, d.y)), (staff[partner].anim as AnimationPlayer).play.bind("Talk", 0.2))
+		"pet":
+			_act_go(i, cat_pet_spot(), -90.0, func() -> void:
+				(s.anim as AnimationPlayer).play("Idle", 0.2)
+				cat.hold(s.act_until))
 		"pier":
 			_act_go(i, layout.slot("dock") + Vector2(-0.2, -0.25 + 0.15 * (i % 3)), 90.0, (s.anim as AnimationPlayer).play.bind("LookUp", 0.3))
+		"read", "doodle":
+			var sl := layout.room_slot(prop_slot[act])
+			_act_go(i, sl.pos + Vector2(0, sl.size.y / 2.0 + 0.4), 0.0, func() -> void:
+				if act == "read":
+					hold(i, "papers")
+				(s.anim as AnimationPlayer).play("HoldIdle" if act == "read" else "Scratch", 0.2))
 		"quirk":
 			_act_go(i, s.desk.seat, float(s.desk.rot), func() -> void:
 				(s.anim as AnimationPlayer).play("SitRest", 0.2)
@@ -947,6 +1041,63 @@ func hold(i: int, kind: String) -> void:
 	else:
 		p.position = Vector3(0, 0.1, 0) + (Vector3(0, 0, 0.03) if kind == "papers" else Vector3(0, -0.04, 0))   # 손 끝 (뼈 길이 ≈ 0.09)
 	s.held_node = p
+
+
+## 도구별 장소 이동 (1.3, PLAN 12-3): 일하는 직원이 같은 소품 종류를 3번 연속 쓰면 그 소품 앞으로 · 다른 종류 도구가 오면 자리로.
+##   일이 끝나면 · 내 차례면 · 퇴근이면 set_state 가 자리 · 창구 · 정류장으로 데려감. 조용히 모드 · 내 차례가 있는 동안 · 소품이 없거나 쓰는 중이면 안 감.
+##   소품 앞에서 신호가 없어도 그대로 기다림 (자리로 안 돌아감)
+func set_tool_spot(i: int, kind: String, n: int, now := -1.0) -> void:
+	var s: Dictionary = staff[i]
+	if s.state != "work":
+		return
+	if str(s.get("act", "")) == "tool_spot":
+		if kind != str(s.get("spot_kind", "")):
+			_tool_return(i)
+		return
+	if kind == "" or n < TOOL_SPOT_N or not TOOL_PROP.has(kind) or str(s.get("act", "")) != "" or s.tween != null or not (s.node as Node3D).visible 			or s.desk.is_empty() or int(s.borrow_j) >= 0 or any_turn() or bool(Game.settings.get("quiet", false)):
+		return
+	var prop: String = TOOL_PROP[kind]
+	if not has_unlock(PROP_UNLOCK[prop]) or _prop_busy(prop, i) or big_movers(i) + 1 > int(idle_cfg.get("big_max", 3)):
+		return
+	if now < 0.0:
+		now = _now()
+	if now - float(s.get("spot_at", -1.0e18)) < float(idle_cfg.get("tool_gap_s", 90)):
+		return
+	var sl := layout.room_slot(prop)
+	s.act = "tool_spot"
+	s.spot_kind = kind
+	s.spot_prop = prop
+	s.spot_at = now
+	s.big_at = now
+	_act_go(i, sl.pos + Vector2(0, sl.size.y / 2.0 + 0.4), 0.0, (s.anim as AnimationPlayer).play.bind("Idle", 0.2))
+
+
+## 그 소품 앞을 누가 쓰는가 (도구 이동 · 쉬는 직원 책장 / 화이트보드 · 아침 조회)
+func _prop_busy(prop: String, except: int) -> bool:
+	for j in staff.size():
+		if j == except:
+			continue
+		var a := str(staff[j].get("act", ""))
+		if (a == "tool_spot" and str(staff[j].get("spot_prop", "")) == prop) or (a == "read" and prop == "bookshelf") 				or (a in ["doodle", "gather"] and prop == "whiteboard" and has_unlock("whiteboard")):
+			return true
+	return false
+
+
+## 소품 앞에서 자리로 (다른 종류 도구 · 아침 조회가 화이트보드 앞을 쓸 때)
+func _tool_return(i: int) -> void:
+	var s: Dictionary = staff[i]
+	if str(s.get("act", "")) != "tool_spot":
+		return
+	_stop_walk(i)
+	_leave_act(i)
+	s.spot_prop = ""
+	if s.desk.is_empty():
+		return
+	s.act = "tool_back"
+	_act_go(i, s.desk.seat, float(s.desk.rot), func() -> void:
+		s.act = ""
+		(s.anim as AnimationPlayer).play(_pose_anim(s), 0.2)
+		_tool_props(i))
 
 
 ## ② '방금 쓴 도구' (office_routine 이 확인 때마다 부름): 종류가 바뀌면 동작 · 아이콘 · 소품을 바꿈. 최소 TOOL_MIN_S 초 유지
@@ -1166,7 +1317,7 @@ func _apply_look(i: int) -> void:
 				if int(staff[g].borrow_j) == i and staff[g].state != "off":
 					_apply_look(g)
 					return
-	var dp: Dictionary = desk_parts[di]
+	var dp: Dictionary = spec_parts[di - Layout.SPEC_BASE] if di >= Layout.SPEC_BASE else desk_parts[di]
 	_set_glow(dp.bulb, Color("fff6e8") if look.lamp else Color("cfcac2"), look.lamp)
 	(dp.light as Node3D).visible = look.lamp
 	_set_glow(dp.screen, Color("cfe3ee") if state in ["work", "watch", "turn", "unknown"] else Color("3a3a3c"), state in ["work", "watch", "turn"])
@@ -1463,10 +1614,12 @@ func _add_staff(d: Dictionary) -> void:
 	bg.shaded = false
 	tagbox.add_child(bg)
 	var tag := _label(40, 9)
+	tag.pixel_size *= TAG_PLATE_K
 	tag.text = "인턴" if guest else NAMES[d.id % NAMES.size()]
 	tag.modulate = Color("3a3f4a")
 	tagbox.add_child(tag)
 	var dot := _label(40, 9)
+	dot.pixel_size *= TAG_PLATE_K
 	tagbox.add_child(dot)
 	var stripe := Sprite3D.new()   # 프로젝트 색 줄 (이름판 왼쪽, M3 5세션째)
 	stripe.texture = _stripe_texture()
@@ -1483,6 +1636,12 @@ func _add_staff(d: Dictionary) -> void:
 	tool_icon.shaded = false
 	tool_icon.visible = false
 	tagbox.add_child(tool_icon)
+	var chip := _label(32, 9)   # 모델 칩: 명패 바로 아래 한 줄 (① 1.1), 글자만 + 흰 테두리
+	chip.modulate = Color("3a3f4a")
+	chip.outline_size = 8
+	chip.outline_modulate = Color(1, 1, 1, 0.9)
+	chip.visible = false
+	tagbox.add_child(chip)
 	var icon := Node3D.new()
 	root.add_child(icon)
 	var plate := Sprite3D.new()
@@ -1527,7 +1686,7 @@ func _add_staff(d: Dictionary) -> void:
 		sp.shaded = false
 		bubble.add_child(sp)
 	staff.append({"node": root, "model": model, "team": "", "person": -1, "body": body, "head": head, "anim": anim, "icon": icon, "plate": plate, "label": label, "tag": tag,
-			"tagbox": tagbox, "tag_bg": bg, "dot": dot, "stripe": stripe, "color": "", "borrow": {}, "borrow_j": -1, "bubble": bubble, "bubble_text": "", "say_text": "", "say_until": 0,
+			"tagbox": tagbox, "chip": chip, "tag_bg": bg, "dot": dot, "stripe": stripe, "color": "", "borrow": {}, "borrow_j": -1, "bubble": bubble, "bubble_text": "", "say_text": "", "say_until": 0,
 			"tween": null, "leaving": false, "spot": {}, "hover": false, "sweat": sweat, "fail": false, "vest": vest, "outfits": outfits, "guest": guest,
 			"name": tag.text, "days": 0, "state": "off", "desk": {} if guest else d, "id": int(d.id),
 			"act": "", "act_until": 0.0, "act_exit": null, "held": "", "held_node": null, "greet": false, "quirk_at": 0.0,
@@ -1547,7 +1706,8 @@ func _paint_staff(model: Node3D, shirt: String, hair: String) -> void:
 				m.set_surface_override_material(k, mat)
 
 
-const TAG_H := 0.23   ## 이름판 글자 높이 (칸) — 창 100% 에서 약 12px, 옆자리 이름판과 안 겹치게
+const TAG_PLATE_K := 0.8       ## 명패 판 · 글자만 이 배율로 (모델 칩 · 말풍선은 TAG_H 그대로, 칩과 어울리게)
+const TAG_H := 0.2## 이름판 글자 높이 (칸) — 창 100% 에서 약 12px, 옆자리 이름판과 안 겹치게
 const TAG_LIFT_BACK := 0.6    ## 짝수 열 이름판 올림 (칸) 뒷줄 · 앞줄 — 정면 0° 에서 옆자리와 안 겹치게 (15° 땐 0.3 · 0.42)
 const TAG_LIFT_FRONT := 0.56
 const TAG_TWO_UP := 0.3        ## 2줄 명패: 판이 위로 더 자라는 높이 (칸)
@@ -1604,6 +1764,9 @@ func _layout_tag(s: Dictionary, look: Dictionary) -> void:
 	var bg_px := tag.pixel_size * 56.0 / 32.0   # 판 높이 = 글자 56px 상당
 	bg.pixel_size = bg_px
 	bg.scale = Vector3((total + 26.0) * tag.pixel_size / (128.0 * bg_px), 1.8 if two else 1.0, 1)
+	var chip: Label3D = s.chip
+	chip.visible = chip.text != ""
+	chip.offset.y = -(28.0 * (1.8 if two else 1.0) + 14.0) * tag.pixel_size / chip.pixel_size   # 판 아래쪽 끝 + 여백 (칩 글자 픽셀 단위)
 
 
 ## 흰 둥근 카드 (128×32, 밝은 사무실 비교 O)
@@ -1786,7 +1949,7 @@ func _floors() -> void:
 	var f := _block(b.get_center(), b.size, -0.02, 0.03, C_FLOOR.building)
 	f.name = "Floor_building"
 	island.add_occupied_rect(_mr(b.grow(0.2)))
-	for z in ["workroom", "counter", "rest"]:   # 구역 = 바닥재 1개 + 대표 실루엣 1개 (UX 규칙)
+	for z in (["workroom", "counter", "rest", "lounge"] if layout.front_extra > 0.0 else ["workroom", "counter", "rest"]):   # 구역 = 바닥재 1개 + 대표 실루엣 1개 (UX 규칙)
 		var r: Rect2 = layout.zone_rect(z)
 		var fl := _block(r.get_center(), r.size - Vector2(0.1, 0.1), 0.03, 0.04, C_FLOOR[z])
 		fl.name = "Floor_" + z
@@ -1794,7 +1957,7 @@ func _floors() -> void:
 			fl.material_override = _tile_mat(C_FLOOR[z], C_TILE_LINE, 0.5)
 		elif z == "workroom":   # 작업실 = 카펫 타일 (줄눈 아주 옅게, M4)
 			fl.material_override = _plank_mat(C_FLOOR[z])
-		elif z == "rest":   # 휴게 = 나무 마루 (M4)
+		elif z in ["rest", "lounge"]:   # 휴게 · 라운지 = 나무 마루 (M4)
 			fl.material_override = _plank_mat(C_FLOOR[z])
 	island.add_walk_rect(_mr(b))
 	var p: Rect2 = layout.zone_rect("pier")
@@ -1869,12 +2032,13 @@ func _walls() -> void:
 	# 휴게 | 창구 사이 낮은 벽 + 화분 줄 (v2.6) — 복도 쪽은 열어 둠, 소파 등이 여기에 붙음
 	var dx := float(layout.data.zones.divider_x)
 	var dz0 := float(layout.data.workroom.front_z) + 0.75
-	var dv := _block(Vector2(dx, (dz0 + b.end.y) / 2.0), Vector2(0.12, b.end.y - dz0), 0.0, 0.42, C_WALL_LOW, true)
+	var dz1 := layout.base_front()   # 라운지 띠 (앞쪽 새 구역) 는 안 가름 — 카페 카운터가 화분에 안 끼게
+	var dv := _block(Vector2(dx, (dz0 + dz1) / 2.0), Vector2(0.12, dz1 - dz0), 0.0, 0.42, C_WALL_LOW, true)
 	dv.name = "Divider"
-	var nl := int((b.end.y - dz0) / 0.45)
+	var nl := int((dz1 - dz0) / 0.45)
 	for k in nl:
 		var leaf := _mesh(_sphere(0.1 * layout.unit_m), "6f8a55")
-		leaf.position = layout.m3(Vector2(dx, dz0 + (k + 0.5) * (b.end.y - dz0) / nl), 0.5)
+		leaf.position = layout.m3(Vector2(dx, dz0 + (k + 0.5) * (dz1 - dz0) / nl), 0.5)
 		add_child(leaf)
 	# 부두 문틀 (v2.6): 문 양옆 기둥 + 위 가로대
 	for d in bd.doors_left:
@@ -1884,31 +2048,37 @@ func _walls() -> void:
 		_block(Vector2(b.position.x - t / 2, mid), Vector2(t + 0.06, float(d[1]) - float(d[0]) + 0.1), 1.2, 1.32, C_WALL).name = "DoorFrame"
 
 
+## 책상 한 세트 (책상 · 모니터 · 의자 · 개인 소품 + 막힘 칸) 를 놓고 {screen, bulb, light, chair_back} 를 돌려줌. 전문가석도 같은 모델 (d.id 로 조합이 정해짐)
+func _desk_set(d: Dictionary, ds: Vector2, node_name: String) -> Dictionary:
+	var set := Node3D.new()   # 기준 = 앞줄 (rot 0, 앉은 사람이 -z 를 봄). 책상 · 모니터 · 의자를 자리마다 다르게 조합 (개성, M4 사용자)
+	var combo: String = DESK_COMBOS[d.id % DESK_COMBOS.size()]
+	for k in 3:
+		set.add_child(DESK_PARTS[k][combo[k]].instantiate())
+	(set.get_child(0) as Node3D).scale.x = ds.x / DESK_MODEL_W   # 책상 상판만 가로로 늘림 (모니터 2대 · 6열)
+	set.name = node_name
+	set.position = layout.m3(d.pos)
+	set.rotation_degrees.y = d.rot
+	set.scale = Vector3.ONE * layout.unit_m
+	add_child(set)
+	island.add_solid_rect(_mr(Rect2(d.pos - ds / 2.0, ds)))
+	var pers := PERSONAL.instantiate() as Node3D   # 개인 소품 (책상 기준 좌표 = desk_set 과 같음)
+	set.add_child(pers)
+	for k in 6:
+		var item := pers.find_child("Item%d" % k, true, false) as Node3D
+		if item:
+			item.visible = ((d.id * 5 + k * 3) % 7) < 4   # 책상마다 다른 조합 (서류 트레이 · 펜꽂이 · 달력 · 포스트잇 · 액자 · 다육)
+	(set.find_child("ChairBack", true, false) as MeshInstance3D).material_override = _mat(SHIRTS[d.id % SHIRTS.size()])   # 등받이 색 = 직원 보조 구분
+	var bulb := set.find_child("Bulb", true, false) as MeshInstance3D
+	return {"screen": set.find_child("Screen", true, false), "bulb": bulb, "light": _night_light(bulb.global_position + Vector3(0, 0.1, 0), 0.7, 1.5),
+			"chair_back": set.find_child("ChairBack", true, false)}
+
+
 # ------------------------------------------------------------------ 1. 작업실
 func _workroom() -> void:
 	var w: Dictionary = layout.data.workroom
 	var ds := _v2(w.desk_size)
 	for d in layout.desks():
-		var set := Node3D.new()   # 기준 = 앞줄 (rot 0, 앉은 사람이 -z 를 봄). 책상 · 모니터 · 의자를 자리마다 다르게 조합 (개성, M4 사용자)
-		var combo: String = DESK_COMBOS[d.id % DESK_COMBOS.size()]
-		for k in 3:
-			set.add_child(DESK_PARTS[k][combo[k]].instantiate())
-		set.name = "Desk_%d" % d.id
-		set.position = layout.m3(d.pos)
-		set.rotation_degrees.y = d.rot
-		set.scale = Vector3.ONE * layout.unit_m
-		add_child(set)
-		island.add_solid_rect(_mr(Rect2(d.pos - ds / 2.0, ds)))
-		var pers := PERSONAL.instantiate() as Node3D   # 개인 소품 (책상 기준 좌표 = desk_set 과 같음)
-		set.add_child(pers)
-		for k in 6:
-			var item := pers.find_child("Item%d" % k, true, false) as Node3D
-			if item:
-				item.visible = ((d.id * 5 + k * 3) % 7) < 4   # 책상마다 다른 조합 (서류 트레이 · 펜꽂이 · 달력 · 포스트잇 · 액자 · 다육)
-		(set.find_child("ChairBack", true, false) as MeshInstance3D).material_override = _mat(SHIRTS[d.id % SHIRTS.size()])   # 등받이 색 = 직원 보조 구분
-		var bulb := set.find_child("Bulb", true, false) as MeshInstance3D
-		desk_parts.append({"screen": set.find_child("Screen", true, false), "bulb": bulb, "light": _night_light(bulb.global_position + Vector3(0, 0.1, 0), 0.7, 1.5),
-				"chair_back": set.find_child("ChairBack", true, false)})
+		desk_parts.append(_desk_set(d, ds, "Desk_%d" % d.id))
 	# 팀 책상 섬 옆 칸막이 (마주 보는 줄 사이 칸막이는 책상 모델 desk_a · b 안에 있음) — 낮게, 뒷줄 얼굴이 가리지 않게
 	var rows: Array = w.rows
 	var mid_z := (float(rows[0].desk_z) + float(rows[1].desk_z)) / 2.0
@@ -1986,12 +2156,21 @@ func _workroom() -> void:
 		var sl := layout.room_slot(it[0])
 		_prop(it[1], sl.pos, 0.0, 0.0).name = (it[0] as String).capitalize()
 		island.add_solid_rect(_mr(Rect2(sl.pos - sl.size / 2.0, sl.size)))
+	for rn in ["rack2", "rack3"]:   # 서버 랙 2 · 3 (1.3 단계 104): 책장 오른쪽 뒷벽 따라 나란히
+		var rs := layout.room_slot(rn)
+		_prop(RACK, rs.pos, 0.0, 0.0).name = "Rack" + rn.right(1)   # Rack2 · Rack3
+		island.add_solid_rect(_mr(Rect2(rs.pos - rs.size / 2.0, rs.size)))
 	for wc in layout.slots("wait_chairs"):   # 대기 의자 (책상 쪽 = +x 를 봄)
 		_prop(WAIT_CHAIR, wc.pos, 0.0, 90.0).name = "WaitChair"
 	var room := layout.room_rect()
 	_plant(Vector2(room.position.x + 0.35, room.end.y - 0.35))
 	_plant(Vector2(room.end.x - 0.35, room.end.y - 0.35))
 	_wall_props()
+	_unicorn_props(room)
+	_cat_props()
+	if layout.front_extra > 0.0:
+		_lounge_props()
+		_spec_props()
 
 
 ## 뒷벽 안쪽 벽 소품 (M6-2): 호출 보드 양옆 빈 벽에 액자 · 달력 — 얇은 상자 + 글씨, 부딪힘 없음 (밝은 사무실 비교 · 벽 소품)
@@ -2011,6 +2190,174 @@ func _wall_props() -> void:
 	l.outline_size = 0
 	l.position = Vector3(1.03 * layout.unit_m, 1.13 * layout.unit_m, (z + 0.05) * layout.unit_m)
 	add_child(l)
+
+
+## 유니콘 ① (1.2): 작업실 카펫 · 뒷벽 화분 2개 · 유리 간판. 모두 stage 에서 보임 (_stage_setup 이 등록). 화분은 뒷벽 가까이라 부딪힘 없음
+func _unicorn_props(room: Rect2) -> void:
+	var carpet := _block(room.get_center(), room.size - Vector2(0.5, 0.5), 0.04, 0.05, "8d9bb0")
+	carpet.name = "Carpet"
+	for k in 2:
+		var p := Vector2(room.position.x + 2.0 + 1.3 * k, room.position.y + 0.4)
+		_prop(KIT_PLANTS[k], p, 0.0, k * 120.0, Vector3.ONE * 0.7).name = "PlantUni%d" % k
+	var sign := get_node_or_null("Sign")
+	if sign == null:
+		return
+	var glass := Node3D.new()   # 간판 자식 = 모델 좌표 (칸). 판 폭 1.2 · 높이 0.42, 가운데 높이 0.39
+	glass.name = "SignGlass"
+	var frame := MeshInstance3D.new()
+	frame.mesh = _box(Vector3(1.26, 0.48, 0.03))
+	frame.material_override = _mat("f4f0e8")
+	frame.position = Vector3(0, 0.39, -0.01)
+	frame.name = "SignFrame"
+	glass.add_child(frame)
+	var plate := MeshInstance3D.new()
+	plate.mesh = _box(Vector3(1.2, 0.42, 0.03))
+	var pm: StandardMaterial3D = _mat("b9d3df").duplicate()
+	pm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	pm.albedo_color.a = 0.72
+	plate.material_override = pm
+	plate.position = Vector3(0, 0.39, 0.01)
+	plate.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	glass.add_child(plate)
+	sign.add_child(glass)
+
+
+## 라운지 띠 복지 가구 (1.2 단계 64): TV 장 · 간식 냉장고 (kArchive) · 안락의자 2 (KayKit, 빈백 대신) · 러그 · 게임기. 띠는 켤 때 front_extra 로 생김
+func _lounge_props() -> void:
+	var tv: Dictionary = layout.slots("lounge_tv")[0]
+	_prop(KA_TV, tv.pos, 0.03, 0.0).name = "LoungeTv"   # 앞면 +z = 카메라 (화면이 보임)
+	island.add_solid_rect(_mr(Rect2(tv.pos - tv.size / 2.0, tv.size)))
+	var fr: Dictionary = layout.slots("lounge_fridge")[0]
+	_prop(KA_FRIDGE, fr.pos, 0.03, 0.0).name = "LoungeFridge"
+	island.add_solid_rect(_mr(Rect2(fr.pos - fr.size / 2.0, fr.size)))
+	var seats: Array = layout.slots("lounge_seats")
+	var mid: Vector2 = (seats[0].pos + seats[1].pos) / 2.0
+	_prop(KIT_RUG, mid + Vector2(0, -0.15), 0.04, 0.0, Vector3(1.0, 1.0, 0.7)).name = "LoungeRug"
+	for k in seats.size():
+		_prop(KIT_ARMCHAIR, seats[k].pos, 0.03, 180.0, Vector3.ONE * 0.8).name = "LoungeSeat%d" % k   # TV (뒤쪽) 를 봄
+		island.add_solid_rect(_mr(Rect2(seats[k].pos - seats[k].size / 2.0, seats[k].size)))
+	var g: Dictionary = layout.slots("lounge_game")[0]
+	_block(g.pos, g.size, 0.04, 0.07, "2b2f36").name = "LoungeGame"   # 게임기 (바닥 러그 위 작은 상자) + 패드
+	_block(g.pos + Vector2(0, 0.2), Vector2(0.14, 0.08), 0.04, 0.06, "e8e4dc").name = "LoungeGamePad"
+	_cafe_props()
+
+
+## 라운지 카페 코너 (1.2 단계 76 "라운지 개장"): 카페 카운터 (탕비 모델 재사용 + 커피 머신) · 피크닉 탁자 + 의자 2 + 파라솔 (직접) · 전구 줄 (은은한 고정 불빛, 깜빡임 없음). 오른쪽 절반 = 바리스타 로봇 (1.4) 자리를 비워 둠
+func _cafe_props() -> void:
+	var u := layout.unit_m
+	var add := func(n: Node3D, nm: String) -> void:
+		n.name = nm
+		_cafe_nodes.append(n)
+	var cf: Dictionary = layout.slots("lounge_cafe")[0]
+	var counter := _prop(PANTRY, cf.pos, 0.03, -90.0)   # 앞면 +x → 카메라 (+z) 쪽
+	add.call(counter, "LoungeCafeCounter")
+	island.add_solid_rect(_mr(Rect2(cf.pos - cf.size / 2.0, cf.size)))
+	var pk: Dictionary = layout.slots("lounge_picnic")[0]
+	add.call(_prop(KIT_TABLE, pk.pos, 0.03, 0.0, Vector3(0.6, 1.0, 0.6)), "LoungeTable")
+	island.add_solid_rect(_mr(Rect2(pk.pos - pk.size * 0.3, pk.size * 0.6)))
+	var ps: Array = layout.slots("lounge_picnic_seats")
+	for k in ps.size():
+		add.call(_prop(KIT_CHAIR, ps[k].pos, 0.03, 90.0 if k == 0 else -90.0), "LoungeChair%d" % k)   # 탁자를 봄
+	var pole := _mesh(_cyl(0.02 * u, 1.3 * u), "8a8f96")   # 파라솔: 탁자 가운데 기둥 + 반투명 지붕
+	pole.position = layout.m3(pk.pos, 0.65)
+	add.call(pole, "LoungeParasolPole")
+	add_child(pole)
+	var cone := CylinderMesh.new()
+	cone.top_radius = 0.0
+	cone.bottom_radius = 0.62 * u
+	cone.height = 0.22 * u
+	var canopy := _mesh(cone, "d98a8a")
+	var cm: StandardMaterial3D = (canopy.material_override as StandardMaterial3D).duplicate()
+	cm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	cm.albedo_color.a = 0.78
+	canopy.material_override = cm
+	canopy.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	canopy.position = layout.m3(pk.pos, 1.38)
+	add.call(canopy, "LoungeParasol")
+	add_child(canopy)
+	var ln: Array = layout.slots("lounge_lights")   # 전구 줄: 양끝 기둥 사이 처진 줄에 따뜻한 흰 구슬 8개
+	for k in ln.size():
+		var lp := _mesh(_cyl(0.025 * u, 1.6 * u), "6c6863")
+		lp.position = layout.m3(ln[k].pos, 0.8)
+		add.call(lp, "LoungeLightPole%d" % k)
+		add_child(lp)
+	var a: Vector2 = ln[0].pos
+	var b: Vector2 = ln[1].pos
+	var bulb_mat := StandardMaterial3D.new()
+	bulb_mat.albedo_color = Color("f6e7d0")
+	bulb_mat.emission_enabled = true
+	bulb_mat.emission = Color("f6e7d0")
+	bulb_mat.emission_energy_multiplier = 0.8
+	for k in 8:
+		var t := (k + 0.5) / 8.0
+		var bl := MeshInstance3D.new()
+		bl.mesh = _sphere(0.04 * u)
+		bl.material_override = bulb_mat
+		bl.position = layout.m3(a.lerp(b, t), 1.55 - 0.18 * sin(t * PI))
+		bl.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		add.call(bl, "LoungeBulb%d" % k)
+		add_child(bl)
+	add.call(_night_light(layout.m3(pk.pos, 1.2), 1.2, 3.0), "LoungeCafeLight")
+
+
+## 고양이 침대 · 밥그릇 · 고양이 (단계 64 에 보임). 침대 = 휴게 구역 소파 옆 (zones cat_bed), 부딪힘 없음
+## 업계 1위 트로피 (1.4 단계 180, 마지막 단계): 사장 진열장 위 작은 은빛 컵 (노랑 · 금색 없음). 새 모델 없이 도형만
+func _trophy(at: Vector2) -> void:
+	var u := layout.unit_m
+	var t := Node3D.new()
+	t.name = "Trophy"
+	t.position = layout.m3(at, 0.75)
+	t.scale = Vector3.ONE * 1.7   # 작아서 눈에 안 띄므로 키움
+	add_child(t)
+	var base := _mesh(_box(Vector3(0.18, 0.04, 0.12) * u), "5d6b82")
+	base.position.y = 0.02 * u
+	t.add_child(base)
+	var stem := CylinderMesh.new()
+	stem.top_radius = 0.02 * u
+	stem.bottom_radius = 0.03 * u
+	stem.height = 0.1 * u
+	var sm := _mesh(stem, "c9d3df")
+	sm.position.y = 0.09 * u
+	t.add_child(sm)
+	var cup := CylinderMesh.new()
+	cup.top_radius = 0.07 * u
+	cup.bottom_radius = 0.03 * u
+	cup.height = 0.1 * u
+	var cm := _mesh(cup, "8fb4d9")
+	cm.position.y = 0.19 * u
+	t.add_child(cm)
+
+
+## 전문가석 (1.4 단계 160): 라운지 띠 가운데 작은 책상 2개 — 주인 없이 일하는 전문가가 빌려 앉음 (spec_seats 에서 보임)
+func _spec_props() -> void:
+	var sd: Dictionary = layout.data.get("spec_desks", {})
+	for d in layout.spec_desks():
+		spec_parts.append(_desk_set(d, _v2(sd.size), "SpecDesk_%d" % (int(d.id) - Layout.SPEC_BASE)))
+
+
+## 빌릴 수 있는 책상 번호 → 자리 {seat, rot}. 책상 직원 = 그 직원의 책상, 전문가석 = Layout.SPEC_BASE + k
+func borrow_desk(j: int) -> Dictionary:
+	if j >= Layout.SPEC_BASE:
+		return layout.spec_desks()[j - Layout.SPEC_BASE]
+	return staff[j].desk
+
+
+## 지금 빌릴 수 있는 전문가석 번호 (단계 160 전에는 없음)
+func spec_seat_ids() -> Array:
+	if not has_unlock("spec_seats"):
+		return []
+	return range(spec_parts.size()).map(func(k: int) -> int: return Layout.SPEC_BASE + k)
+
+
+func _cat_props() -> void:
+	var bd: Dictionary = layout.slots("cat_bed")[0]
+	_block(bd.pos, bd.size, 0.04, 0.09, "b98f6a").name = "CatBed"
+	_block(bd.pos, bd.size - Vector2(0.12, 0.12), 0.09, 0.12, "d9c3a5").name = "CatBedCushion"
+	var bw: Dictionary = layout.slots("cat_bowl")[0]
+	_block(bw.pos, bw.size, 0.04, 0.08, "7aa7b8").name = "CatBowl"
+	cat = CatScript.new()
+	add_child(cat)
+	cat.setup(layout, idle_cfg.get("cat", {}), str(Game.firm.get("salt", "")))
 
 
 func _plant(p: Vector2) -> void:
@@ -2096,15 +2443,230 @@ func _counter() -> void:
 	var cb: Dictionary = layout.slots("boss_cabinet")[0]
 	_prop(BOSS_CABINET, cb.pos, 0.0, float(cb.rot)).name = "BossCabinet"
 	island.add_solid_rect(_mr(Rect2(cb.pos - cb.size / 2.0, cb.size)))
+	_glass(cb.pos, cb.size + Vector2(0.06, 0.06), 0.0, 0.75).name = "DisplayCase"   # 유리 진열장 (단계 120): 작은 진열장에 유리 덮개
+	_trophy(cb.pos)
 	var pr: Dictionary = layout.slots("printer")[0]
 	_prop(PRINTER, pr.pos, 0.0, 0.0).name = "Printer"   # 흰 복합기 (앞 = +z)
 	island.add_solid_rect(_mr(Rect2(pr.pos - pr.size / 2.0, pr.size)))
+
+
+## 유리 사장실 (1.3 단계 90): 창구가 왼쪽 벽 · 오른쪽은 건물 벽 · 앞쪽 유리 (문 틈 있음). 창구 앞 유리 사이 위아래로 막는 유리 2장. 직원은 안 들어가서 부딪힘 칸은 없음
+func _boss_room() -> void:
+	var cp := layout.signal_pos("counter")
+	var cs := _v2(layout.fixed("counter").size)
+	var bd: Dictionary = layout.slots("boss_desk")[0]
+	var x0 := cp.x - cs.x / 2.0 - 0.08   # 창구 바깥 모서리 조금 밖 (복합기 · 결재함은 안)
+	var x1 := layout.building_rect().end.x
+	var z0 := layout.zone_rect("counter").position.y
+	var z1: float = bd.pos.y + bd.size.y / 2.0 + 0.25
+	var gl: Array = []
+	for seg in [[z0, cp.y - cs.y / 2.0], [cp.y + cs.y / 2.0, z1]]:   # 창구 위아래 왼쪽 벽
+		gl.append(_glass(Vector2(x0, (seg[0] + seg[1]) / 2.0), Vector2(0.04, seg[1] - seg[0]), 0.0, 1.3))
+	var door := Vector2(x1 - 0.7, 0.5)   # 문 틈 (x 가운데 · 폭)
+	for seg in [[x0, door.x - door.y / 2.0], [door.x + door.y / 2.0, x1]]:
+		gl.append(_glass(Vector2((seg[0] + seg[1]) / 2.0, z1), Vector2(seg[1] - seg[0], 0.04), 0.0, 1.3))
+	var dl := _glass(Vector2(door.x, z1), Vector2(door.y, 0.04), 0.0, 1.3)   # 문짝: 사장이 자리를 비우면 닫힘 (set_boss_away)
+	dl.name = "BossDoor"
+	dl.visible = false
+	boss.door = dl
+	boss.door_front = Vector2(door.x, z1 + 0.25)   # 문 바로 앞 (이삿짐 상자 자리)
+	var fr := Node3D.new()   # 연혁 액자: 오른벽 (사장 진열장 위). 마우스를 올린 동안만 목록 (office_routine 이 ray 로 켬)
+	fr.name = "HistoryFrame"
+	add_child(fr)
+	fr.position = layout.m3(Vector2(x1 - 0.03, z0 + 0.4), 0.95)
+	var fu := layout.unit_m
+	var fm := _mesh(_box(Vector3(0.03, 0.4, 0.5) * fu), "6b4a2f")
+	fr.add_child(fm)
+	var fp := _mesh(_box(Vector3(0.035, 0.32, 0.42) * fu), "e8dfc9")
+	fp.position = Vector3(-0.004, 0, 0) * fu
+	fr.add_child(fp)
+	var ft := _hover_card("HistoryText")
+	ft.position = Vector3(-0.3, 0.1, 0) * fu
+	fr.add_child(ft)
+	var hw := Node3D.new()   # 명예의 벽 (1.3 [프로젝트 완료]): 사장 뒤 오른벽, 작은 액자 최대 12개 (위 6 · 아래 6). 마우스 올림 = 날짜 · 같이 일한 기간
+	hw.name = "HonorWall"
+	add_child(hw)
+	hw.position = layout.m3(Vector2(x1 - 0.03, z0 + 1.325), 1.15)
+	var ht := _hover_card("HonorText")
+	ht.position = Vector3(-0.3, 0.3, 0) * fu
+	hw.add_child(ht)
+	var room := Node3D.new()   # 중심에 두어서 나타날 때 (pop) 제자리에서 커짐
+	room.name = "BossRoom"
+	add_child(room)
+	room.position = layout.m3(Vector2((x0 + x1) / 2.0, (z0 + z1) / 2.0))
+	for g: Node3D in gl + [dl]:
+		g.reparent(room)
+	set_boss_away(boss.get("away", false))
+	refresh_honor()
+
+
+## 연혁 액자 목록 (마우스 올림): 대단계 이름 + 날짜 · 날짜 없는 옛 기록 = '이전'
+func set_history_hover(on: bool) -> void:
+	var ft := get_node_or_null("HistoryFrame/HistoryText") as Label3D
+	if ft == null or ft.visible == on:
+		return
+	if on:
+		var st: Array = Company.stage_data().stages
+		var lines := ["연혁"]
+		for e in Game.company.get("history", []):
+			lines.append("%s  %s" % [st[clampi(int(e.stage), 0, st.size() - 1)].name, str(e.date) if str(e.date) != "" else "이전"])
+		ft.text = "
+".join(lines)
+		_fit_card(ft)
+	ft.visible = on
+
+
+## 명예의 벽 액자를 저장값 (Game.company.honor) 으로 다시 그림: 최근 12개. pop = 맨 마지막 액자를 뿅 (새로 걸릴 때)
+func refresh_honor(pop := false) -> void:
+	var hw := get_node_or_null("HonorWall") as Node3D
+	if hw == null:
+		return
+	for c in hw.get_children():
+		if not c is Label3D:
+			c.free()
+	var hon: Array = Game.company.get("honor", [])
+	var shown := hon.slice(maxi(0, hon.size() - 12))
+	var u := layout.unit_m
+	for n in shown.size():
+		var lk: Dictionary = shown[n].get("look", {})
+		var f := Node3D.new()
+		f.position = Vector3(0, 0.125 - 0.25 * float(n / 6), (float(n % 6) - 2.5) * 0.19) * u
+		f.rotation_degrees.y = 40.0   # 벽에 비스듬히 (카메라가 오른벽을 거의 옆에서 봐서 정면으로는 안 읽힘)
+		f.add_child(_mesh(_box(Vector3(0.03, 0.22, 0.17) * u), "6b4a2f"))
+		var pl := _mesh(_box(Vector3(0.035, 0.18, 0.13) * u), "e8dfc9")
+		pl.position.x = -0.004 * u
+		f.add_child(pl)
+		var sh := _mesh(_box(Vector3(0.04, 0.05, 0.1) * u), SHIRTS[int(lk.get("shirt", 0)) % SHIRTS.size()])
+		sh.position = Vector3(-0.006, -0.055, 0) * u
+		f.add_child(sh)
+		var head := _mesh(_sphere(0.04 * u), "e8c9a8")
+		head.position = Vector3(-0.012, 0.015, 0) * u
+		f.add_child(head)
+		var hair := _mesh(_sphere(0.043 * u), HAIRS[int(lk.get("hair", 0)) % HAIRS.size()])
+		hair.position = Vector3(-0.004, 0.03, 0) * u
+		f.add_child(hair)
+		hw.add_child(f)
+		if pop and n == shown.size() - 1 and hw.is_visible_in_tree():
+			f.scale = Vector3.ONE * 0.05
+			f.create_tween().tween_property(f, "scale", Vector3.ONE, 0.45).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+
+## 명예의 벽 목록 (마우스 올림): 날짜 · 같이 일한 기간. 프로젝트 · 폴더 이름은 저장도 안 함
+func set_honor_hover(on: bool) -> void:
+	var ht := get_node_or_null("HonorWall/HonorText") as Label3D
+	if ht == null or ht.visible == on:
+		return
+	if on:
+		var lines := ["명예의 벽"]
+		var all: Array = (Game.company.get("honor", []) as Array).slice(-12)
+		for e in all.slice(-HONOR_LIST_MAX):   # 창 안에 들어가게 최근 몇 개만 (목록이 길면 짤림)
+			lines.append("%s · %d일" % [str(e.date), int(e.days)])
+		if all.size() > HONOR_LIST_MAX:
+			lines.append("… 외 %d개" % (all.size() - HONOR_LIST_MAX))
+		ht.text = "
+".join(lines)
+		_fit_card(ht)
+	ht.visible = on
+
+
+## 마우스 올림 목록 카드 (연혁 · 명예의 벽): 어두운 글씨 + 밝은 둥근 판, 벽 · 유리에 안 가려짐 (이름판과 같은 모양)
+func _hover_card(nm: String) -> Label3D:
+	var l := _label(40, 12)
+	l.name = nm
+	l.pixel_size *= 1.0
+	l.modulate = Color("3a3f4a")
+	l.visible = false
+	var pl := Sprite3D.new()
+	pl.name = "Plate"
+	pl.texture = _card_texture()
+	pl.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	pl.no_depth_test = true
+	pl.render_priority = 11
+	pl.shaded = false
+	pl.pixel_size = l.pixel_size
+	l.add_child(pl)
+	return l
+
+
+## 글자 크기에 맞춰 판을 늘림
+func _fit_card(l: Label3D) -> void:
+	var sz := l.font.get_multiline_string_size(l.text, HORIZONTAL_ALIGNMENT_LEFT, -1, l.font_size)
+	(l.get_node("Plate") as Sprite3D).scale = Vector3((sz.x + 36.0) / 64.0, (sz.y + 24.0) / 64.0, 1.0)
+	l.position.x = -0.15 - (sz.x + 36.0) * l.pixel_size / 2.0   # 오른벽 액자 = 창 오른쪽 끝이라 판은 왼쪽 (사무실 안) 으로 펼침
+
+
+var _card: ImageTexture
+func _card_texture() -> ImageTexture:
+	if _card:
+		return _card
+	var img := Image.create(64, 64, false, Image.FORMAT_RGBA8)
+	for x in 64:
+		for y in 64:
+			var c := Vector2(clampf(x + 0.5, 14.0, 50.0), clampf(y + 0.5, 14.0, 50.0))
+			if Vector2(x + 0.5, y + 0.5).distance_to(c) <= 14.0:
+				img.set_pixel(x, y, Color(0.99, 0.98, 0.96, 0.96))
+	_card = ImageTexture.create_from_image(img)
+	return _card
+
+
+## 이삿짐 든 직원이 서는 자리: 상자 자리 한 칸 앞 (작은 건물은 앞끝 안쪽으로 눌러 둠)
+func boss_move_spot() -> Vector2:
+	var p: Vector2 = boss.door_front + Vector2(0, 0.35)
+	p.y = minf(p.y, layout.base_front() - 0.2)
+	return p
+
+
+## 사장실 이사 (1.3 단계 90): 쉬는 직원 하나가 짐 상자를 들고 문 앞까지 와서 내려놓음 (boss_move_end 가 상자를 치우고 모임으로 돌려보냄)
+func boss_move_in(i: int) -> void:
+	var s: Dictionary = staff[i]
+	_stop_walk(i)
+	_leave_act(i)
+	s.act = "gather"   # 하는 동안 새 쉬는 행동 안 고름 (모임과 같은 규칙)
+	s.act_until = _now() + 3600.0
+	hold(i, "box")
+	_act_go(i, boss_move_spot(), 0.0, func() -> void:   # 직원 앞 = -z = 사장실 쪽
+		hold(i, "")
+		(s.anim as AnimationPlayer).play("Idle", 0.2)
+		var bx := (PROPS.box as PackedScene).instantiate() as Node3D
+		bx.name = "MoveBox"
+		bx.position = layout.m3(boss_move_spot() - Vector2(0, 0.3))
+		bx.scale = Vector3.ONE * layout.unit_m
+		add_child(bx))
+
+
+## [프로젝트 완료] 연출 (1.3): 쉬는 직원이 사장실 문 앞에 서고 (모임과 같은 규칙) · 사장이 고개를 끄덕임 (끝나면 gather_end)
+func honor_walk(i: int) -> void:
+	var s: Dictionary = staff[i]
+	_stop_walk(i)
+	_leave_act(i)
+	s.act = "gather"
+	s.act_until = _now() + 3600.0
+	_act_go(i, boss_move_spot(), 0.0, (s.anim as AnimationPlayer).play.bind("Idle", 0.2))
+
+
+func boss_nod() -> void:
+	var fig := boss.get("fig") as Node3D
+	if fig == null:
+		return
+	var tw := fig.create_tween()
+	tw.tween_property(fig, "rotation:x", 0.25, 0.2).set_ease(Tween.EASE_OUT)
+	tw.tween_property(fig, "rotation:x", 0.0, 0.3).set_ease(Tween.EASE_IN_OUT)
+
+
+func boss_move_end(i: int) -> void:
+	var bx := get_node_or_null("MoveBox")
+	if bx:
+		bx.queue_free()
+	gather_end([i])
 
 
 ## 사장의 흔적 (v2.8 C15): 내가 있으면 스탠드 흰빛 · 자리 비우면 의자가 뒤로 빠지고 쪽지 (presence.gd 자리 비움)
 func set_boss_away(away: bool) -> void:
 	if boss.is_empty():
 		return
+	boss.away = away
+	if boss.has("door"):
+		(boss.door as Node3D).visible = away
 	_set_glow(boss.bulb, Color("7d7a76") if away else Color("fff6e8"), not away)   # 꺼지면 어둡게 (낮에도 차이가 보이게)
 	(boss.light as OmniLight3D).visible = not away
 	(boss.note as Node3D).visible = away
@@ -2202,9 +2764,6 @@ func _rest() -> void:
 	island.add_solid_rect(_mr(Rect2(mt.pos - mt.size * 0.4, mt.size * 0.8)))
 	var x4: Dictionary = layout.slots("extra_seat")[0]   # 4인 탁자 (단계 36): 네 번째 의자. 회의 자리 (meeting_seats) 는 3개 그대로
 	_prop(KIT_CHAIR, x4.pos, 0.03, float(x4.rot)).name = "Chair4"
-	var sp: Dictionary = layout.slots("sleep_pod")[0]   # 수면 캡슐 (단계 44): 앞면 = 탁자 쪽
-	_prop(KA_POD, sp.pos, 0.0, float(sp.rot), Vector3.ONE).name = "SleepPod"
-	island.add_solid_rect(_mr(Rect2(sp.pos - sp.size / 2.0, sp.size)))
 
 
 ## 단계 36 탕비실 정비: 정수기 자리에 나무 장 + 냉온수기 + 캡슐 커피 머신 (kArchive). 노드 원점 = 장 바닥 가운데 (뿅 연출이 제자리에서 커지게)
@@ -2223,6 +2782,14 @@ func _pantry_new(wt: Dictionary) -> void:
 		m.scale = Vector3.ONE * u
 		pn.add_child(m)
 	island.add_solid_rect(_mr(Rect2(wt.pos - Vector2(0.35, 0.21), Vector2(0.7, 0.42))))
+	var es := Node3D.new()   # 에스프레소 머신 (단계 120): 상자 조합 — 몸통 · 윗판 · 불빛. 장 위 가운데
+	es.name = "Espresso"
+	es.position = layout.m3(wt.pos + Vector2(0.02, 0.0), 0.5)
+	add_child(es)
+	for p in [[Vector3(0.12, 0.16, 0.14), 0.08, "3a3a40"], [Vector3(0.14, 0.025, 0.16), 0.172, "b8bcc4"], [Vector3(0.03, 0.03, 0.02), 0.1, "c8463d"]]:
+		var part := _mesh(_box((p[0] as Vector3) * u), p[2])
+		part.position = Vector3(0, float(p[1]), 0.0 if (p[0] as Vector3).x > 0.05 else 0.075) * u
+		es.add_child(part)
 
 
 # ------------------------------------------------------------------ 4. 승강장 = 버스 정류장 (M3 4세션째 사용자 결정: 회의 C 개선 + 안내 단말기)
@@ -2596,6 +3163,9 @@ func _stage_setup() -> void:
 		if not _stage_nodes.has(key):
 			_stage_nodes[key] = []
 		_stage_nodes[key].append(n)
+	add.call("boss_room", get_node_or_null("BossRoom"))
+	add.call("boss_room", get_node_or_null("HistoryFrame"))
+	add.call("boss_room", get_node_or_null("HonorWall"))
 	add.call("bookshelf", get_node_or_null("Bookshelf"))
 	add.call("whiteboard", get_node_or_null("Whiteboard"))
 	add.call("telescope", get_node_or_null("Telescope"))
@@ -2603,9 +3173,15 @@ func _stage_setup() -> void:
 	add.call("pantry_upgrade", get_node_or_null("WaterOld"), true)
 	add.call("pantry_upgrade", get_node_or_null("WaterOld2"), true)
 	add.call("table4", get_node_or_null("Chair4"))
-	add.call("sleep_pod", get_node_or_null("SleepPod"))
 	var rack := get_node_or_null("Rack") as Node3D
 	add.call("server_rack", rack)
+	for k in spec_parts.size():
+		add.call("spec_seats", get_node_or_null("SpecDesk_%d" % k))
+	add.call("espresso", get_node_or_null("Espresso"))
+	add.call("display_case", get_node_or_null("DisplayCase"))
+	add.call("trophy", get_node_or_null("Trophy"))
+	add.call("server_rack3", get_node_or_null("Rack2"))
+	add.call("server_rack3", get_node_or_null("Rack3"))
 	if rack:   # 초기 단계 = 서버 선반 (같은 자리, 랙과 교체)
 		var sl := layout.room_slot("rack")
 		var shelf := _prop(SERVER_SHELF, sl.pos, 0.0, 0.0)
@@ -2615,6 +3191,19 @@ func _stage_setup() -> void:
 	if sign:
 		add.call("sign_new", sign.find_child("SignNew", true, false))
 		add.call("sign_new", sign.find_child("SignHand", true, false), true)
+		add.call("sign_glass", sign.find_child("SignGlass", true, false))
+		add.call("carpet", get_node_or_null("Carpet"))
+		for cn in ["CatBed", "CatBedCushion", "CatBowl", "Cat"]:
+			add.call("cat", get_node_or_null(cn))
+		for cn: Node3D in _cafe_nodes:
+			add.call("cafe", cn)
+		for cn in ["LoungeTv", "LoungeFridge", "LoungeSeat0", "LoungeSeat1", "LoungeRug", "LoungeGame", "LoungeGamePad"]:
+			add.call("welfare", get_node_or_null(cn))
+		add.call("plants", get_node_or_null("PlantUni0"))
+		add.call("plants", get_node_or_null("PlantUni1"))
+	var ceil_light := _night_light(layout.m3(Vector2(0.0, layout.room_rect().get_center().y), CEIL_LIGHT_Y), CEIL_LIGHT_ENERGY, 7.0)   # 중견 새 조명 (단계 90): 작업실 가운데 천장 불
+	ceil_light.name = "CeilingLight"
+	add.call("floor_new", ceil_light)
 	_sign_forced = "--sign-new" in Game.dev_args()
 	var looks: Dictionary = Company.stage_data().get("looks", {})
 	for d in layout.desks():
@@ -2622,6 +3211,15 @@ func _stage_setup() -> void:
 		if set == null:
 			continue
 		add.call("personal_shelf", set.find_child("PersonalShelf", true, false))
+		var mon2 := set.get_child(1).duplicate() as Node3D   # 모니터 2대 (단계 104): 모니터 옆에 하나 더
+		mon2.name = "Monitor2"
+		var mon1 := set.get_child(1) as Node3D   # 책상 (폭 1.2) 안에 둘이 들어가게 좌우로 벌리고 넓은 모니터는 가로만 줄임 (apply_stage 가 켜고 끔)
+		var ms := minf(1.0, 0.31 / float(MONITOR_HALF_W[DESK_COMBOS[int(d.id) % DESK_COMBOS.size()][1]]))
+		mon1.set_meta("pair_s", ms)
+		mon2.position.x += MONITOR_PAIR_X
+		mon2.scale.x = ms
+		set.add_child(mon2)
+		add.call("monitor2", mon2)
 		for k in 3:   # 책상 · 모니터 · 의자만 (개인 소품의 나무는 그대로)
 			for mi in set.get_child(k).find_children("*", "MeshInstance3D", true, false):
 				var m: Mesh = (mi as MeshInstance3D).mesh
@@ -2632,6 +3230,17 @@ func _stage_setup() -> void:
 					for key in looks:
 						if (looks[key] as Dictionary).has(mat.resource_name):
 							_look_mats.append({"mi": mi, "surface": sf, "key": key, "mat": _mat(looks[key][mat.resource_name])})
+	var printer := get_node_or_null("Printer")   # 복합기 (단계 104 전엔 낡은 색)
+	if printer != null:
+		for mi in printer.find_children("*", "MeshInstance3D", true, false):
+			var pm: Mesh = (mi as MeshInstance3D).mesh
+			for sf in pm.get_surface_count():
+				var pmat := pm.surface_get_material(sf)
+				if pmat == null:
+					continue
+				for key in looks:
+					if (looks[key] as Dictionary).has(pmat.resource_name):
+						_look_mats.append({"mi": mi, "surface": sf, "key": key, "mat": _mat(looks[key][pmat.resource_name])})
 	# '오늘 업무 끝' (일찍 퇴근 날만): 화이트보드가 있으면 거기에 남색 마커 글씨 (낙서는 지움) — 게시판은 사용량 · 성장 자리 (사용자 2026-10-16)
 	#   화이트보드 전 (근무일 0~5) 엔 게시판 귀퉁이에 작은 쪽지
 	board_note = _note_label("오늘 업무 끝", 0.2)
@@ -2699,6 +3308,33 @@ func apply_stage(n: int, pop := false) -> Array:
 			nd.visible = on
 	for e in _look_mats:
 		(e.mi as MeshInstance3D).set_surface_override_material(int(e.surface), null if e.key in have else e.mat)
+	for d in layout.desks():   # 모니터 2대 (단계 104): 원래 모니터를 왼쪽으로
+		var ds := get_node_or_null("Desk_%d" % d.id)
+		var m1 := ds.get_child(1) as Node3D if ds != null else null
+		if m1 != null and m1.has_meta("pair_s"):
+			var two: bool = "monitor2" in have
+			m1.position.x = -MONITOR_PAIR_X if two else 0.0
+			m1.scale.x = float(m1.get_meta("pair_s")) if two else 1.0
+	for dp in desk_parts:   # 책상 스탠드 더 밝게 (단계 90 조명, day_night 의 boost)
+		(dp.light as OmniLight3D).set_meta("boost", DESK_LAMP_BOOST if "floor_new" in have else 1.0)
+	var cpt := get_node_or_null("Carpet") as MeshInstance3D   # 새 바닥 (단계 90): 카펫이 더 짙은 푸른빛으로
+	if cpt != null and cpt.material_override is StandardMaterial3D:
+		(cpt.material_override as StandardMaterial3D).albedo_color = Color("6e7fa0") if "floor_new" in have else Color("8d9bb0")
+	var sg := get_node_or_null("Sign")
+	if sg and "sign_glass" in have:   # 유리 간판이 남색 판을 대신함 (글자는 남색)
+		(sg.find_child("SignNew", true, false) as Node3D).visible = false
+	if sg:   # 대형 간판 (1.4 단계 140): 같은 간판을 키우고 (시계와 안 겹치게 왼쪽으로) 테두리를 짙은 남회색으로 (노랑 예약)
+		if not sg.has_meta("scale0"):
+			sg.set_meta("scale0", sg.scale)
+			sg.set_meta("x0", sg.position.x)
+		var big: bool = "sign_big" in have
+		sg.scale = (sg.get_meta("scale0") as Vector3) * (SIGN_BIG_K if big else 1.0)
+		sg.position.x = float(sg.get_meta("x0")) - (SIGN_BIG_SHIFT * layout.unit_m if big else 0.0)
+		var fr := sg.find_child("SignFrame", true, false) as MeshInstance3D
+		if fr:
+			fr.material_override = _mat("5d6b82" if big else "f4f0e8")
+	if sign_text:
+		sign_text.modulate = Color(C_POPUP) if "sign_glass" in have else Color("f1eee9")
 	stage = n
 	return shown
 
@@ -2765,6 +3401,9 @@ func any_working() -> bool:
 
 ## 모임: 쉬는 직원들이 모임 자리로 걸어가 판을 봄. 하던 쉬는 행동은 그만둠 (act = gather 동안 새 행동 안 고름)
 func gather(idxs: Array) -> void:
+	for j in staff.size():   # 화이트보드 앞에서 일을 보던 직원은 모임에 자리를 내줌
+		if str(staff[j].get("act", "")) == "tool_spot" and str(staff[j].get("spot_prop", "")) == "whiteboard":
+			_tool_return(j)
 	var pts := gather_points(idxs.size())
 	var board: Vector2 = gather_spot().board
 	for n in idxs.size():

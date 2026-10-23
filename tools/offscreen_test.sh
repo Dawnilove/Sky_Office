@@ -18,6 +18,6 @@ trap 'rm -f "$P/override.cfg"' EXIT
 if [ "${ALL:-0}" = "1" ]; then
 	timeout 180 "$G" --path "$P" -- --offscreen --fresh "$@"
 else
-	timeout 180 "$G" --path "$P" -- --offscreen --fresh "$@" 2>&1 | grep -E "SCENARIO|DAY|SHOT|SCRIPT ERROR|Parse Error|at: res://" | head -300
+	timeout 180 "$G" --path "$P" -- --offscreen --fresh "$@" 2>&1 | grep -E "SCENARIO|DAY|SHOT|SCRIPT ERROR|Parse Error|at: res://" | head -3000
 fi
 exit "${PIPESTATUS[0]}"

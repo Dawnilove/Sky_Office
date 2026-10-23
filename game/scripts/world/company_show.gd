@@ -173,23 +173,46 @@ func _assembly() -> void:
 	busy = false
 
 
+## [프로젝트 완료] (직원 카드): 쉬는 직원이 사장실 문 앞에 서고 사장이 끄덕임 → 명예의 벽에 액자가 뿅. 일하는 중 · 내 차례 · 조용히 모드 · 사장실 없음 = 연출 없이 액자만
+func honor_scene(i: int) -> void:
+	if busy or Director.scene("stage", _ctx()) != "play" or not office.has_unlock("boss_room") or not (office.staff[i].node as Node3D).visible or not str(office.staff[i].state) in ["rest", "done"]:
+		office.refresh_honor(true)
+		return
+	busy = true
+	office.honor_walk(i)
+	await get_tree().create_timer(WALK_S * k).timeout
+	office.boss_nod()
+	await get_tree().create_timer(0.6 * k).timeout
+	office.refresh_honor(true)
+	await get_tree().create_timer(1.0 * k).timeout
+	office.gather_end([i])
+	busy = false
+
+
 ## 단계 상승 1단계: 모임 → 박수 + 팝업 → 가구 '뿅' (대단계 = 간판 교체) → 흩어짐. 모일 직원이 없으면 가구 · 팝업만
 func stage_up() -> void:
 	busy = true
 	var n: int = office.stage + 1
 	history.append("stage:%d" % n)
 	var idxs: Array = office.resting() if Director.scene("stage", _ctx()) == "play" else []
-	if idxs.is_empty():
+	var carrier := -1   # 사장실 이사 (단계 90, 한 번): 쉬는 직원 1명이 짐 상자를 문 앞까지 (조용히 모드 · 쉬는 직원 없음 = 상자 없이 바로 완성)
+	if not idxs.is_empty() and "boss_room" in Company.unlocked(n) and not "boss_room" in Company.unlocked(n - 1):
+		carrier = idxs.pop_front()
+		office.boss_move_in(carrier)
+	if idxs.is_empty() and carrier < 0:
 		office.show_popup(popup_text(n))
 		office.apply_stage(n, true)
 		busy = false
 		return
-	office.gather(idxs)
+	if not idxs.is_empty():
+		office.gather(idxs)
 	await get_tree().create_timer(WALK_S * k).timeout
 	office.gather_play(idxs, "Clap")
 	office.show_popup(popup_text(n))
 	await get_tree().create_timer(0.6 * k).timeout
 	office.apply_stage(n, true)
+	if carrier >= 0:
+		office.boss_move_end(carrier)
 	await get_tree().create_timer((CLAP_S - 0.6) * k).timeout
 	office.gather_end(idxs)
 	busy = false

@@ -9,11 +9,21 @@
 		{"group": "스타트업", "name": "첫 사용자", "days": 20, "unlock": ["telescope", "personal_shelf"], "say": "망원경 · 개인 소품 칸"},
 		{"group": "중소기업", "name": "법인 성장", "days": 28, "big": true, "diameter": 11, "unlock": [], "say": "다음에 켤 때 사무실이 커져요"},
 		{"group": "중소기업", "name": "탕비실 정비", "days": 36, "unlock": ["pantry_upgrade", "table4"], "say": "탕비실이 새로 꾸며졌어요"},
-		{"group": "중소기업", "name": "야근 문화", "days": 44, "unlock": ["sleep_pod"], "say": "수면 캡슐이 들어왔어요"}
+		{"group": "중소기업", "name": "야근 문화", "days": 44, "unlock": []},
+		{"group": "유니콘", "name": "기업가치 1조", "days": 54, "big": true, "diameter": 12, "unlock": ["carpet", "plants", "sign_glass"], "say": "다음에 켤 때 사무실이 커져요"},
+		{"group": "유니콘", "name": "복지 강화", "days": 64, "front_extra": 1.5, "unlock": ["cat", "welfare"], "say": "고양이가 왔어요 · 다음에 켤 때 라운지가 생겨요"},
+		{"group": "유니콘", "name": "라운지 개장", "days": 76, "unlock": ["cafe"], "say": "라운지에 카페 코너가 열렸어요"},
+		{"group": "중견기업", "name": "사옥 단장", "days": 90, "big": true, "diameter": 13, "unlock": ["boss_room", "floor_new"], "say": "사장실에 유리벽이 생겼어요 · 다음에 켤 때 사무실이 커져요"},
+		{"group": "중견기업", "name": "시스템 확충", "days": 104, "unlock": ["server_rack3", "copier", "monitor2"], "say": "서버 랙 · 복합기 · 모니터가 새로 들어왔어요"},
+		{"group": "중견기업", "name": "인재 영입", "days": 120, "unlock": ["espresso", "display_case"], "say": "에스프레소 머신과 유리 진열장이 생겼어요"},
+		{"group": "대기업", "name": "본사 완공", "days": 140, "big": true, "diameter": 14, "unlock": ["sign_big"], "say": "대형 간판이 걸렸어요 · 다음에 켤 때 사무실이 커져요"},
+		{"group": "대기업", "name": "전문가석 개설", "days": 160, "unlock": ["spec_seats"], "say": "라운지에 전문가석이 생겼어요"},
+		{"group": "대기업", "name": "업계 1위", "days": 180, "unlock": ["trophy"], "say": "업계 1위! 사장 진열장에 트로피가 놓였어요 · 가장 큰 사무실이에요"}
 	],
 	"_looks": "unlock 전 재질 (재질 이름 → 색). desk_real 전 = 박스 책상 (골판지) · chair_new 전 = 낡은 의자",
 	"looks": {
 		"desk_real": {"KWoodTop": "a0703c", "KWood": "8a5c2e", "KWoodD": "6f4722", "KFront": "966637", "Knob": "5c3d1d"},
+		"copier": {"PrWhite": "a8a398", "PrGray": "8a857a", "PrScreen": "3a4250"},
 		"chair_new": {"ChairBase": "7d7872", "ChairC": "9a948c", "ChairD": "8a847c", "Chrome": "8f8b85"}
 	}
 }

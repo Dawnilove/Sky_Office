@@ -43,6 +43,8 @@ static func touch(reg: Dictionary, agent: String, proj: String, t: float, now: f
 	if i >= 0:
 		var s: Dictionary = nr.staff[i]
 		s.last = maxf(float(s.last), t)
+		if s.get("done", false) and t > float(s.get("done_at", 0.0)):
+			s.done = false   # 끝낸 프로젝트를 다시 열면 원래 직원이 단골로 복귀 (1.3 [프로젝트 완료])
 		if s.leave and now - float(s.last) < leave_s():
 			s.leave = false   # 같은 직원 복직 (책상은 sync)
 		return nr
@@ -53,6 +55,16 @@ static func touch(reg: Dictionary, agent: String, proj: String, t: float, now: f
 	nr.staff.append({"id": int(nr.next), "agent": agent, "proj": proj, "desk": -1, "home": -1,
 			"hired": t, "last": t, "leave": false, "dispatch": false})
 	nr.next = int(nr.next) + 1
+	return nr
+
+
+## [프로젝트 완료] (1.3): 그 직원의 단골 표시를 뺌 (직원은 남음 · 놀고 있는 직원으로 지원 근무). 같은 프로젝트의 새 활동이 오면 touch 가 원래 직원을 복귀시킴
+static func finish(reg: Dictionary, id: int, now: float) -> Dictionary:
+	var nr := reg.duplicate(true)
+	for s in nr.staff:
+		if int(s.id) == id:
+			s.done = true
+			s.done_at = now
 	return nr
 
 
@@ -134,7 +146,7 @@ static func assign(reg: Dictionary, state: Dictionary, now: float, prev := {}) -
 	var taken := {}
 	for sid in order:   # ① 붙은 배정
 		var st := staff_by_id(reg, int(prev.get(sid, -1)))
-		if not st.is_empty() and not st.leave and not taken.has(int(st.id)):
+		if not st.is_empty() and not st.leave and not st.get("done", false) and not taken.has(int(st.id)):
 			emp[sid] = int(st.id)
 			taken[int(st.id)] = true
 	for sid in order:   # ② 단골
@@ -142,7 +154,7 @@ static func assign(reg: Dictionary, state: Dictionary, now: float, prev := {}) -
 			continue
 		var s: Dictionary = state.sessions[sid]
 		var i := find(reg, str(s.agent), str(s.proj))
-		if i >= 0 and not reg.staff[i].leave and not taken.has(int(reg.staff[i].id)):
+		if i >= 0 and not reg.staff[i].leave and not reg.staff[i].get("done", false) and not taken.has(int(reg.staff[i].id)):
 			emp[sid] = int(reg.staff[i].id)
 			taken[int(reg.staff[i].id)] = true
 	for sid in order:   # ③ 지원 근무

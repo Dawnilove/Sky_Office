@@ -127,7 +127,7 @@ func _apply_lighting() -> void:
 		lamp = max(lamp, 0.35)
 	_lamp_lights = _lamp_lights.filter(func(e) -> bool: return is_instance_valid(e[0]))   # 창고에 넣어 사라진 불빛 빼기
 	for e in _lamp_lights:
-		e[0].light_energy = e[1] * (0.25 + 0.95 * lamp) * float(e[0].get_meta("dim", 1.0))   # dim: 농부가 잠들면 집 창문 불 끔 (farmer_routine)
+		e[0].light_energy = e[1] * (0.25 + 0.95 * lamp) * float(e[0].get_meta("dim", 1.0)) * float(e[0].get_meta("boost", 1.0))   # boost: 단계별 조명 (office 중견 단계 90). dim: 농부가 잠들면 집 창문 불 끔 (farmer_routine)
 	if is_instance_valid(_fire_flicker):
 		_fire_flicker.base = 2.6 * (0.8 + 0.6 * lamp)
 

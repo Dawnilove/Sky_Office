@@ -30,6 +30,7 @@ const FirmUI := preload("res://scripts/ui/firm_ui.gd")
 const Phone := preload("res://scripts/world/phone.gd")
 const PhoneUI := preload("res://scripts/ui/phone_ui.gd")
 const BoardUI := preload("res://scripts/ui/board_ui.gd")
+const StaffCard := preload("res://scripts/ui/staff_card.gd")
 const CommandRunner := preload("res://scripts/world/command_runner.gd")
 const CommandUI := preload("res://scripts/ui/command_ui.gd")
 ## 높이: 섬은 창 위쪽 645 까지만 그려져서 아래 빈 하늘을 잘라 1000 → 740 (M5: 회사 크기가 1080p 에서 134% 에 걸리던 것 → 180%)
@@ -98,10 +99,17 @@ func _ready() -> void:
 		diameter = Company.diameter_for(stage_arg)
 	elif not ("--offscreen" in Game.dev_args() or "--demo" in Game.dev_args()):
 		diameter = Company.diameter_for(int(Game.company.get("shown_stage", 0)))   # 1.1 증축: 저장된 단계의 크기로 켬 (다음에 켤 때 적용)
+	var front_extra := 0.0   # 라운지 띠 (1.2 단계 64): 지름과 같은 방식 — 켤 때 저장된 단계로
+	if stage_arg >= 0:
+		front_extra = Company.front_extra_for(stage_arg)
+	elif not ("--offscreen" in Game.dev_args() or "--demo" in Game.dev_args()):
+		front_extra = Company.front_extra_for(int(Game.company.get("shown_stage", 0)))
 	for a in Game.dev_args():
 		if a.begins_with("--diameter="):
 			diameter = int(a.get_slice("=", 1))
-	layout = Layout.new(diameter)
+		if a.begins_with("--front-extra="):
+			front_extra = float(a.get_slice("=", 1))
+	layout = Layout.new(diameter, Layout.PATH, front_extra)
 	diameter_k = layout.diameter / 10.0
 	island = IslandBuilder.new()
 	island.name = "Island"
@@ -264,7 +272,11 @@ func _ready() -> void:
 	board_ui.name = "BoardUI"
 	add_child(board_ui)
 	board_ui.setup(ui, office, routine)
-	window_ctl.click_handler = func(p: Vector2) -> bool: return phone_ui.click(p) or board_ui.click(p)
+	staff_card = StaffCard.new()   # 직원 카드 + [프로젝트 완료] (1.3)
+	staff_card.name = "StaffCard"
+	add_child(staff_card)
+	staff_card.setup(firm_ui, office, routine, watch, company_show)
+	window_ctl.click_handler = func(p: Vector2) -> bool: return phone_ui.click(p) or board_ui.click(p) or staff_card.click(p)
 	command_runner = CommandRunner.new()   # 게임 안 한 줄 명령 (로드맵 ⑤) — 설정에서 켜기 전엔 아무것도 안 보임
 	command_runner.name = "CommandRunner"
 	add_child(command_runner)
@@ -351,6 +363,7 @@ var routine: Node             ## 직원 일과 (office_routine.gd, M3) — 화�
 var firm_ui: Node             ## 창업 화면 · 입사식 · 결재함 · 돌아오면 요약 (firm_ui.gd, M5 3세션째)
 var phone: Node               ## 전화 = 플러그인 · 무결성 · 연결 상태 (phone.gd, M5 4세션째)
 var phone_ui: Node            ## 연결 상태 패널 · 개통 안내 · 폐업 정리 카드 (phone_ui.gd)
+var staff_card: Node          ## 직원 카드 (staff_card.gd)
 var board_ui: Node            ## 게시판 큰 창 (board_ui.gd)
 var command_runner: Node      ## 게임 안 한 줄 명령 (로드맵 ⑤, 선택 기능 · 기본 꺼짐)
 var command_ui: Node

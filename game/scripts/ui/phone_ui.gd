@@ -175,12 +175,15 @@ func _codex_part(body: VBoxContainer) -> void:
 	var cs: Dictionary = Phone.codex_side(Phone.codex_home())
 	if phone.codex_hooked():
 		body.add_child(ui._note("연결됨 · Codex 신호를 받고 있어요."))
+	elif not FileAccess.file_exists(phone.bell_path()):
+		body.add_child(ui._note("먼저 위에서 전화를 개통해 주세요 (bell 이 있어야 해요)."))
 	elif bool(cs.bell):
-		body.add_child(ui._note("붙여 넣음 · Codex 에서 /hooks 로 믿기 (신뢰) 를 눌러 주세요."))
+		body.add_child(ui._note("붙여 넣음 · codex 를 열고 /hooks 에서 직접 믿기 (신뢰) 를 눌러 주세요."))
 	elif bool(cs.file):
-		body.add_child(ui._note("hooks.json 이 이미 있어요. 복사한 내용을 hooks 안에 합쳐 주세요."))
+		body.add_child(ui._note("hooks.json 이 이미 있어요. 덮지 말고 복사한 내용을 합쳐 주세요."))
 	else:
-		body.add_child(ui._note("지금은 관찰 모드 (추정). 복사해서 ~/.codex/hooks.json 으로 저장하면 정확해져요."))
+		body.add_child(ui._note("복사해서 ~/.codex/hooks.json 으로 저장하세요. 지금은 관찰 모드 (추정)."))
+	body.add_child(ui._note("저장 뒤 codex 의 /hooks 에서 새 훅을 직접 믿어야 해요 (안 믿으면 조용히 건너뜀). 명령이 바뀌면 다시 믿기. CLI 만 확인됨."))
 	body.add_child(ui.button("Codex 훅 복사", func() -> void:
 		DisplayServer.clipboard_set(Phone.codex_snippet(phone.bell_path()))
 		Game.toast.emit("복사함 · hooks.json 에 붙여 넣기")))

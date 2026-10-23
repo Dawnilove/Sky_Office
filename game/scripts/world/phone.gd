@@ -138,7 +138,7 @@ static func judge(files: Dictionary, side: Dictionary, root_dir: String, sig: Di
 
 
 # ------------------------------------------------------------------ Codex 연결 (복사 안내, 7-5 같은 철학: 게임이 ~/.codex/hooks.json 을 직접 안 고침)
-const CODEX_EVENTS := ["SessionStart", "UserPromptSubmit", "PostToolUse", "Stop", "Interrupt", "SessionEnd"]   ## PreToolUse · PermissionRequest 는 영구 금지, notify 안 씀
+const CODEX_EVENTS := ["SessionStart", "UserPromptSubmit", "PostToolUse", "Stop", "SessionEnd"]   ## 실측 (Codex 0.163): Interrupt 는 안 옴 (Esc = Stop) → 뺌. PreToolUse · PermissionRequest 는 영구 금지, notify 안 씀
 
 
 static func codex_home() -> String:
@@ -146,12 +146,13 @@ static func codex_home() -> String:
 	return c if c != "" else home().path_join(".codex")
 
 
-## Codex hooks.json 에 붙일 내용 (사용자가 직접). bell 경로는 따옴표로 감쌈 (한글 · 띄어쓰기). Interrupt · SessionEnd 는 제한 3초라 timeout 2
+## Codex hooks.json 에 붙일 내용 (사용자가 직접). Codex 는 훅 명령을 PowerShell 로 실행 → `& "경로" 인자` 꼴이어야 함 (따옴표만 있으면 Failed, 실측).
+## 경로 이스케이프는 JSON.stringify 가 맡음 (한글 · 띄어쓰기 · 백슬래시)
 static func codex_snippet(bell_exe: String) -> String:
-	var cmd := "\"%s\" --agent codex" % bell_exe.replace("/", "\\")
+	var cmd := "& \"%s\" --agent codex" % bell_exe.replace("/", "\\")
 	var hooks := {}
 	for e in CODEX_EVENTS:
-		hooks[e] = [{"hooks": [{"type": "command", "command": cmd, "commandWindows": cmd, "async": true, "timeout": 2 if e in ["Interrupt", "SessionEnd"] else 5}]}]
+		hooks[e] = [{"hooks": [{"type": "command", "command": cmd, "timeout": 5}]}]
 	return JSON.stringify({"hooks": hooks}, "  ", false)
 
 

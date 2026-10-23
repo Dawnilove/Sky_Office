@@ -730,6 +730,10 @@ func _settings_panel(body: VBoxContainer) -> void:
 			body.add_child(segment([["보이기", true], ["숨기기", false]], bool(Game.settings.get("show_project", true)),
 					func(v) -> void: Game.set_setting("show_project", v)))
 			body.add_child(_note("부를 때 뜨는 명패에 폴더 이름이 보여요. 화면 공유 땐 끄기 (직무만). 파일에는 저장하지 않아요."))
+			section(body, "명패 아래 모델")
+			body.add_child(segment([["보이기", true], ["숨기기", false]], bool(Game.settings.get("show_model", true)),
+					func(v) -> void: Game.set_setting("show_model", v)))
+			body.add_child(_note("명패 아래에 모델 이름 (Opus 4.7). 훅이 켜진 세션만, 관찰 모드는 안 보여요."))
 			group(body, "비켜 줄 때")
 			section(body, "다른 프로그램이 전체 화면일 때 (게임·영상)")
 			body.add_child(segment([["회사 숨기고 쉬기", true], ["계속 보이기", false]], Game.settings.pause_fullscreen,

@@ -18,6 +18,8 @@ MODELS = [
     ("angular-convenience-coffee-vending-unit-ready", "capsule_coffee", 0.46, 3000),
     ("angular-convenience-hot-water-dispenser-counter-streamline-normal", "water_dispenser", 0.72, 3000),
     ("angular-onsen-capsule-sleeping-pod-pavilion-streamline-normal", "sleep_pod", 0.9, 3500),
+    ("angular-restaurant-undercounter-fridge-closed", "snack_fridge", 0.7, 3000),   # 1.2 단계 64 복지 가구
+    ("common-furniture-television-media-console-streamline-normal", "tv_console", 0.94, 3500),
 ]
 os.makedirs(OUT, exist_ok=True)
 

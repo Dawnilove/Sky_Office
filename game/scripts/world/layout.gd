@@ -12,14 +12,16 @@ var diameter := 10
 var R := 5.0          ## 반지름 (칸)
 var unit_m := 0.88
 var desk_cols := 2
+var front_extra := 0.0   ## 라운지 띠 (1.2 단계 64): 건물 앞쪽을 이만큼 더 늘림 (칸). 휴게 · 창구는 원래 앞끝 그대로, 새 띠 = lounge 구역
 
 
-func _init(d := 10, path := PATH) -> void:
+func _init(d := 10, path := PATH, extra := 0.0) -> void:
+	front_extra = extra
 	data = JSON.parse_string(FileAccess.get_file_as_string(path))
 	diameter = clampi(d, int(data.diameter_min), int(data.diameter_max))
 	R = diameter / 2.0
 	unit_m = float(data.unit_m)
-	desk_cols = diameter + int(data.desk_cols_minus_diameter)   # 10 → 2열 (책상 4) … 14 → 6열 (책상 12)
+	desk_cols = int(data.desk_cols[diameter - int(data.diameter_min)])   # 10 → 2열 (책상 4) … 13 · 14 → 6열 (책상 12)
 
 
 ## 칸 → 월드 미터 (Vector2 = [x, z])
@@ -47,7 +49,12 @@ func building_rect() -> Rect2:
 	var b: Dictionary = data.building
 	var hw := float(b.half_w_ratio) * R
 	var back := float(b.back_z)
-	return Rect2(-hw, back, hw * 2.0, float(b.front_ratio) * R - back)
+	return Rect2(-hw, back, hw * 2.0, float(b.front_ratio) * R + front_extra - back)
+
+
+## 라운지 띠를 뺀 원래 앞끝 z (휴게 · 창구의 앞쪽 벽)
+func base_front() -> float:
+	return float(data.building.front_ratio) * R
 
 
 # ------------------------------------------------------------------ 작업실 (2인 마주보기 책상, 열만 늘어남)
@@ -83,6 +90,24 @@ func desks() -> Array:
 	return out
 
 
+const SPEC_BASE := 100   ## 전문가석 번호 = SPEC_BASE + k (책상 번호와 안 섞임)
+
+
+## 전문가석 (1.4 단계 160): 라운지 띠 가운데 작은 책상 2개 (앉는 쪽 섞음). 지름 14 + 라운지 띠 (front_extra) 일 때만. {id, pos, seat, rot}
+func spec_desks() -> Array:
+	var sd: Dictionary = data.get("spec_desks", {})
+	if sd.is_empty() or diameter < int(sd.min_diameter) or front_extra <= 0.0:
+		return []
+	var lz := zone_rect("lounge")
+	var out: Array = []
+	for k in sd.items.size():
+		var it: Dictionary = sd.items[k]
+		var p := lz.position + lz.size * _v2(it.rel)
+		var rot := float(it.rot)
+		out.append({"id": SPEC_BASE + k, "pos": p, "seat": p + Vector2(0.0, 0.55 if rot == 0.0 else -0.55), "rot": rot})
+	return out
+
+
 ## 작업실 가구 자리 (건물 왼쪽 · 오른쪽 벽 기준)
 func room_slot(name: String) -> Dictionary:
 	var s: Dictionary = data.workroom.slots[name]
@@ -91,7 +116,7 @@ func room_slot(name: String) -> Dictionary:
 
 # ------------------------------------------------------------------ 구역 사각형
 func zone_names() -> Array:
-	return ["workroom", "counter", "rest", "pier"]
+	return ["workroom", "counter", "rest", "pier", "lounge"] if front_extra > 0.0 else ["workroom", "counter", "rest", "pier"]
 
 
 func zone_rect(name: String) -> Rect2:
@@ -112,8 +137,9 @@ func zone_rect(name: String) -> Rect2:
 		var v := func(a, wall: String, edge: float) -> float: return edge if str(a) == wall else float(a)
 		var x0: float = v.call(w[0], "left", b.position.x)
 		var x1: float = v.call(w[2], "right", b.end.x)
-		var z1: float = v.call(w[3], "front", b.end.y)
-		return Rect2(x0, float(w[1]), x1 - x0, z1 - float(w[1]))
+		var z0: float = base_front() if str(w[1]) == "front" else float(w[1])   # "front" = 라운지 띠를 뺀 앞끝, "front2" = 띠까지 (건물 맨 앞)
+		var z1: float = b.end.y if str(w[3]) == "front2" else v.call(w[3], "front", base_front())
+		return Rect2(x0, z0, x1 - x0, z1 - z0)
 	if z.has("edge"):   # 건물 벽에 붙은 부두 (왼쪽 벽 바깥)
 		var size := _v2(z.size)
 		var b := building_rect()

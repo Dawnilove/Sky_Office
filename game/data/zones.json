@@ -3,7 +3,7 @@
 	"unit_m": 0.88,
 	"diameter_min": 10,
 	"diameter_max": 14,
-	"desk_cols_minus_diameter": -8,
+	"desk_cols": [2, 3, 4, 6, 6],
 	"fixed": {
 		"board": {"pos": [0.0, -3.35], "size": [1.5, 0.5], "cells": [6, 2], "height": 1.72},
 		"flagpole": {"pos": [1.67, -3.52], "base_y": 2.1, "height": 1.5},
@@ -27,10 +27,10 @@
 	},
 	"workroom": {
 		"front_z": -0.4,
-		"col_gap": 1.2,
+		"col_gap": 1.35,
 		"pod_cols": 2,
-		"pod_aisle": 0.9,
-		"desk_size": [1.2, 0.6],
+		"pod_aisle": 0.5,
+		"desk_size": [1.35, 0.6],
 		"rows": [
 			{"desk_z": -2.2, "seat_z": -2.75, "rot": 180},
 			{"desk_z": -1.6, "seat_z": -1.05, "rot": 0}
@@ -38,6 +38,8 @@
 		"slots": {
 			"rack": {"edge": "left", "pos": [0.4, -3.1], "size": [0.6, 0.5]},
 			"bookshelf": {"edge": "left", "pos": [1.2, -3.2], "size": [0.75, 0.35]},
+			"rack2": {"edge": "right", "pos": [-0.37, -3.1], "size": [0.6, 0.5]},
+			"rack3": {"edge": "right", "pos": [-0.97, -3.1], "size": [0.6, 0.5]},
 			"whiteboard": {"edge": "center", "pos": [0.0, -3.4], "size": [1.65, 0.12]},
 			"telescope": {"edge": "right", "pos": [-0.4, -1.2], "size": [0.4, 0.4]}
 		}
@@ -47,7 +49,14 @@
 		"divider_x": 1.0,
 		"counter": {"wall_rect": [1.1, 0.1, "right", "front"]},
 		"rest": {"wall_rect": ["left", 0.1, 0.9, "front"]},
+		"lounge": {"wall_rect": ["left", "front", "right", "front2"]},
 		"pier": {"edge": "left", "z": -0.05, "size": [1.75, 1.0]}
+	},
+	"spec_desks": {
+		"_comment": "전문가석 (1.4 단계 160): 라운지 띠 가운데 작은 책상 2개 (rel = 라운지 구역 안 비율, rot 0 = 앉은 사람이 -z · 180 = +z 를 봄, 앉는 쪽 섞음). 지름 14 + 라운지 띠 일 때만",
+		"min_diameter": 14,
+		"size": [1.0, 0.6],
+		"items": [{"rel": [0.395, 0.3], "rot": 0}, {"rel": [0.495, 0.667], "rot": 180}]
 	},
 	"slots": {
 		"queue": {"edge": "right", "pos": [[-1.9, 1.2], [-2.26, 1.2], [-2.62, 1.2], [-2.98, 1.2]], "rot": -90},
@@ -58,13 +67,22 @@
 		"notice_board": {"edge": "left", "pos": [[0.95, 0.32]], "size": [0.66, 0.35]},
 		"water": {"zone": "rest", "rel": [[0.05, 0.921]], "size": [0.3, 0.3]},
 		"coat_rack": {"edge": "left", "pos": [[0.3, -0.75]]},
-		"wait_chairs": {"edge": "left", "pos": [[0.45, -1.9], [0.45, -1.3]], "rot": -90},
+		"wait_chairs": {"edge": "left", "pos": [[0.35, -1.9], [0.35, -1.3]], "rot": -90},
 		"pantry": {"zone": "rest", "rel": [[0.059, 0.521]], "rot": 90, "size": [0.5, 1.4]},
 		"sofa": {"fixed": [[0.55, 1.35]], "rot": 90, "size": [1.3, 0.45]},
 		"meeting_table": {"zone": "rest", "rel": [[0.505, 0.535]], "size": [1.1, 1.1]},
 		"meeting_seats": {"zone": "rest", "rel": [[0.356, 0.535, -90], [0.653, 0.535, 90], [0.505, 0.186, 180]]},
 		"extra_seat": {"zone": "rest", "rel": [[0.505, 0.884, 180]]},
-		"sleep_pod": {"zone": "rest", "rel": [[0.8, 0.17]], "rot": 90, "size": [1.0, 0.9]},
+		"lounge_tv": {"zone": "lounge", "rel": [[0.1, 0.24]], "size": [1.36, 0.49]},
+		"lounge_fridge": {"zone": "lounge", "rel": [[0.3, 0.3]], "size": [0.66, 0.68]},
+		"lounge_seats": {"zone": "lounge", "rel": [[0.06, 0.7], [0.14, 0.7]], "size": [0.6, 0.6]},
+		"lounge_game": {"zone": "lounge", "rel": [[0.1, 0.47]], "size": [0.3, 0.2]},
+		"lounge_cafe": {"zone": "lounge", "rel": [[0.62, 0.26]], "size": [1.46, 0.56]},
+		"lounge_picnic": {"zone": "lounge", "rel": [[0.84, 0.6]], "size": [0.9, 0.9]},
+		"lounge_picnic_seats": {"zone": "lounge", "rel": [[0.75, 0.6], [0.93, 0.6]], "size": [0.4, 0.4]},
+		"lounge_lights": {"zone": "lounge", "rel": [[0.5, 0.06], [0.96, 0.06]], "size": [0.1, 0.1]},
+		"cat_bed": {"zone": "rest", "rel": [[0.7, 0.17]], "size": [0.5, 0.4]},
+		"cat_bowl": {"zone": "rest", "rel": [[0.6, 0.17]], "size": [0.2, 0.2]},
 		"rest_spots": {"zone": "rest", "rel": [[0.188, 0.488, 90], [0.188, 0.767, 90], [0.792, 0.419], [0.792, 0.744]], "rot": 180},
 		"dock": {"zone": "pier", "rel": [[0.3, 0.6]]},
 		"stop_sign": {"zone": "pier", "rel": [[0.117, 0.86]]},

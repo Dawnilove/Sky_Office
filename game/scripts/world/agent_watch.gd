@@ -160,6 +160,19 @@ static func tool_style(agent: String) -> Dictionary:
 	return _styles.get(agent, {})
 
 
+## 모델 이름 → 명패 칩 글자 ("claude-opus-4-7[1m]" → "Opus 4.7", "gpt-5.1-codex" → "gpt-5.1"). 모르는 이름은 앞 12자 그대로, "" = 칩 없음
+static func model_short(m: String) -> String:
+	var low := m.strip_edges().to_lower()
+	var re := RegEx.new()
+	re.compile("(opus|sonnet|haiku|fable)-(\\d+)(?:[-.](\\d{1,2})(?!\\d))?")
+	var r := re.search(low)
+	if r:
+		return r.get_string(1).capitalize() + " " + r.get_string(2) + ("." + r.get_string(3) if r.get_string(3) != "" else "")
+	re.compile("gpt-\\d+(?:\\.\\d+)?")
+	r = re.search(low)
+	return r.get_string() if r else m.strip_edges().left(12)
+
+
 ## glob (/ 로 나눈 칸마다 * 가능) 에 맞는 파일 경로. 글자만 있는 칸은 목록 없이 바로 내려감 (.system_generated 같은 숨김 폴더도 됨)
 static func glob_files(dir: String, segs: PackedStringArray) -> Array:
 	var out := []
@@ -329,6 +342,13 @@ func _apply(e: Dictionary, now: float) -> void:
 		if str(e.get("event", "")) == "SubagentStart" and str(e.get("agent_type", "")) != "" and str(e.get("aid", "")) != "":
 			var bias := int(Time.get_time_zone_from_system().get("bias", 0))
 			snap.staff = StaffRegistry.touch_role(snap.staff, str(s.proj), str(e.agent_type), int(floor((float(e.t) + bias * 60.0) / 86400.0)))
+
+
+## [프로젝트 완료] (직원 카드): 그 직원의 단골 표시를 빼고 저장
+func finish_project(id: int) -> void:
+	snap.staff = StaffRegistry.finish(snap.staff, id, Time.get_unix_time_from_system())
+	_save()
+	updated.emit()
 
 
 ## 관찰 모드: 수정 시각이 바뀐 .jsonl 만 이벤트로. 처음 보는 오래된 파일은 기억만 (하루 넘으면 세션도 안 만듦)

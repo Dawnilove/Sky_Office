@@ -141,7 +141,8 @@ func _m4_life(check: Callable) -> void:
 				break
 			tw.custom_step(5.0)
 	check.call("M4 쉬는 행동 고르기: 비중 × 성격 (부지런 = 버릇 ×2) · 성격 = id % 4", Office.pick_act("부지런", cfg, 0.0) == "coffee"
-			and Office.pick_act("부지런", cfg, 0.999) == "quirk" and Office.pick_act("느긋", cfg, 0.999, ["quirk"]) == "pier"
+			and Office.pick_act("부지런", cfg, 0.999) == "quirk" and Office.pick_act("느긋", cfg, 0.999, ["quirk", "read", "doodle", "pet"]) == "pier"
+			and Office.pick_act("부지런", cfg, 0.999, ["quirk", "pet"]) == "doodle" and Office.pick_act("조용", cfg, 0.999, ["quirk", "doodle", "pet"]) == "read"
 			and Office.personality_of(2, cfg) == "수다" and Office.personality_of(5, cfg) == "느긋")
 	for j in office.desk_count:
 		office.set_state(j, "off")
@@ -171,6 +172,62 @@ func _m4_life(check: Callable) -> void:
 			partner = j
 	check.call("M4 소파 (기대 앉기) · 수다 (쉬는 동료와 2명, 손짓)", sofa and partner == 2 and (s1.anim as AnimationPlayer).current_animation == "Talk",
 			"sofa=%s partner=%d" % [sofa, partner])
+	office.set_state(0, "work")
+	office.set_state(1, "work")
+	var stage0: int = office.stage   # 쉬는 행동 +2 (1.1 ②): 책장 읽기 = 서류 들고 · 화이트보드 낙서 = Scratch · 자리 하나 = 한 명 · 조회 중 낙서 금지
+	office.stage = 99
+	office.set_state(0, "rest")
+	office.set_state(1, "rest")
+	office.rest_act(0, "read")
+	run.call(0)
+	office.rest_act(1, "read")
+	var shelf: Dictionary = office.layout.room_slot("bookshelf")
+	var rd: bool = s0.held == "papers" and (s0.anim as AnimationPlayer).current_animation == "HoldIdle" and office.staff[1].act == "stand" 			and (s0.node as Node3D).position.distance_to(office.layout.m3(shelf.pos + Vector2(0, shelf.size.y / 2.0 + 0.4))) < 0.05
+	office.rest_act(0, "doodle")
+	run.call(0)
+	var dd: bool = s0.held == "" and (s0.anim as AnimationPlayer).current_animation == "Scratch" and s0.act == "doodle"
+	office.staff[1].act = "gather"
+	office.rest_act(0, "doodle")
+	var gate: bool = s0.act == "stand"
+	office.staff[1].act = ""
+	office.stage = 0   # 책장 · 화이트보드 전 = 안 감
+	office.rest_act(0, "read")
+	check.call("1.1 쉬는 행동 +2: 책장 읽기 (서류) · 낙서 (Scratch) · 자리 하나 = 한 명 · 조회 중 낙서 · 코너 전 = 서 있음", rd and dd and gate and s0.act == "stand",
+			"%s %s %s %s" % [rd, dd, gate, s0.act])
+	office.stage = stage0
+	# 고양이 (1.2 ④): 자는 중 쓰다듬기 (한 명만) · 걷는 중엔 못 씀 · 내 차례 · 조용히 · 하루 끝 · 큰 연출 2명이면 걷지 않고 잠
+	var cat: Node3D = office.cat
+	var CatS = office.CatScript
+	office.set_state(0, "rest")
+	office.set_state(1, "rest")
+	var can0: bool = office.can_pet()
+	office.rest_act(0, "pet")
+	run.call(0)
+	var pet0: bool = s0.act == "pet" and (s0.node as Node3D).position.distance_to(office.layout.m3(office.cat_pet_spot())) < 0.05 and cat.hold_until > 0.0
+	office.rest_act(1, "pet")
+	var one_pet: bool = office.staff[1].act != "pet"
+	cat.hold(0.0)
+	cat.start("eat", 0.0)
+	var walking: bool = cat._tween != null and not office.can_pet()
+	cat.tick(1.0, {"turn": true})
+	var yield_turn: bool = cat.act == "sleep"
+	if cat._tween != null:
+		cat._tween.custom_step(30.0)
+	var home: bool = cat.at_bed()
+	cat.start("stroll", 0.0)
+	cat.tick(1.0, {"big_now": 2})
+	var yield_big: bool = cat.act == "sleep"
+	var calms: bool = CatS.calm({"quiet": true}) and CatS.calm({"off": true}) and not CatS.calm({"big_now": 1}) and not CatS.calm({})
+	var cc: Dictionary = office.idle_cfg.cat
+	var no_walk := true
+	for k in 101:
+		no_walk = no_walk and not (CatS.pick(cc, k / 101.0, false) in ["stroll", "eat"])
+	check.call("1.2 고양이: 자는 중 쓰다듬기 (한 명) · 걷는 중엔 못 씀 · 내 차례 · 큰 연출 2명이면 침대로 돌아가 잠 · 조용히 · 하루 끝 · 걷기 간격",
+			can0 and pet0 and one_pet and walking and yield_turn and home and yield_big and calms and no_walk and CatS.pick(cc, 0.0, true) == "sleep" and CatS.pick(cc, 0.999, true) == "eat",
+			"%s %s %s %s %s %s %s %s %s" % [can0, pet0, one_pet, walking, yield_turn, home, yield_big, calms, no_walk])
+	if cat._tween != null:
+		cat._tween.custom_step(30.0)
+	cat.hold(0.0)
 	office.set_state(0, "work")
 	office.set_state(1, "work")
 	office.set_state(2, "work")
@@ -340,7 +397,50 @@ func _m2(check: Callable) -> void:
 	check.call("1.1 증축: 지름 11 = 책상 6 · 기존 4개 자리 그대로 · 신호 고정", d11.size() == 6 and range(4).all(func(i): return d10[i].pos == d11[i].pos)
 			and l10.signal_pos("board") == l11.signal_pos("board") and l10.signal_pos("flagpole") == l11.signal_pos("flagpole"), str(d11.map(func(d): return d.pos)))
 	check.call("1.1 증축: 단계 → 지름 (28 전 10 · 28부터 11) · 모르는 값은 10", Company.diameter_for(0) == 10 and Company.diameter_for(5) == 10
-			and Company.diameter_for(6) == 11 and Company.diameter_for(99) == 11, str(Company.diameter_for(6)))
+			and Company.diameter_for(6) == 11 and Company.diameter_for(8) == 11 and Company.diameter_for(14) == 13 and Company.diameter_for(15) == 14 and Company.diameter_for(99) == 14, str(Company.diameter_for(6)))
+	var cat_ok := true
+	var cat_note := ""
+	for dd in [10, 11, 12, 13, 14]:   # 고양이 자리 (침대 · 밥그릇 · 쓰다듬는 자리): 휴게 구역 안 · 소파 · 쉬는 자리 · 회의 의자와 안 겹침
+		var lc := Layout.new(dd)
+		var rr: Rect2 = lc.zone_rect("rest")
+		var bed: Vector2 = lc.slots("cat_bed")[0].pos
+		var bowl: Vector2 = lc.slots("cat_bowl")[0].pos
+		var pet := bed + Vector2(-0.5, 0.2)
+		var so: Dictionary = lc.slots("sofa")[0]
+		var sofa_r := Rect2(so.pos - Vector2(so.size.y, so.size.x) / 2.0, Vector2(so.size.y, so.size.x))
+		var near := 9.0
+		for nm in ["rest_spots", "meeting_seats"]:
+			for sp in lc.slots(nm):
+				for q in [bed, bowl, pet]:
+					near = minf(near, (sp.pos as Vector2).distance_to(q))
+		var one: bool = [bed, bowl, pet].all(func(q: Vector2) -> bool: return rr.grow(-0.05).has_point(q)) and not sofa_r.grow(0.1).has_point(bed) and not sofa_r.grow(0.1).has_point(pet)
+		cat_ok = cat_ok and one and near >= 0.45
+		cat_note += " d%d:%s/%.2f" % [dd, one, near]
+	check.call("1.2 고양이 자리: 침대 · 밥그릇 · 쓰다듬는 자리가 지름 10~14 에서 휴게 구역 안 · 소파 · 서는 자리와 0.45칸 이상 떨어짐", cat_ok, cat_note)
+	# 1.3 지름 13 · 14: 책상 10 · 12 (5 · 6열) · 책상 · 의자 · 책장 · 서버 랙 3 (단계 104) · 화이트보드 · 대기 의자 (의자 0.5칸) 가 서로 안 겹침 · 건물 안
+	var o13: Array = []
+	for dd13 in [13, 14]:
+		var l13 := Layout.new(dd13)
+		var r13: Array = []
+		for dk in l13.desks():
+			r13.append(["책상%d" % dk.id, Rect2(dk.pos - Vector2(0.675, 0.3), Vector2(1.35, 0.6))])
+			r13.append(["의자%d" % dk.id, Rect2(dk.seat - Vector2(0.25, 0.25), Vector2(0.5, 0.5))])
+		for n in ["rack", "rack2", "rack3", "bookshelf", "whiteboard"]:
+			var rs: Dictionary = l13.room_slot(n)
+			r13.append([n, Rect2(rs.pos - rs.size / 2.0, rs.size)])
+		for q in l13.slots("wait_chairs"):
+			r13.append(["대기의자", Rect2(q.pos - Vector2(0.25, 0.25), Vector2(0.5, 0.5))])
+		var cols13: int = [2, 3, 4, 6, 6][dd13 - 10]
+		if l13.desks().size() != 2 * cols13 or l13.desk_cols != cols13:
+			o13.append("d%d 책상 수" % dd13)
+		for a in r13.size():
+			if r13[a][0] != "whiteboard" and not l13.building_rect().encloses(r13[a][1]):   # 화이트보드는 뒷벽에 걸림
+				o13.append("d%d %s 건물 밖" % [dd13, r13[a][0]])
+			for b2 in range(a + 1, r13.size()):
+				var ix: Rect2 = (r13[a][1] as Rect2).intersection(r13[b2][1])
+				if ix.size.x > 0.01 and ix.size.y > 0.01:
+					o13.append("d%d %s-%s %.2f×%.2f" % [dd13, r13[a][0], r13[b2][0], ix.size.x, ix.size.y])
+	check.call("1.3 지름 13 · 14: 책상 10 · 12 · 책상 · 의자 · 책장 · 서버 랙 3 · 화이트보드 · 대기 의자 건물 안 · 겹침 0", o13.is_empty(), str(o13))
 	check.call("책상 마주보기 (뒷줄 = 카메라 쪽 · 앞줄 = 뒤쪽)", d10.all(func(d): return d.rot == (180.0 if d.row == 0 else 0.0)))
 	for l: Layout in [l10, l11, l14]:
 		var tag := "지름 %d" % l.diameter
@@ -480,6 +580,17 @@ func _m2(check: Callable) -> void:
 			t0 == nm and t1 == nm and t1h == nm and t2 == "OverLand" and t3 == nm + "\nOverLand" and t4 == nm + "\nPhysical-…" and bool(Game.settings.show_project),
 			"%s / %s / %s / %s / %s / %s" % [t0, t1, t1h, t2, t3, t4])
 	office.set_days(0, 0)
+	var ms := AgentWatch.model_short
+	var chip0: Label3D = office.staff[0].chip
+	office.set_staff_model(0, "claude-opus-4-7[1m]")
+	var c1 := chip0.text + "/" + str(chip0.visible)
+	office.set_staff_model(0, "")
+	var c2 := chip0.text + "/" + str(chip0.visible)
+	check.call(tag2 + " 모델 칩 (1.1 ①): 이름 줄이기 · 모르는 이름 앞 12자 · 모르면 숨김",
+			ms.call("claude-opus-4-7") == "Opus 4.7" and ms.call("claude-sonnet-4-5-20250929") == "Sonnet 4.5" and ms.call("claude-haiku-4-5") == "Haiku 4.5"
+			and ms.call("claude-fable-5") == "Fable 5" and ms.call("claude-opus-4-1-20250805") == "Opus 4.1" and ms.call("gpt-5.1-codex") == "gpt-5.1"
+			and ms.call("some-weird-long-model-name") == "some-weird-l" and ms.call("") == "" and c1 == "Opus 4.7/true" and c2 == "/false" and bool(Game.settings.show_model),
+			"%s | %s" % [c1, c2])
 	check.call(tag2 + " 칩 바 없음 (M3 4세션째 결정) · 노랑 순서표는 그대로", main.ui.chips == null and office.chips().size() == desks.size())
 	# 아이콘 크기: 창 100% · 1칸 = 50px 기준 16px 이상
 	var icon_px := 0.38 * 50.0
@@ -701,6 +812,29 @@ func _m3_staff(check: Callable) -> void:
 	var pa1 := StaffRegistry.assign(pr3, ps2, 10, {"s3": 0})
 	check.call("1.1 풀 B 붙으면 안 놓음: 단골 p1 (직원 0) 이 나중에 와도 직원 0 을 맡은 s3 는 그대로 · p1 은 다른 직원 · 안 붙였으면 p1 = 직원 0",
 			pa0.h1.staff == 0 and not pa0.h1.cover and pa1.s3.staff == 0 and pa1.h1.staff == 1 and pa1.h1.cover, str(pa1))
+	# 1.3 도구 연속 횟수 (장소 이동): 같은 소품 종류가 이어진 횟수 · 다른 종류 · 고치기 · 새 프롬프트가 오면 새로 셈 · 서브에이전트 도구는 안 셈
+	var sp := func(evs: Array) -> Array:
+		var v: Dictionary = AgentState.decide(AgentState.replay([_ev(0, "SessionStart", "q"), _ev(1, "UserPromptSubmit", "q")] + evs), 10.0)["q"]
+		return [v.spot, v.spot_n]
+	var pt := func(t: float, tool: String, extra := {}) -> Dictionary: return _ev(t, "PostToolUse", "q", {"tool": tool}.merged(extra))
+	var sp3: Array = sp.call([pt.call(2, "Grep"), pt.call(3, "Glob"), pt.call(4, "Grep")])
+	var sp_run: Array = sp.call([pt.call(2, "Grep"), pt.call(3, "Grep"), pt.call(4, "Bash"), pt.call(5, "PowerShell")])
+	var sp_edit: Array = sp.call([pt.call(2, "Bash"), pt.call(3, "Bash"), pt.call(4, "Edit")])
+	var sp_sub: Array = sp.call([pt.call(2, "Bash"), pt.call(3, "Bash", {"aid": "x1"}), pt.call(4, "Bash")])
+	var sp_new: Array = sp.call([pt.call(2, "Bash"), pt.call(3, "Bash"), _ev(4, "UserPromptSubmit", "q"), pt.call(5, "Bash")])
+	check.call("1.3 도구 연속 횟수: 검색 (Grep · Glob) 3번 = search 3 · 다른 소품 종류가 오면 새로 셈 · 고치기가 오면 0 · 서브에이전트 도구는 안 셈 · 새 프롬프트에서 새로 셈",
+			sp3 == ["search", 3] and sp_run == ["run", 2] and sp_edit == ["", 0] and sp_sub == ["run", 2] and sp_new == ["run", 1], "%s %s %s %s %s" % [sp3, sp_run, sp_edit, sp_sub, sp_new])
+	# 1.3 프로젝트 완료: 단골 해제 (직원은 남음) → 다른 직원이 맡음 · 옛 신호로는 안 돌아옴 · 새 활동이 오면 원래 직원 복귀 · 일하는 중엔 못 누름
+	var fin := StaffRegistry.finish(pr3, 0, 20)
+	var fin_a := StaffRegistry.assign(fin, ps2, 30)
+	var fin_old := StaffRegistry.touch(fin, "claude", "p1", 15, 40, 2)
+	var fin_new := StaffRegistry.touch(fin, "claude", "p1", 25, 40, 2)
+	var fin_b := StaffRegistry.assign(fin_new, ps2, 30)
+	var SC := load("res://scripts/ui/staff_card.gd")
+	check.call("1.3 프로젝트 완료: 직원 0 은 남고 (기록 그대로) 단골만 해제 → p1 은 지원 근무 · 옛 신호 (완료 전) 는 복귀 안 시킴 · 새 활동이 오면 원래 직원이 단골로 복귀 · 쉬는 직원만 끝낼 수 있음",
+			fin.staff.size() == 2 and fin.staff[0].done and not fin.staff[1].get("done", false) and fin_a.h1.cover and fin_old.staff[0].done
+			and not fin_new.staff[0].done and fin_b.h1.staff == 0 and not fin_b.h1.cover
+			and SC.can_finish("rest") and SC.can_finish("done") and not SC.can_finish("work") and not SC.can_finish("turn") and not SC.can_finish("wait"), str(fin_a))
 	var vw2: Dictionary = OfficeRoutine.views(ps2, pr3, 10.0, {"s3": 0})
 	check.call("1.1 풀 B 보이기: 키 = 직원 id · 세션 프로젝트 (명패 폴더 · 전문가 근속) · 지원 근무 표시 · 색 = 단골 직원 id 또는 프로젝트 해시",
 			vw2["s:0"].proj == "p3" and vw2["s:0"].cover and vw2["s:1"].proj == "p1" and StaffRegistry.color_key(pr3, "claude", "p2") == 1
@@ -1073,6 +1207,14 @@ func _m3_routine(check: Callable) -> void:
 	var pf0: Dictionary = R.borrow_plan({"x:1": {"guest": true, "look": "wait", "v": {"state": "work"}}}, [2, 3, 4], {}, 6)
 	check.call("1.1 R5-lite 단골 자리: 단골 전문가는 늘 같은 책상 (9 % 6 = 3) 이 비면 그 자리 · 이미 차면 다른 빈 책상 · 단골 아니면 예전처럼 앞 번호",
 			pf["x:1"] == 3 and pf["x:2"] == 2 and pf0["x:1"] == 2, str(pf))
+	# 1.4 전문가석: 단골 (근속 5일+) 전문가만 앉음 · 이미 앉은 자리는 그대로 · 자리가 모자라면 다음은 빈 책상 · 전문가석이 없으면 (단계 160 전) 예전 그대로
+	var spw := {"x:1": {"guest": true, "look": "wait", "v": {"state": "work", "spec": "Plan"}, "fav_key": 9}, "x:2": {"guest": true, "look": "wait", "v": {"state": "work", "spec": "Explore"}},
+			"x:3": {"guest": true, "look": "wait", "v": {"state": "work", "spec": "summarizer"}, "fav_key": 4}, "x:4": {"guest": true, "look": "wait", "v": {"state": "work", "spec": "general-purpose"}, "fav_key": 5}}
+	var sp0: Dictionary = R.borrow_plan(spw, [2, 3], {}, 6, [100, 101])
+	var sp1: Dictionary = R.borrow_plan(spw, [2, 3], {"x:4": 101}, 6, [100, 101])
+	var sp2: Dictionary = R.borrow_plan(spw, [2, 3], {}, 6)
+	check.call("1.4 전문가석 배정 (순수): 단골 전문가 2명이 전문가석 (100 · 101) · 단골 아닌 전문가 · 모자란 단골은 빈 책상 · 앉은 자리는 그대로 · 전문가석 없으면 예전 그대로",
+			sp0 == {"x:1": 100, "x:3": 101, "x:2": 2, "x:4": 3} and sp1 == {"x:4": 101, "x:1": 100, "x:2": 2, "x:3": 3} and not sp2.values().any(func(v): return int(v) >= 100), "%s %s %s" % [sp0, sp1, sp2])
 	var reg0 := StaffRegistry.sync(StaffRegistry.touch(StaffRegistry.empty(), "claude", "p1", 1000.0, 1000.0), 4, 1000.0)
 	var ag := AgentState.replay([_ev(1000, "SessionStart", "a"), _ev(1001, "SessionStart", "b"), _ev(1002, "UserPromptSubmit", "b")])
 	var vw: Dictionary = R.views(ag, reg0, 1003.0)
@@ -1339,6 +1481,27 @@ func _m5_company(check: Callable) -> void:
 	check.call("M5 저장 값 정리: 모르는 키 버림 · 빠진 키 채움 · 근무일 정수", n.earned_days == 3 and typeof(n.earned_days) == TYPE_INT
 			and not n.has("zzz") and n.has("win_start") and Company.normalize(null) == Company.empty())
 
+	# 1.3 연혁: 옛 저장 (칸 없음) = 지난 대단계를 날짜 없이 한 번 · 대단계가 오른 날 날짜 기록 · 일반 단계는 안 적음
+	var oldh: Array = Company.normalize({"shown_stage": 5}).history
+	var keep_h: Array = Company.normalize({"shown_stage": 5, "history": [{"stage": 3, "date": "2026-01-02"}, 7]}).history
+	var hs := Company.empty()
+	hs.earned_days = 27
+	hs.shown_stage = 5
+	var h1 := _co(hs, [["prompt", T]])   # 27 → 28 = 대단계 (법인 성장) 에 오름
+	var hs2 := Company.empty()
+	hs2.earned_days = 34
+	hs2.shown_stage = 6
+	var h2 := _co(hs2, [["prompt", T]])   # 35 → 일반 단계 (탕비실 정비)
+	check.call("1.3 연혁: 옛 저장은 지난 대단계를 '이전' 으로 한 번 채움 · 새 저장은 그대로 (이상한 항목 버림) · 대단계가 오른 날만 날짜 적음", oldh == [{"stage": 3, "date": ""}]
+			and keep_h == [{"stage": 3, "date": "2026-01-02"}] and h1.history.size() == 1 and int(h1.history[0].stage) == 6 and str(h1.history[0].date).length() == 10
+			and h2.history.is_empty(), "%s %s %s" % [oldh, h1.history, h2.history])
+
+	# 1.3 명예의 벽 기념사진: 겉모습 번호 · 날짜 · 기간만 (프로젝트 이름 · 폴더 · 해시 없음) · 이상한 저장값은 버림
+	var he := Company.honor_entry({"hired": T, "last": T + 11 * 86400.0, "proj": "비밀폴더", "agent": "claude"}, {"shirt": 3, "hair": 2, "acc": 1, "person": 0, "name": 7, "team": 4}, T + 12 * 86400.0)
+	var hn := Company.normalize({"honor": [he, 5, {"date": "x"}]})
+	check.call("1.3 명예의 벽 기념사진: 날짜 + 같이 일한 기간 (12일) + 겉모습 4가지만 · 프로젝트 이름 · 폴더 · 이름 · 팀 없음 · 이상한 항목 버림",
+			he.keys().size() == 3 and str(he.date).length() == 10 and int(he.days) == 12 and he.look.keys().size() == 4 and hn.honor == [he] and Company.normalize(null) == Company.empty(), str(he))
+
 	# 감지기 → 근무일 신호
 	var kinds := [AgentWatch.company_kind({"event": "UserPromptSubmit"}), AgentWatch.company_kind({"event": "jsonl", "closed": false}),
 			AgentWatch.company_kind({"event": "jsonl", "closed": true}), AgentWatch.company_kind({"event": "StopFailure", "error_kind": "rate_limit"}),
@@ -1435,15 +1598,16 @@ func _m5_save(check: Callable) -> void:
 func _m5_show(check: Callable) -> void:
 	var sd: Dictionary = Company.stage_data()
 	var groups: Array = sd.stages.map(func(s): return s.group)
-	check.call("M5 단계 데이터: stages.json 9단계 (창업 3 · 스타트업 3 · 중소기업 ① 법인 성장 = 증축 · ② 탕비실 정비 · ③ 야근 문화) · 문턱 = v2.8 ×2 · company.gd 가 여기서 읽음",
-			Company.stage_days() == [0, 2, 6, 10, 14, 20, 28, 36, 44] and Company.thresholds == Company.stage_days()
-			and groups == ["창업", "창업", "창업", "스타트업", "스타트업", "스타트업", "중소기업", "중소기업", "중소기업"] and Company.stage_for(9) == 2 and Company.stage_for(20) == 5 and Company.stage_for(28) == 6
-			and Company.stage_for(36) == 7 and Company.stage_for(44) == 8,
+	check.call("M5 단계 데이터: stages.json 15단계 (창업 3 · 스타트업 3 · 중소기업 3 · 유니콘 3 · 중견 ① 사옥 단장 = 증축 · ② 시스템 확충 · ③ 인재 영입 · 대기업 ① 본사 완공 = 증축 · 대형 간판 · ② 전문가석 개설 · ③ 업계 1위 = 마지막 단계) · 문턱 = v2.8 ×2 · company.gd 가 여기서 읽음",
+			Company.stage_days() == [0, 2, 6, 10, 14, 20, 28, 36, 44, 54, 64, 76, 90, 104, 120, 140, 160, 180] and Company.thresholds == Company.stage_days()
+			and groups == ["창업", "창업", "창업", "스타트업", "스타트업", "스타트업", "중소기업", "중소기업", "중소기업", "유니콘", "유니콘", "유니콘", "중견기업", "중견기업", "중견기업", "대기업", "대기업", "대기업"] and Company.stage_for(9) == 2 and Company.stage_for(20) == 5 and Company.stage_for(28) == 6
+			and Company.stage_for(36) == 7 and Company.stage_for(44) == 8 and Company.stage_for(54) == 9 and Company.stage_for(64) == 10 and Company.stage_for(76) == 11 and Company.stage_for(90) == 12 and Company.stage_for(104) == 13 and Company.stage_for(120) == 14
+			and Company.diameter_for(8) == 11 and Company.diameter_for(9) == 12,
 			str(Company.thresholds))
 	var all := ["bookshelf", "whiteboard", "desk_real", "chair_new", "sign_new", "server_rack", "telescope", "personal_shelf"]
-	check.call("M5 단계 가구: 첫 출근 = 새로 생긴 것 없음 · 첫 사용자 = 8가지 모두 · 재질 교체 2가지 (박스 책상 · 낡은 의자)",
+	check.call("M5 단계 가구: 첫 출근 = 새로 생긴 것 없음 · 첫 사용자 = 8가지 모두 · 재질 교체 3가지 (박스 책상 · 낡은 복합기 · 낡은 의자)",
 			Company.unlocked(0).is_empty() and all.all(func(k): return k in Company.unlocked(5)) and Company.unlocked(2) == ["bookshelf", "whiteboard"]
-			and sd.looks.keys() == ["desk_real", "chair_new"])
+			and sd.looks.keys() == ["desk_real", "copier", "chair_new"])
 	check.call("M5 단계 팝업 글: '창업 ② 첫 의뢰' + 생긴 것 · 스타트업은 ①부터", CompanyShow.popup_text(1) == "창업 ② 첫 의뢰\n책장이 들어왔어요"
 			and CompanyShow.popup_text(3).begins_with("스타트업 ① 첫 투자"), CompanyShow.popup_text(1).replace("\n", " / "))
 	check.call("M5 하루 일정 (순수): 0% 아침 조회 · 33% 점심 · 창 밖 퇴근 · 하루 한 번씩 · 늦게 켜면 조회 건너뜀",
@@ -1475,18 +1639,204 @@ func _m5_show(check: Callable) -> void:
 	var s3 := [(sign.find_child("SignNew", true, false) as Node3D).visible, box_mat.call(), vis.call("Whiteboard"), vis.call("ServerShelf")]
 	check.call("M5 단계 가구 적용: 0 = 손글씨 간판 · 서버 선반 · 박스 책상 (책장 · 화이트보드 · 망원경 · 랙 · 개인 칸 없음) → 3 = 남색 간판 · 진짜 책상",
 			s0 == [false, false, false, false, true, true, false, false, true] and s3 == [true, false, true, true], "%s %s 재질 %d" % [s0, s3, office._look_mats.size()])
-	# kArchive 가구 (② 가구 모델): 6 = 정수기 상자 · 의자 3 → 7 = 나무 장 + 냉온수기 + 캡슐 커피 · 4번째 의자 → 8 = 수면 캡슐
+	# kArchive 가구 (② 가구 모델): 6 = 정수기 상자 · 의자 3 → 7 = 나무 장 + 냉온수기 + 캡슐 커피 · 4번째 의자
 	var ka := func(st: int) -> Array:
 		office.apply_stage(st)
-		return [vis.call("WaterOld"), vis.call("PantryNew"), vis.call("Chair4"), vis.call("SleepPod")]
+		return [vis.call("WaterOld"), vis.call("PantryNew"), vis.call("Chair4")]
 	var k6: Array = ka.call(6)
 	var k7: Array = ka.call(7)
 	var k8: Array = ka.call(8)
 	var kfrom: Vector2 = main.layout.slot("rest_spots")
 	var kreach: bool = main.layout.slots("rest_spots").all(func(sp: Dictionary) -> bool: return not main.island.find_path(main.layout.m(kfrom), main.layout.m(sp.pos)).is_empty())
-	var kin: bool = ["extra_seat", "sleep_pod"].all(func(n: String) -> bool: return main.layout.building_rect().has_point(main.layout.slots(n)[0].pos))
-	check.call("M5 kArchive 가구: 단계 6 = 정수기 상자 · 7 = 냉온수기 + 캡슐 커피 (정수기 상자 사라짐) + 4번째 의자 · 8 = 수면 캡슐 · 쉬는 자리 모두 걸어갈 수 있음 · 건물 안",
-			k6 == [true, false, false, false] and k7 == [false, true, true, false] and k8 == [false, true, true, true] and kreach and kin, "%s %s %s %s %s" % [k6, k7, k8, kreach, kin])
+	var kin: bool = ["extra_seat"].all(func(n: String) -> bool: return main.layout.building_rect().has_point(main.layout.slots(n)[0].pos))
+	check.call("M5 kArchive 가구: 단계 6 = 정수기 상자 · 7 = 냉온수기 + 캡슐 커피 (정수기 상자 사라짐) + 4번째 의자 · 쉬는 자리 모두 걸어갈 수 있음 · 건물 안",
+			k6 == [true, false, false] and k7 == [false, true, true] and k8 == [false, true, true] and kreach and kin, "%s %s %s %s %s" % [k6, k7, k8, kreach, kin])
+	# 유니콘 ① (1.2): 단계 9 = 카펫 · 화분 2 · 유리 간판 (남색 판 숨김), 8 까지는 없음 · 지름 12 = 책상 8
+	var u := func(st: int) -> Array:
+		office.apply_stage(st)
+		return [vis.call("Carpet"), vis.call("PlantUni0"), vis.call("PlantUni1"), vis.call("Sign/SignGlass"),
+				(sign.find_child("SignNew", true, false) as Node3D).visible]
+	var u8: Array = u.call(8)
+	var u9: Array = u.call(9)
+	var cat_u := func(st: int) -> bool:
+		office.apply_stage(st)
+		return (office.get_node("Cat") as Node3D).visible and vis.call("CatBed") and vis.call("CatBowl")
+	check.call("1.2 유니콘 단계 64: 고양이 · 침대 · 밥그릇은 63 까지 없고 64 에 생김", not cat_u.call(9) and cat_u.call(10))
+	# 1.4 대형 간판 (단계 140 = 15): 14 까지는 그대로, 15 부터 1.4배 · 시계 쪽 반대로 0.7칸 · 테두리 남회색 (노랑 없음), 다시 14 로 돌리면 원래대로
+	office.apply_stage(14)
+	var sc14: Vector3 = (sign as Node3D).scale
+	var sx14: float = (sign as Node3D).position.x
+	office.apply_stage(15)
+	var sc15: Vector3 = (sign as Node3D).scale
+	var sx15: float = (sign as Node3D).position.x
+	var fr15: Color = (((sign as Node3D).find_child("SignFrame", true, false) as MeshInstance3D).material_override as StandardMaterial3D).albedo_color
+	office.apply_stage(14)
+	check.call("1.4 대형 간판: 단계 140 = 간판 1.4배 · 왼쪽 0.7칸 · 테두리 남회색, 그 전으로 돌리면 원래 크기", is_equal_approx(sc15.x / sc14.x, 1.4) and is_equal_approx(sx14 - sx15, 0.7 * main.layout.unit_m)
+			and (sign as Node3D).scale == sc14 and fr15 == Color("5d6b82"), "%s %s %s" % [sc15.x / sc14.x, sx14 - sx15, fr15])
+	# 1.4 전문가석 (단계 160 = 16): 지름 14 + 라운지 띠에서만 책상 2 · 라운지 구역 안 (의자 포함) · 라운지 가구 · 서로와 안 겹침 · 앉는 쪽이 섞임
+	var sx := true
+	var snote := ""
+	for dd in [10, 12, 14]:
+		for fe in [0.0, 1.5]:
+			var sl := Layout.new(dd, Layout.PATH, fe)
+			var sds: Array = sl.spec_desks()
+			var want_n: int = 2 if dd == 14 and fe > 0.0 else 0
+			sx = sx and sds.size() == want_n
+			if want_n == 0:
+				continue
+			var lzr: Rect2 = sl.zone_rect("lounge")
+			var srects: Array = []
+			for sdk in sds:
+				srects.append(Rect2(sdk.pos - Vector2(0.5, 0.3), Vector2(1.0, 0.6)))
+				srects.append(Rect2(sdk.seat - Vector2(0.22, 0.22), Vector2(0.44, 0.44)))
+			var lrs: Array = []
+			for n in ["lounge_tv", "lounge_fridge", "lounge_seats", "lounge_cafe", "lounge_picnic", "lounge_picnic_seats"]:
+				for q in sl.slots(n):
+					lrs.append(Rect2(q.pos - q.size / 2.0, q.size).grow(-0.02))
+			var sok: bool = srects.all(func(r: Rect2) -> bool: return lzr.grow(0.01).encloses(r)) and srects.all(func(r: Rect2) -> bool: return lrs.all(func(o: Rect2) -> bool: return not o.intersects(r)))
+			for a in srects.size():
+				for b2 in range(a + 1, srects.size()):
+					if (srects[a] as Rect2).intersects(srects[b2]):
+						sok = false
+			sx = sx and sok and sds[0].rot != sds[1].rot and sds[0].id == Layout.SPEC_BASE
+			snote += " ok=%s" % sok
+	check.call("1.4 전문가석 자리: 지름 14 + 라운지 띠에서만 책상 2개 · 라운지 안 (의자 포함) · 라운지 가구 · 서로와 안 겹침 · 앉는 쪽 섞임", sx, snote)
+	if office.spec_parts.size() > 0:
+		office.apply_stage(15)
+		var spv15: bool = vis.call("SpecDesk_0")
+		var spids15: Array = office.spec_seat_ids()
+		office.apply_stage(16)
+		var spv16: bool = vis.call("SpecDesk_0") and vis.call("SpecDesk_1")
+		var spids16: Array = office.spec_seat_ids()
+		office.apply_stage(14)
+		check.call("1.4 전문가석 (office): 단계 159 까지 안 보이고 빌릴 수도 없음, 160 부터 보임 · 번호 100 · 101", not spv15 and spids15.is_empty() and spv16 and spids16 == [100, 101])
+	# 1.4 업계 1위 (단계 180 = 17, 마지막): 16 까지 트로피 없음 · 17 부터 진열장 위에 · 게시판 '다음' = 마지막 단계
+	var tr := office.get_node("Trophy") as Node3D
+	office.apply_stage(16)
+	var tr16: bool = tr.visible
+	office.apply_stage(17)
+	var tr17: bool = tr.visible
+	office.apply_stage(14)
+	check.call("1.4 업계 1위: 단계 180 = 마지막 단계 (18번째) · 트로피 생김 (그 전엔 없음) · 마지막 단계 뒤에 다음 단계 없음 (게시판 '마지막 단계')", not tr16 and tr17 and Company.stage_data().stages.size() == 18
+			and Company.stage_for(500) == 17 and BoardUI.lines({"earned_days": 500, "shown_stage": 17}, {"staff": []}, {})[3][1] == "마지막 단계", "%s %s" % [tr16, tr17])
+	# 라운지 띠 (1.2 단계 64, 안 A): 켤 때 front_extra 로 건물 앞이 늘어남. 휴게 · 창구 자리는 그대로, 새 띠 = lounge 구역 (건물 안 · 겹침 없음)
+	var lx: bool = true
+	var lnote := ""
+	for dd in [10, 12, 14]:
+		var l0 := Layout.new(dd)
+		var l1 := Layout.new(dd, Layout.PATH, Company.front_extra_for(10))
+		var lr: Rect2 = l1.zone_rect("lounge")
+		var same: bool = ["rest_spots", "meeting_seats", "queue", "sofa", "cat_bed", "boss_desk"].all(func(n: String) -> bool:
+			return l0.slots(n).map(func(q): return q.pos) == l1.slots(n).map(func(q): return q.pos))
+		var inside: bool = l1.building_rect().encloses(lr) and is_equal_approx(lr.size.y, 1.5) and is_equal_approx(l1.building_rect().size.y - l0.building_rect().size.y, 1.5)
+		var apart: bool = not lr.intersects(l1.zone_rect("rest")) and not lr.intersects(l1.zone_rect("counter")) and not lr.intersects(l1.room_rect())
+		var items: bool = ["lounge_tv", "lounge_fridge", "lounge_seats", "lounge_game", "lounge_cafe", "lounge_picnic", "lounge_picnic_seats"].all(func(n: String) -> bool:
+			return l1.slots(n).all(func(q: Dictionary) -> bool: return lr.grow(-0.1).encloses(Rect2(q.pos - q.size / 2.0, q.size))))
+		var lrects: Array = []   # 가구끼리도 안 겹침 (게임기 · 러그 아래 자리는 제외)
+		for n in ["lounge_tv", "lounge_fridge", "lounge_seats", "lounge_cafe", "lounge_picnic", "lounge_picnic_seats"]:
+			for q in l1.slots(n):
+				lrects.append(Rect2(q.pos - q.size / 2.0, q.size).grow(-0.02))
+		for a in lrects.size():
+			for b2 in range(a + 1, lrects.size()):
+				if (lrects[a] as Rect2).intersects(lrects[b2]):
+					items = false
+		lx = lx and same and inside and apart and items and l0.zone_names().size() == 4 and l1.zone_names().size() == 5
+		lnote += " d%d:%s%s%s%s" % [dd, same, inside, apart, items]
+	check.call("1.2 라운지 띠: 건물 앞 +1.5칸 · 휴게 · 창구 자리 그대로 · 새 구역은 건물 안 · 겹침 없음 · 가구 자리가 띠 안 (지름 10 · 12 · 14)", lx and Company.front_extra_for(9) == 0.0 and Company.front_extra_for(10) == 1.5, lnote)
+	# 1.3 유리 사장실 (단계 90 = 12): 그 전엔 안 보임 · 유리가 건물 안 · 줄 서는 자리와 0.2칸 이상 떨어짐 · 사장 책상 · 결재함 · 복합기는 방 안
+	var br := office.get_node_or_null("BossRoom") as Node3D
+	var was_stage: int = office.stage
+	office.apply_stage(11)
+	var br_hid := br != null and not br.visible
+	office.apply_stage(12)
+	var br_show := br != null and br.visible and br.get_child_count() == 5
+	var bnote := ""
+	var bok := br_hid and br_show
+	if br != null:
+		var bu: float = office.layout.unit_m
+		var bb: Rect2 = office.layout.building_rect().grow(0.01)
+		var gx0 := 99.0
+		for g: MeshInstance3D in br.get_children().filter(func(c): return c.name != "BossDoor"):
+			var gr := Rect2(Vector2(g.global_position.x, g.global_position.z) / bu - Vector2(g.mesh.get_aabb().size.x, g.mesh.get_aabb().size.z) / bu / 2.0, Vector2(g.mesh.get_aabb().size.x, g.mesh.get_aabb().size.z) / bu)
+			gx0 = minf(gx0, gr.position.x)
+			bok = bok and bb.encloses(gr)
+			for q in office.layout.slots("queue"):
+				bok = bok and gr.grow(0.2).has_point(q.pos) == false
+		for n in ["boss_desk", "boss_cabinet", "printer", "inbox"]:
+			var q0: Vector2 = office.layout.slots(n)[0].pos
+			bok = bok and q0.x > gx0 and q0.y < office.layout.slots("boss_desk")[0].pos.y + 1.0
+		bnote = "hid %s show %s 왼쪽 x %.2f" % [br_hid, br_show, gx0]
+	office.set_boss_away(true)
+	var dclosed: bool = br != null and (br.get_node("BossDoor") as Node3D).visible
+	office.set_boss_away(false)
+	bok = bok and dclosed and not (br.get_node("BossDoor") as Node3D).visible
+	var hf := office.get_node_or_null("HistoryFrame") as Node3D
+	office.set_history_hover(true)
+	var htxt: String = (office.get_node("HistoryFrame/HistoryText") as Label3D).text
+	var hshown: bool = (office.get_node("HistoryFrame/HistoryText") as Label3D).visible
+	office.set_history_hover(false)
+	bok = bok and hf != null and hf.visible and hshown and htxt.begins_with("연혁") and not (office.get_node("HistoryFrame/HistoryText") as Label3D).visible
+	var keep_honor: Variant = Game.company.get("honor", [])
+	var hon: Array = []
+	for hi in 14:
+		hon.append({"date": "2026-10-%02d" % (hi + 1), "days": hi + 1, "look": {"shirt": hi, "hair": hi, "acc": 0, "person": 0}})
+	Game.company.honor = hon.slice(0, 3)
+	office.refresh_honor()
+	var n3: int = office.get_node("HonorWall").get_children().filter(func(c): return not c is Label3D).size()
+	Game.company.honor = hon
+	office.refresh_honor()
+	var n12: int = office.get_node("HonorWall").get_children().filter(func(c): return not c is Label3D).size()
+	office.set_honor_hover(true)
+	var htx: String = (office.get_node("HonorWall/HonorText") as Label3D).text
+	office.set_honor_hover(false)
+	Game.company.honor = keep_honor
+	office.refresh_honor()
+	bok = bok and n3 == 3 and n12 == 12 and htx.begins_with("명예의 벽") and htx.count("
+") == 7 and htx.contains("2026-10-14 · 14일") and htx.ends_with("외 6개")   # 12개 중 최근 6줄 + 외 N개
+	office.apply_stage(was_stage)
+	check.call("1.3 사장실: 단계 90 전엔 숨김 · 이후 유리 4장 + 문짝 (자리 비우면 닫힘) + 연혁 액자 + 명예의 벽 (최대 12 · 마우스 올림 = 목록) · 건물 안 · 줄 자리와 0.2칸 이상 떨어짐 · 책상 · 진열장 · 복합기 · 결재함은 방 안", bok, bnote)
+	if office.layout.front_extra > 0.0:   # 이 실행이 띠를 켠 경우만 (--front-extra=1.5): 복지 가구 = 단계 64 에 보임
+		var w := func(st: int) -> bool:
+			office.apply_stage(st)
+			return ["LoungeTv", "LoungeFridge", "LoungeSeat0", "LoungeSeat1", "LoungeRug", "LoungeGame"].all(func(n: String) -> bool: return vis.call(n))
+		check.call("1.2 복지 가구: TV 장 · 간식 냉장고 · 안락의자 2 · 러그 · 게임기는 단계 63 까지 없고 64 에 생김", not w.call(9) and w.call(10))
+		office.apply_stage(10)   # 안락의자 (소파 행동의 목적지 확장): 홀수 번호 직원은 TV 앞에 앉음 · 걸어갈 수 있음
+		for j in office.desk_count:
+			office.set_state(j, "off")
+		office.set_state(1, "rest")
+		var seat1: Dictionary = main.layout.slots("lounge_seats")[0]
+		var from1: Vector2 = main.layout.slot("rest_spots")
+		var out1: Vector2 = seat1.pos + Vector2(0.55, 0.0)
+		var reach1: bool = not main.island.find_path(main.layout.m(from1), main.layout.m(out1)).is_empty()
+		office.rest_act(1, "sofa")
+		run.call(1)
+		await get_tree().create_timer(0.6).timeout
+		var s1c: Dictionary = office.staff[1]
+		var sat: bool = (s1c.anim as AnimationPlayer).current_animation == "SitRest" and (s1c.node as Node3D).position.distance_to(main.layout.m3(seat1.pos + Vector2(0, 0.04))) < 0.05
+		check.call("1.2 라운지 안락의자: 쉬는 직원(홀수 번호)이 TV 앞 안락의자에 앉음 · 소파 쪽에서 걸어갈 수 있음", reach1 and sat, "%s %s" % [reach1, sat])
+		var cafe_n := ["LoungeCafeCounter", "LoungeTable", "LoungeChair0", "LoungeChair1", "LoungeParasol", "LoungeBulb0", "LoungeBulb7", "LoungeCafeLight"]
+		var cv := func(st: int) -> bool:
+			office.apply_stage(st)
+			return cafe_n.all(func(n: String) -> bool: return vis.call(n))
+		var c9: bool = cv.call(10)   # 단계 64 (복지) 까지는 카페 코너 없음
+		var c11: bool = cv.call(11)   # 76 라운지 개장
+		var cf: Dictionary = main.layout.slots("lounge_cafe")[0]
+		var cfront: Vector2 = cf.pos + Vector2(0, 0.6)
+		var reach2: bool = not main.island.find_path(main.layout.m(from1), main.layout.m(cfront)).is_empty()
+		office.set_state(0, "rest")
+		office.rest_act(0, "coffee")   # 짝수 번호 직원 = 라운지 카페 카운터에서 커피
+		run.call(0)
+		var s0c: Dictionary = office.staff[0]
+		var cup: bool = s0c.held == "cup" and (s0c.anim as AnimationPlayer).current_animation == "Drink" and (s0c.node as Node3D).position.distance_to(main.layout.m3(cfront)) < 0.05
+		check.call("1.2 라운지 개장 (단계 76): 카페 카운터 · 피크닉 탁자 · 의자 · 파라솔 · 전구 줄은 단계 75 까지 없고 76 에 생김 · 짝수 번호 직원은 카페 카운터에서 커피 · 걸어갈 수 있음",
+				not c9 and c11 and reach2 and cup, "%s %s %s %s" % [c9, c11, reach2, cup])
+		office.set_state(0, "off")
+		office.set_state(1, "off")
+	var d12 := Layout.new(12)
+	var room12: Rect2 = d12.room_rect()
+	check.call("1.2 유니콘 단계 54: 카펫 · 화분 2 · 유리 간판 (남색 판 대신) · 지름 12 = 책상 8 모두 작업실 안",
+			u8 == [false, false, false, false, true] and u9 == [true, true, true, true, false] and d12.desks().size() == 8
+			and d12.desks().all(func(d: Dictionary) -> bool: return room12.has_point(d.pos) and room12.has_point(d.seat)), "%s %s" % [u8, u9])
 	office.apply_stage(1)
 	var at1: String = office.gather_spot().at
 	var pts1: Array = office.gather_points(4)
@@ -1539,6 +1889,139 @@ func _m5_show(check: Callable) -> void:
 	check.call("M5 단계 상승: 모두 일하는 중이면 미룸 · 아무도 없으면 가구만 · 대단계 (스타트업 ①) = 남색 간판으로 교체",
 			not quiet and office.stage == 3 and (sign.find_child("SignNew", true, false) as Node3D).visible
 			and not (sign.find_child("SignHand", true, false) as Node3D).visible and not box_mat.call())
+
+	# 1.3 사장실 이사 (단계 90): 쉬는 직원 1명이 짐 상자를 들고 문 앞까지 → 내려놓음 → 유리방이 뿅 → 상자 치우고 돌아감. 쉬는 직원이 없으면 상자 없이 바로
+	office.apply_stage(11)
+	office.set_state(0, "rest")
+	sh.stage_target = 12
+	sh.stage_up()
+	var carry_box: bool = str(office.staff[0].get("held", "")) == "box"
+	run.call(0)
+	var dropped: bool = office.get_node_or_null("MoveBox") != null and str(office.staff[0].get("held", "")) == "" and not (office.get_node("BossRoom") as Node3D).visible
+	var front: Vector2 = office.boss_move_spot()
+	var front_ok: bool = main.layout.building_rect().has_point(front) and not main.island.find_path(main.layout.m(main.layout.slot("rest_spots")), main.layout.m(front)).is_empty()
+	await get_tree().create_timer(0.75).timeout
+	var moved: bool = (office.get_node("BossRoom") as Node3D).visible and office.get_node_or_null("MoveBox") == null and office.stage == 12 and not sh.busy and str(office.staff[0].get("act", "")) == ""
+	office.apply_stage(11)
+	office.set_state(0, "off")
+	sh.stage_target = 12
+	sh.stage_up()   # 아무도 없음 = 상자 없이 바로 완성된 방
+	var lite: bool = office.get_node_or_null("MoveBox") == null and office.stage == 12 and (office.get_node("BossRoom") as Node3D).visible
+	check.call("1.3 사장실 이사: 쉬는 직원이 상자를 들고 → 문 앞에 내려놓음 (건물 안 · 걸어갈 수 있음) → 방 생김 · 상자 치움 · 쉬는 직원 없으면 상자 없이 바로", carry_box and dropped and front_ok and moved and lite,
+			"%s %s %s %s %s" % [carry_box, dropped, front_ok, moved, lite])
+	sh.stage_target = 3
+	office.apply_stage(3)
+	office.set_state(0, "off")
+	office.staff[0].act = ""
+	run.call(0)
+	# 1.3 프로젝트 완료 연출: 쉬는 직원이 문 앞에 서고 → 사장이 끄덕임 → 명예의 벽에 액자 · 일하는 중이면 연출 없이 액자만
+	office.apply_stage(12)
+	Game.company.honor = [{"date": "2026-10-23", "days": 5, "look": {"shirt": 1, "hair": 1, "acc": 0, "person": 0}}]
+	office.set_state(0, "rest")
+	sh.honor_scene(0)
+	var hs_busy: bool = sh.busy and str(office.staff[0].get("act", "")) == "gather"
+	run.call(0)
+	var hs_at: bool = office.staff[0].tween == null and (office.staff[0].node as Node3D).position.distance_to(main.layout.m3(office.boss_move_spot())) < 0.05
+	await get_tree().create_timer(0.75).timeout
+	var hs_n: int = office.get_node("HonorWall").get_children().filter(func(c): return not c is Label3D).size()
+	var hs_done: bool = not sh.busy and str(office.staff[0].get("act", "")) == ""
+	office.set_state(0, "work")
+	sh.honor_scene(0)   # 일하는 중 = 연출 없음
+	var hs_quick: bool = not sh.busy
+	check.call("1.3 프로젝트 완료 연출: 문 앞에 서서 → 액자 1개 → 모임 풀림 · 일하는 중이면 연출 없이 액자만", hs_busy and hs_at and hs_n == 1 and hs_done and hs_quick,
+			"%s %s %d %s %s" % [hs_busy, hs_at, hs_n, hs_done, hs_quick])
+	Game.company.honor = []
+	office.refresh_honor()
+	office.apply_stage(3)
+	office.set_state(0, "off")
+	office.staff[0].act = ""
+	run.call(0)
+	# 1.3 도구별 장소 이동: 3번 연속 = 소품 앞 · 2번은 안 감 · 다른 종류 = 자리로 · 내 차례 · 일 끝남이 오면 소품 앞을 떠남 · 조용히 모드 · 내 차례 있음 · 소품 쓰는 중 · 소품 아직 없음 = 안 감 · 모임이 화이트보드를 쓰면 비킴
+	office.apply_stage(12)
+	for j in [0, 1, 2]:
+		office.set_state(j, "off")
+		office.staff[j].act = ""
+		office.staff[j].spot_at = -1.0e18
+	office.set_state(0, "work")
+	office.set_state(1, "work")
+	var ts_seat: Vector3 = (office.staff[0].node as Node3D).position
+	office.set_tool_spot(0, "search", 2)
+	var ts_two: bool = str(office.staff[0].get("act", "")) == "" and office.staff[0].tween == null
+	office.set_tool_spot(0, "search", 3)
+	var ts_go: bool = str(office.staff[0].act) == "tool_spot" and office.staff[0].tween != null
+	run.call(0)
+	var bs: Dictionary = main.layout.room_slot("bookshelf")
+	var ts_at: bool = (office.staff[0].node as Node3D).position.distance_to(main.layout.m3(bs.pos + Vector2(0, bs.size.y / 2.0 + 0.4))) < 0.05 and (office.staff[0].anim as AnimationPlayer).current_animation == "Idle"
+	office.set_tool_spot(1, "search", 3)   # 책장 앞은 한 명
+	var ts_busy: bool = str(office.staff[1].get("act", "")) == ""
+	office.set_tool_spot(0, "search", 5)   # 같은 종류가 이어지면 그대로
+	var ts_stay: bool = str(office.staff[0].act) == "tool_spot" and office.staff[0].tween == null
+	office.set_tool_spot(0, "", 0)   # 고치기 · 읽기 = 자리로
+	var ts_back: bool = str(office.staff[0].act) == "tool_back" and office.staff[0].tween != null
+	run.call(0)
+	var ts_home: bool = str(office.staff[0].act) == "" and (office.staff[0].node as Node3D).position.distance_to(ts_seat) < 0.05
+	office.set_tool_spot(0, "run", 3)   # 간격 (90초) 안에는 다시 안 감
+	var ts_gap: bool = str(office.staff[0].act) == ""
+	office.staff[0].spot_at = -1.0e18
+	office.set_tool_spot(0, "run", 3)
+	run.call(0)
+	office.set_state(0, "turn", true)   # 내 차례 = 소품 앞을 떠나 창구로
+	var ts_turn: bool = str(office.staff[0].act) == "" and office.staff[0].tween != null
+	run.call(0)
+	office.set_state(0, "work")
+	office.staff[0].spot_at = -1.0e18
+	office.set_state(2, "turn")   # 내 차례가 있으면 새로 안 감
+	office.set_tool_spot(0, "run", 3)
+	var ts_turn_no: bool = str(office.staff[0].get("act", "")) == ""
+	office.set_state(2, "off")
+	Game.settings.quiet = true
+	office.set_tool_spot(0, "run", 3)
+	var ts_quiet: bool = str(office.staff[0].get("act", "")) == ""
+	Game.settings.quiet = false
+	office.set_tool_spot(0, "plan", 3)   # 화이트보드 앞 → 모임이 시작되면 비킴
+	run.call(0)
+	var ts_wb: bool = str(office.staff[0].act) == "tool_spot" and str(office.staff[0].spot_prop) == "whiteboard"
+	office.set_state(2, "rest")
+	office.gather([2])
+	var ts_gather: bool = str(office.staff[0].act) == "tool_back"
+	run.call(0)
+	office.set_state(2, "off")
+	office.staff[2].act = ""
+	office.apply_stage(4)   # 망원경 (단계 5) 이 아직 없음 = 안 감
+	office.staff[0].spot_at = -1.0e18
+	office.set_tool_spot(0, "web", 3)
+	var ts_none: bool = str(office.staff[0].get("act", "")) == ""
+	check.call("1.3 장소 이동: 3번 연속 = 소품 앞 (2번은 안 감 · 한 명만 · 같은 종류면 그대로) · 다른 종류 = 자리로 · 90초 간격 · 내 차례가 오면 떠남 · 내 차례 있음 · 조용히 모드 · 소품 없음 = 안 감 · 모임이 오면 화이트보드 비킴",
+			ts_two and ts_go and ts_at and ts_busy and ts_stay and ts_back and ts_home and ts_gap and ts_turn and ts_turn_no and ts_quiet and ts_wb and ts_gather and ts_none,
+			"%s %s %s %s %s %s %s %s %s %s %s %s %s %s" % [ts_two, ts_go, ts_at, ts_busy, ts_stay, ts_back, ts_home, ts_gap, ts_turn, ts_turn_no, ts_quiet, ts_wb, ts_gather, ts_none])
+	office.apply_stage(3)
+	for j in [0, 1, 2]:
+		office.set_state(j, "off")
+		office.staff[j].act = ""
+	run.call(0)
+	run.call(1)
+	# 1.3 중견 가구: 단계 90 새 바닥 (카펫 색) · 104 서버 랙 3 · 복합기 · 모니터 2대 · 120 에스프레소 · 유리 진열장 — 그 전엔 없음
+	var vis2 := func(path: String) -> bool:
+		var nd := office.get_node_or_null(path) as Node3D
+		return nd != null and nd.visible
+	var mon_all := func() -> Array:
+		return range(office.desk_count).map(func(j: int) -> bool: return vis2.call("Desk_%d/Monitor2" % j))
+	var cop := func() -> bool:   # 복합기 낡은 색 (단계 104 전) 이 지금 입혀져 있나
+		var es: Array = office._look_mats.filter(func(e: Dictionary) -> bool: return e.key == "copier")
+		return not es.is_empty() and es.all(func(e: Dictionary) -> bool: return (e.mi as MeshInstance3D).get_surface_override_material(int(e.surface)) != null)
+	var cpc := func() -> Color: return ((office.get_node("Carpet") as MeshInstance3D).material_override as StandardMaterial3D).albedo_color
+	office.apply_stage(11)
+	var f11: Array = [vis2.call("Rack2"), vis2.call("Espresso"), vis2.call("DisplayCase"), mon_all.call().any(func(b): return b), cop.call(), cpc.call()]
+	office.apply_stage(12)
+	var f12: Array = [vis2.call("Rack2"), cop.call(), mon_all.call().any(func(b): return b), cpc.call()]
+	office.apply_stage(13)
+	var f13: Array = [vis2.call("Rack2"), vis2.call("Rack3"), cop.call(), mon_all.call().all(func(b): return b), vis2.call("Espresso"), vis2.call("DisplayCase")]
+	office.apply_stage(14)
+	var f14: Array = [vis2.call("Espresso"), vis2.call("DisplayCase"), vis2.call("Rack3")]
+	check.call("1.3 중견 가구: 단계 90 = 새 바닥 (카펫 색이 바뀜) · 104 = 랙 3 · 복합기 · 모니터 2대 (책상마다) · 120 = 에스프레소 · 유리 진열장 — 그 전엔 없음",
+			f11.slice(0, 5) == [false, false, false, false, true] and f12.slice(0, 3) == [false, true, false] and f12[3] != f11[5]
+			and f13 == [true, true, false, true, false, false] and f14 == [true, true, true], "%s %s %s %s" % [f11, f12, f13, f14])
+	office.apply_stage(3)
 
 	# 아침 조회 · 점심 · 퇴근 (일찍 퇴근)
 	office.set_state(0, "rest")
@@ -1814,14 +2297,14 @@ func _m5_phone(check: Callable) -> void:
 	var pj = JSON.parse_string(FileAccess.get_file_as_string(Phone.BUNDLE + "plugin.json"))
 	check.call("M5 플러그인 묶음: 파일 4개 · 훅 12개 (PostModelSwitch 포함 · PreToolUse · PermissionRequest 없음 · --record 없음 · SessionEnd 만 동기) · 버전 = PLUGIN_VER",
 			hooks_ok and Phone.expected().values().all(func(x): return str(x).length() == 64) and str(pj.version) == Phone.PLUGIN_VER, str(ev.keys()))
-	# Codex 복사 안내: 6개 훅 · 금지 훅 없음 · 경로는 따옴표 + 백슬래시 · --agent codex · 게임이 파일을 안 씀 (읽기만)
-	var cj = JSON.parse_string(Phone.codex_snippet("C:/Users/한글 이름/.skyoffice/plugin/0.2.0/bell/bell.exe"))
+	# Codex 복사 안내: 5종 (Interrupt · PreToolUse · PermissionRequest 없음) · 명령 = & "경로" --agent codex (PowerShell) · 공백 + 한글 경로도 JSON 왕복이 맞음
+	var cexe := "C:/Users/한글 이름/.skyoffice/plugin/0.2.0/bell/bell.exe"
+	var cj = JSON.parse_string(Phone.codex_snippet(cexe))
 	var cxh: Dictionary = cj.hooks if typeof(cj) == TYPE_DICTIONARY else {}
-	check.call("Codex 복사 안내: 훅 6개 (PreToolUse · PermissionRequest 없음) · 명령 = 따옴표 경로 + --agent codex · async · Interrupt/SessionEnd 제한 2초",
-			cxh.keys().size() == 6 and not cxh.has("PreToolUse") and not cxh.has("PermissionRequest")
-			and cxh.Stop[0].hooks[0].commandWindows == "\"C:\\Users\\한글 이름\\.skyoffice\\plugin\\0.2.0\\bell\\bell.exe\" --agent codex"
-			and cxh.Stop[0].hooks[0].command == cxh.Stop[0].hooks[0].commandWindows and bool(cxh.Stop[0].hooks[0].async)
-			and int(cxh.Interrupt[0].hooks[0].timeout) == 2 and int(cxh.SessionEnd[0].hooks[0].timeout) == 2 and int(cxh.Stop[0].hooks[0].timeout) == 5)
+	check.call("Codex 복사 안내: 훅 5종 · 명령 = & 따옴표 경로 (공백 · 한글) + --agent codex · timeout 5",
+			cxh.keys().size() == 5 and not cxh.has("Interrupt") and not cxh.has("PreToolUse") and not cxh.has("PermissionRequest") and cxh.has("SessionEnd")
+			and cxh.Stop[0].hooks[0].command == "& \"C:\\Users\\한글 이름\\.skyoffice\\plugin\\0.2.0\\bell\\bell.exe\" --agent codex"
+			and int(cxh.Stop[0].hooks[0].timeout) == 5, str(cxh.get("Stop")))
 	var cdir := OS.get_user_data_dir().path_join("codex_probe")
 	DirAccess.make_dir_recursive_absolute(cdir)
 	var c0 := Phone.codex_side(cdir)

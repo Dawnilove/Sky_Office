@@ -20,7 +20,15 @@ const ACTIVE := ["UserPromptSubmit", "PostToolUse", "PostToolUseFailure", "Subag
 const KNOWN := ["SessionStart", "UserPromptSubmit", "PostToolUse", "PostToolUseFailure", "Notification", "Stop", "StopFailure",
 		"SubagentStart", "SubagentStop", "PreCompact", "SessionEnd", "PostModelSwitch", "jsonl"]
 
+## 도구 → 소품 종류 (1.3 도구별 장소 이동): 검색 = 책장 · 실행 = 서버 랙 · 웹 = 망원경 · 할 일 = 화이트보드. 그 밖 (고치기 · 읽기 · 에이전트) = ""
+const SPOT_KIND := {"Grep": "search", "Glob": "search", "Bash": "run", "PowerShell": "run", "BashOutput": "run", "Monitor": "run",
+		"WebFetch": "web", "WebSearch": "web", "TodoWrite": "plan"}
+
 static var _tm := {}
+
+
+static func spot_kind(tool: String) -> String:
+	return str(SPOT_KIND.get(tool, ""))
 
 
 static func timings() -> Dictionary:
@@ -51,6 +59,7 @@ static func _new_session(e: Dictionary) -> Dictionary:
 		"subs": {},          # 지금 일하는 서브에이전트 {aid: {type, t, tool, tool_at}} — 역할 이름 있는 것만 (M6-1 전문가 직원)
 		"model": "",         # 모델 이름 (bell 의 model 필드: Claude = SessionStart · PostModelSwitch, Codex = 모든 훅). 관찰 모드는 모름 = ""
 		"prompt_at": -1.0,   # 마지막으로 일을 준 시각 (UserPromptSubmit → 종이비행기 연출, v2.8 C4)
+		"spot": "", "spot_n": 0,   # 같은 소품 종류 도구가 연속 몇 번인지 (본 에이전트만 · 다른 종류가 오면 새로 셈, 1.3 장소 이동)
 	}
 
 
@@ -110,6 +119,8 @@ static func reduce(state: Dictionary, e: Dictionary) -> Dictionary:
 			s.end_at = -1.0
 			s.closed = false
 		"UserPromptSubmit":
+			s.spot = ""
+			s.spot_n = 0
 			s.work_start = t
 			s.prompt_at = t
 			s.phase = "work"
@@ -117,6 +128,10 @@ static func reduce(state: Dictionary, e: Dictionary) -> Dictionary:
 			s.tool = str(e.get("tool", ""))
 			s.tool_at = t
 			var sub_id := str(e.get("aid", ""))
+			if sub_id == "":   # 서브에이전트 도구는 안 셈 (본 에이전트 = 책상 직원만 장소 이동)
+				var sk := spot_kind(str(e.get("tool", "")))
+				s.spot_n = int(s.get("spot_n", 0)) + 1 if sk != "" and sk == str(s.get("spot", "")) else (1 if sk != "" else 0)
+				s.spot = sk
 			if s.subs.has(sub_id):
 				s.subs[sub_id].tool = str(e.get("tool", ""))
 				s.subs[sub_id].tool_at = t
@@ -196,7 +211,7 @@ static func decide(state: Dictionary, now: float) -> Dictionary:
 
 static func view(s: Dictionary, now: float) -> Dictionary:
 	var tm := timings()
-	var v := {"state": "off", "since": float(s.last), "stage": 0, "tool": "", "fail": false, "stop": false, "check": false, "long": false, "guess": false}
+	var v := {"state": "off", "since": float(s.last), "stage": 0, "tool": "", "fail": false, "stop": false, "check": false, "long": false, "guess": false, "spot": "", "spot_n": 0}
 	if s.phase == "off" or now - float(s.last) >= float(tm.leave_s):
 		return v   # 퇴근: SessionEnd 또는 신호 없음 1시간 (M4 사용자 결정, 전 3시간)
 	if not s.hooked:   # 관찰 모드: '활동 중' (반투명 = 추정) / '쉼' 두 가지만 (5-1)
@@ -217,6 +232,8 @@ static func view(s: Dictionary, now: float) -> Dictionary:
 	match str(s.phase):
 		"work":
 			v.tool = str(s.tool)
+			v.spot = str(s.get("spot", ""))
+			v.spot_n = int(s.get("spot_n", 0))
 			v.fail = float(s.fail_at) >= 0.0 and now - float(s.fail_at) < float(tm.fail_show_s)
 			v.stop = float(s.get("stop_at", -1.0)) >= 0.0 and now - float(s.stop_at) < float(tm.get("stop_show_s", 4))
 			if int(s.bg) == 0 and int(s.subagents) == 0 and now - float(s.last) >= float(tm.quiet_s):

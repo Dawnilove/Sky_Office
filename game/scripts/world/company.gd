@@ -43,6 +43,15 @@ static func diameter_for(stage: int) -> int:
 	return d
 
 
+## 단계 번호 → 라운지 띠 (건물 앞 늘림, 칸). stages.json 의 front_extra 중 그 단계까지 가장 큰 값, 없으면 0 (1.2 — 켤 때 적용)
+static func front_extra_for(stage: int) -> float:
+	var e := 0.0
+	var st: Array = stage_data().stages
+	for i in mini(stage + 1, st.size()):
+		e = maxf(e, float(st[i].get("front_extra", 0.0)))
+	return e
+
+
 ## 단계 번호 → 그때까지 생긴 것 (unlock 누적)
 static func unlocked(stage: int) -> Array:
 	var out: Array = []
@@ -53,7 +62,7 @@ static func unlocked(stage: int) -> Array:
 
 
 static func empty() -> Dictionary:
-	return {"earned_days": 0, "shown_stage": 0, "win_start": -1.0, "early_at": -1.0, "provisional": false, "prev_start": -1.0, "last_t": -1.0}
+	return {"earned_days": 0, "shown_stage": 0, "win_start": -1.0, "early_at": -1.0, "provisional": false, "prev_start": -1.0, "last_t": -1.0, "history": [], "honor": []}
 
 
 ## 저장에서 불러온 값 → 모르는 키 버리고 빠진 키 채움
@@ -65,7 +74,23 @@ static func normalize(v: Variant) -> Dictionary:
 				out[k] = v[k]
 	out.earned_days = int(out.earned_days)
 	out.shown_stage = int(out.shown_stage)
+	if typeof(v) == TYPE_DICTIONARY and not v.has("history"):   # 옛 저장 (연혁 칸 없음): 이미 지난 대단계를 날짜 없이 한 번 채움
+		out.history = []
+		for i in range(1, mini(int(out.shown_stage), stage_data().stages.size() - 1) + 1):
+			if bool(stage_data().stages[i].get("big", false)):
+				out.history.append({"stage": i, "date": ""})
+	else:
+		out.history = (out.history as Array).filter(func(e: Variant) -> bool: return typeof(e) == TYPE_DICTIONARY and e.has("stage") and e.has("date"))
+	out.honor = (out.honor as Array).filter(func(e: Variant) -> bool: return typeof(e) == TYPE_DICTIONARY and e.has("date") and e.has("days") and e.get("look") is Dictionary)
 	return out
+
+
+## 명예의 벽 기념사진 한 장 (1.3): 겉모습 번호 · 날짜 · 같이 일한 기간 (입사일 ~ 마지막 활동, 달력 일수). 프로젝트 이름 · 폴더 · 해시는 안 넣음
+static func honor_entry(st: Dictionary, look: Dictionary, now: float) -> Dictionary:
+	var bias := int(Time.get_time_zone_from_system().bias) * 60
+	var days := maxi(1, int(floor((float(st.get("last", now)) + bias) / 86400.0) - floor((float(st.get("hired", now)) + bias) / 86400.0)) + 1)
+	return {"date": Time.get_date_string_from_unix_time(int(now) + bias), "days": days,
+			"look": {"shirt": int(look.get("shirt", 0)), "hair": int(look.get("hair", 0)), "acc": int(look.get("acc", 0)), "person": int(look.get("person", 0))}}
 
 
 ## 지금 창이 끝나는 시각 (일찍 퇴근이면 그 시각). 창이 없으면 -1
@@ -124,6 +149,8 @@ static func _new_day(st: Dictionary, t: float, provisional: bool) -> void:
 	st.earned_days = int(st.earned_days) + 1
 	if int(st.shown_stage) < stage_for(int(st.earned_days)):   # 업데이트로 문턱이 생겨도 하루 1단계씩
 		st.shown_stage = int(st.shown_stage) + 1
+		if bool(stage_data().stages[mini(int(st.shown_stage), stage_data().stages.size() - 1)].get("big", false)):   # 연혁: 대단계가 오른 날짜 (사장실 액자)
+			st.history.append({"stage": int(st.shown_stage), "date": Time.get_date_string_from_unix_time(int(t) + int(Time.get_time_zone_from_system().bias) * 60)})
 
 
 ## 근무일 → 도달한 단계 번호 (0부터)
