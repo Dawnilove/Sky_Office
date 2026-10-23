@@ -100,7 +100,7 @@ claude plugin marketplace remove skyoffice
 - Godot 4.7 .NET (`game/`) · 화면 없이 시험: `bash tools/offscreen_test.sh --scenario`
 - 배포 빌드 `tools/build_release.sh` 는 서명 비밀 키가 있는 개발 PC 에서만 (공개 키 `tools/signing/update_public.pem`)
 - 에셋 출처 · 라이선스: [game/assets/LICENSES.md](game/assets/LICENSES.md)
-- 크레딧: 가구 일부 (캡슐 커피 · 냉온수기 · 수면 캡슐) — **자료: kArchive · 출처: 쓰레드 dogfooter**
+- 크레딧: 가구 일부 (캡슐 커피 · 냉온수기 · 간식 냉장고 · TV 장) — **자료: kArchive · 출처: 쓰레드 dogfooter** (v0.4.0 까지의 배포판에는 수면 캡슐도 들어 있어요)
 
 ## 라이선스
 
