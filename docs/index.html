@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>하늘 오피스 (Sky Office)</title>
+<meta name="description" content="Claude Code 에이전트가 일하는 모습을 하늘에 뜬 작은 사무실로 보는 바탕화면 게임. 나는 사장, 직원은 AI 에이전트예요.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%98%81%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#eef6fd; --card:#ffffff; --text:#14304a; --muted:#587089; --line:#d6e6f5;
+  --accent:#2f8fe0; --accent-dark:#1f6fb8; --accent-soft:#dcedfc; --yellow:#f6c93b;
+  --radius:16px; --shadow:0 6px 24px rgba(31,111,184,.10);
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#0e1c2b; --card:#16293c; --text:#e6f0fa; --muted:#9bb3c9; --line:#254159;
+    --accent:#4aa3ee; --accent-dark:#7bbcf5; --accent-soft:#1c3550; --shadow:0 6px 24px rgba(0,0,0,.35)}
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{margin:0;background:var(--bg);color:var(--text);
+  font-family:"Pretendard","Noto Sans KR","Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;
+  line-height:1.65;-webkit-text-size-adjust:100%}
+a{color:var(--accent-dark)}
+img{max-width:100%;height:auto;display:block}
+code{background:var(--accent-soft);padding:.1em .4em;border-radius:6px;font-size:.92em}
+pre{background:#0f2336;color:#d8ecff;padding:14px 16px;border-radius:12px;overflow-x:auto;font-size:.9rem}
+pre code{background:none;padding:0;color:inherit}
+.wrap{max-width:1040px;margin:0 auto;padding:0 16px}
+
+/* 위쪽 메뉴 */
+nav{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;gap:4px;align-items:center;overflow-x:auto;white-space:nowrap;height:52px}
+nav b{margin-right:10px}
+nav a{text-decoration:none;color:var(--muted);padding:6px 10px;border-radius:999px;font-size:.92rem}
+nav a:hover{background:var(--accent-soft);color:var(--text)}
+
+/* 첫 화면 */
+.hero{text-align:center;padding:56px 0 28px}
+.hero .cloud{font-size:3rem}
+.hero h1{font-size:clamp(1.9rem,5.2vw,3rem);line-height:1.25;margin:.2em 0 .3em;letter-spacing:-.02em}
+.hero p.lead{font-size:clamp(1.02rem,2.4vw,1.2rem);color:var(--muted);margin:0 auto 22px;max-width:640px}
+.btns{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.btn{display:inline-block;padding:13px 22px;border-radius:999px;background:var(--accent);color:#fff;
+  font-weight:700;text-decoration:none;box-shadow:var(--shadow)}
+.btn:hover{background:var(--accent-dark);color:#fff}
+.btn.ghost{background:var(--card);color:var(--accent-dark);border:1px solid var(--line);box-shadow:none}
+.btn.ghost:hover{background:var(--accent-soft);color:var(--text)}
+.meta{margin-top:12px;color:var(--muted);font-size:.9rem}
+.shot-main{margin:30px auto 0;width:100%;max-width:860px;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--line)}
+.note{max-width:760px;margin:22px auto 0;padding:12px 16px;background:var(--card);border:1px solid var(--line);
+  border-radius:12px;color:var(--muted);font-size:.9rem;text-align:left}
+
+/* 구역 */
+section{padding:44px 0 8px}
+h2{font-size:clamp(1.4rem,3.6vw,1.8rem);margin:0 0 6px;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:0 0 22px}
+.grid{display:grid;gap:14px}
+.g3{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+.card .ico{font-size:1.7rem}
+.card h3{margin:.3em 0 .2em;font-size:1.05rem}
+.card p{margin:0;color:var(--muted);font-size:.95rem}
+figure{margin:0;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+figure img{width:100%}
+figcaption{padding:12px 16px;font-size:.94rem}
+figcaption b{display:block}
+figcaption span{color:var(--muted)}
+
+/* 표 · 단계 */
+.tbl{width:100%;border-collapse:collapse;background:var(--card);border-radius:var(--radius);overflow:hidden;
+  border:1px solid var(--line);font-size:.95rem}
+.tbl th,.tbl td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl th{background:var(--accent-soft);width:28%}
+.tbl tr:last-child td,.tbl tr:last-child th{border-bottom:0}
+.tblwrap{overflow-x:auto}
+ol.steps{list-style:none;counter-reset:s;padding:0;margin:0;display:grid;gap:12px}
+ol.steps li{counter-increment:s;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:14px 16px 14px 56px;position:relative;box-shadow:var(--shadow)}
+ol.steps li::before{content:counter(s);position:absolute;left:14px;top:12px;width:30px;height:30px;border-radius:50%;
+  background:var(--accent);color:#fff;font-weight:700;display:grid;place-items:center}
+ol.steps small{display:block;color:var(--muted)}
+.lamp{display:inline-block;width:.8em;height:.8em;border-radius:50%;margin-right:.4em;vertical-align:-.05em}
+.badge{display:inline-block;background:var(--yellow);color:#4a3600;font-weight:700;border-radius:999px;padding:1px 10px;font-size:.82rem}
+details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-top:12px}
+summary{cursor:pointer;font-weight:600}
+
+footer{margin-top:56px;padding:30px 0 44px;border-top:1px solid var(--line);color:var(--muted);font-size:.9rem;text-align:center}
+footer a{margin:0 8px}
+@media (max-width:520px){.hero{padding-top:36px}.tbl th{width:34%}}
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <b>☁️ 하늘 오피스</b>
+  <a href="#game">게임 소개</a><a href="#screens">화면</a><a href="#features">기능</a>
+  <a href="#install">설치</a><a href="#safe">개인정보</a><a href="#help">문제 해결</a><a href="#next">앞으로</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="cloud">☁️</div>
+  <h1>터미널을 계속 보지 않아도,<br>섬을 흘끗 보면 돼요.</h1>
+  <p class="lead">Claude Code 에이전트가 일하는 모습을, 하늘에 뜬 작은 사무실로 보는 바탕화면 게임.<br>나는 사장, 직원은 AI 에이전트예요.</p>
+  <div class="btns">
+    <a class="btn" href="https://github.com/Dawnilove/Sky_Office/releases/download/v0.4.0/SkyOffice-0.4.0-windows-x64.zip">⬇ Windows 용 받기 (v0.4.0)</a>
+    <a class="btn ghost" href="https://github.com/Dawnilove/Sky_Office/releases">릴리스 노트 · 이전 버전</a>
+    <a class="btn ghost" href="https://github.com/Dawnilove/Sky_Office">GitHub</a>
+  </div>
+  <div class="meta">Windows 11 x64 · MIT · 무료 · 서명 파일(.sig)도 함께 올라와 있어요</div>
+  <img class="shot-main" src="images/office-day.png" alt="낮의 하늘 오피스 전경" width="1209" height="828">
+  <div class="note">Claude Code 와 함께 쓰는 팬 게임이에요. Anthropic 과 제휴 · 보증 관계가 아니에요. 정식 지원은 <b>Claude Code</b>, Codex · Antigravity 는 관찰 모드(Codex 는 선택 훅)예요.</div>
+</div></header>
+
+<main class="wrap">
+
+<section id="game">
+  <h2>이런 게임이에요</h2>
+  <p class="sub">Claude Code 세션 하나가 직원 한 명이에요.</p>
+  <div class="grid g3">
+    <div class="card"><div class="ico">🧑‍💻</div><h3>일을 시키면 일해요</h3><p>직원이 책상에서 일하고, 끝나면 기지개를 켜고 쉬어요.</p></div>
+    <div class="card"><div class="ico">❗</div><h3>내 차례엔 노란 알림</h3><p>허락 · 질문이 오면 직원 머리 위에 노란 느낌표가 떠요. 노랑은 오직 “내 차례”예요.</p></div>
+    <div class="card"><div class="ico">🏢</div><h3>회사가 자라요</h3><p>근무일이 쌓이면 창업에서 대기업까지 사무실이 커져요.</p></div>
+  </div>
+</section>
+
+<section id="screens">
+  <h2>화면</h2>
+  <p class="sub">낮과 밤, 점심시간, 회사 성장까지.</p>
+  <div class="grid g2">
+    <figure><img src="images/call-night.png" alt="밤, 내 차례 알림" loading="lazy" width="1209" height="828">
+      <figcaption><b>내 차례 알림</b><span>허락 · 질문이 오면 직원 머리 위에 노랑 느낌표와 명패</span></figcaption></figure>
+    <figure><img src="images/lunch.png" alt="점심시간 휴게 코너" loading="lazy" width="1512" height="1400">
+      <figcaption><b>회사 생활</b><span>아침 조회 · 점심 · 쉬는 직원의 잔잔한 움직임 (끌 수 있어요)</span></figcaption></figure>
+    <figure><img src="images/stage-up.png" alt="회사 단계 상승" loading="lazy" width="1512" height="1400">
+      <figcaption><b>회사 성장</b><span>근무일이 쌓이면 6단계로 사무실이 커져요</span></figcaption></figure>
+    <figure><img src="images/board.png" alt="게시판" loading="lazy" width="864" height="592">
+      <figcaption><b>게시판</b><span>근무일 · 직원 · 다음 단계까지 한눈에</span></figcaption></figure>
+  </div>
+</section>
+
+<section id="features">
+  <h2>기능</h2>
+  <div class="grid g3">
+    <div class="card"><div class="ico">🔔</div><h3>호출 보드 · 봉투</h3><p>서브에이전트가 끝나면 봉투가 날아와요. 명패에 마우스를 올리면 직무와 하는 일 한 줄.</p></div>
+    <div class="card"><div class="ico">🧭</div><h3>분업</h3><p>책상 직원은 PM, 일하는 서브에이전트는 전문가 손님이에요. 역할 이름만 받고 지침서는 읽지 않아요.</p></div>
+    <div class="card"><div class="ico">🏗️</div><h3>18단계 성장</h3><p>창업 → 스타트업 → 중소기업 → 유니콘 → 중견기업 → 대기업. 책상 6 → 8 → 10 → 12.</p></div>
+    <div class="card"><div class="ico">🛋️</div><h3>새 가구 · 공간</h3><p>탕비 코너, 라운지 + 카페, 유리 사장실, 서버 랙, 전문가석, 트로피 진열장까지.</p></div>
+    <div class="card"><div class="ico">🐱</div><h3>사무실 고양이</h3><p>침대 · 밥그릇 · 잠 · 산책 · 쓰다듬기 (단계 64).</p></div>
+    <div class="card"><div class="ico">🏆</div><h3>프로젝트 완료</h3><p>사장실 명예의 벽에 기념 액자. 프로젝트 이름은 저장하지 않아요.</p></div>
+    <div class="card"><div class="ico">🔭</div><h3>도구별 장소 이동</h3><p>같은 도구를 3번 쓰면 책장 · 서버 랙 · 망원경 · 화이트보드 앞으로 가요.</p></div>
+    <div class="card"><div class="ico">🤝</div><h3>다른 도구</h3><p>Codex ◆ · Antigravity ▲ 직원도 관찰 모드로 보여요. 게임이 설정 파일을 직접 고치지 않아요.</p></div>
+    <div class="card"><div class="ico">🌙</div><h3>하루 · 조용히 모드</h3><p>하루 = Claude 5시간 창(낮 → 밤). 합성 환경음, 조용히 모드, 자동 업데이트.</p></div>
+  </div>
+  <details>
+    <summary>선택 기능 · 기본 꺼짐: 게임에서 Claude 부르기</summary>
+    <p>설정 → 회사 탭에서 켜면 사장 책상 전화 패널에서 직원 있는 프로젝트 하나에 한 줄을 보낼 수 있어요.
+    게임이 내 PC 의 <code>claude.exe</code> 를 한 번 실행해요. <b>토큰이 쓰여요</b>. 보낼 때마다 확인 카드가 뜨고, 그 폴더 파일을 <b>읽기만</b> 해요 (최대 5턴 · $0.50 · 120초). 명령과 답은 <b>저장하지 않아요</b>.</p>
+  </details>
+</section>
+
+<section id="install">
+  <h2>설치 · 연결 · 제거</h2>
+  <p class="sub">연결은 선택이고, 약 1분이면 돼요.</p>
+  <ol class="steps">
+    <li><b>받기</b> — 위의 <a href="https://github.com/Dawnilove/Sky_Office/releases">릴리스</a>에서 <code>SkyOffice-버전-windows-x64.zip</code> → <b>모두 압축 풀기</b></li>
+    <li><b>켜기</b> — <code>SkyOffice.exe</code> 두 번 클릭 → 회사 이름 정하기</li>
+    <li><b>연결</b> (선택) — 사장 책상의 <b>전화기</b> → <b>[개통하기]</b> → 하늘색 불이 들어오면 끝
+      <small><code>claude 명령을 못 찾았어요</code> → <b>[명령 복사]</b> → Claude Code 를 쓰는 PowerShell 에 붙여 넣고 Enter. 열려 있던 Claude Code 는 껐다 다시 켜세요.</small></li>
+    <li><b>확인</b> — Claude Code 에서 아무 일이나 시키면 직원이 움직여요</li>
+    <li><b>제거</b> — 설정 → 회사 → 맨 아래 <b>폐업 정리</b> (플러그인 · 저장 · 자동 실행 삭제) → 게임 폴더는 직접 삭제</li>
+  </ol>
+  <p style="margin-top:18px">개통 전에는 <b>관찰 모드</b>로 동작해요. Claude Code 기록 파일의 수정 시각만 봐요.</p>
+  <div class="tblwrap"><table class="tbl">
+    <tr><th>전화기</th><th>뜻</th></tr>
+    <tr><td><span class="lamp" style="background:#9aa5b1"></span>회색 불</td><td>미개통 (관찰 모드)</td></tr>
+    <tr><td><span class="lamp" style="background:#4cc3ff"></span>하늘색 불</td><td>개통 · 정상</td></tr>
+    <tr><td>수화기 내려감 + X</td><td>불통 — 전화기를 누르면 원인 1줄</td></tr>
+  </table></div>
+</section>
+
+<section id="safe">
+  <h2>개인정보 · 안전</h2>
+  <p class="sub">게임에는 <b>승인 버튼이 없어요.</b> 허락은 늘 터미널에서 해요.</p>
+  <div class="grid g2">
+    <figure><img src="images/phone-panel.png" alt="전화 연결 상태 패널" loading="lazy" width="1512" height="1036">
+      <figcaption><b>전화 연결 상태 패널</b><span>마지막 신호 · 최근 신호 · 연결 점검</span></figcaption></figure>
+    <div class="tblwrap"><table class="tbl">
+      <tr><th>받는 것</th><td>신호 종류 · 도구 이름 · 폴더 끝 이름 · 모델 이름 (Codex 훅)</td></tr>
+      <tr><th>안 받는 것</th><td>프롬프트 · 명령 · 파일 내용 · 대화 · 오류 문장 · 환경 변수</td></tr>
+      <tr><th>저장</th><td>내 PC 안에만 (<code>%USERPROFILE%\.skyoffice</code> · <code>%APPDATA%\SkyOffice</code>)</td></tr>
+      <tr><th>인터넷</th><td>안 써요 (게임은 업데이트 확인만)</td></tr>
+    </table></div>
+  </div>
+  <p>훅 12개 모두 <b>출력 없음 · 결정 권한 없음</b>. 켤 때마다 설치 파일 4개의 SHA-256 을 게임 안 원본과 비교하고, 다르면 불통 + 신호 처리 중단이에요.
+  소스와 해시는 <a href="https://github.com/Dawnilove/Sky_Office#개인정보--안전">README</a> 에 있어요.</p>
+  <details>
+    <summary>직접 개통 / 제거 (PowerShell)</summary>
+<pre><code>claude plugin marketplace add "$env:USERPROFILE\.skyoffice\plugin\0.2.0"
+claude plugin install skyoffice-bell@skyoffice --scope user
+
+claude plugin uninstall skyoffice-bell@skyoffice
+claude plugin marketplace remove skyoffice</code></pre>
+  </details>
+</section>
+
+<section id="help">
+  <h2>문제 해결</h2>
+  <div class="tblwrap"><table class="tbl">
+    <tr><th>증상</th><th>해결</th></tr>
+    <tr><td>개통했는데 불이 안 들어옴</td><td>Claude Code 를 다시 켜고 일을 하나 시키기</td></tr>
+    <tr><td>불통 “신호가 안 와요”</td><td>Claude Code 다시 켜기 → 전화기 [연결 점검]</td></tr>
+    <tr><td>불통 “파일이 바뀌었어요”</td><td>전화기 → [개통하기] 로 다시 개통</td></tr>
+  </table></div>
+  <p>그래도 안 되면 <a href="https://github.com/Dawnilove/Sky_Office/issues">Issues</a> 에 알려 주세요.</p>
+</section>
+
+<section id="next">
+  <h2>앞으로</h2>
+  <div class="grid g3">
+    <div class="card"><h3>다음 버전 목표</h3><p>캐릭터 새 모델(뜨개 질감) · 새 배경음악</p></div>
+    <div class="card"><h3>연출</h3><p>망원경 연출 · 부두 벤치 · 창밖 연출</p></div>
+    <div class="card"><h3>검토 중 <span class="badge">미정</span></h3><p>Gemini/Antigravity 훅 연동 · 게임 안 명령 쓰기 권한</p></div>
+  </div>
+</section>
+
+</main>
+
+<footer><div class="wrap">
+  <div>
+    <a href="https://github.com/Dawnilove/Sky_Office">GitHub</a>
+    <a href="https://github.com/Dawnilove/Sky_Office/releases">릴리스 노트</a>
+    <a href="https://github.com/Dawnilove/Sky_Office/issues">버그 신고</a>
+    <a href="https://github.com/Dawnilove/Sky_Office/blob/main/LICENSE">라이선스 (MIT)</a>
+  </div>
+  <p>제3자 자료: Godot Engine (MIT) · 주아 글꼴 (OFL 1.1) · CC0 에셋.<br>
+  가구 일부 — <b>자료: kArchive · 출처: 쓰레드 dogfooter</b> (MIT 가 아니라 kArchive 조건: 표기 필수 · 원본 재판매 금지)</p>
+</div></footer>
+
+</body>
+</html>
