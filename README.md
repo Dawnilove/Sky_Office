@@ -1,17 +1,26 @@
 <div align="center">
 
+<img src="images/call-night.png" alt="밤의 하늘 오피스. 일하는 직원들 머리 위에 노란 느낌표(내 차례)가 떠 있어요" width="720">
+
 # ☁️ 하늘 오피스 (Sky Office)
 
-**Claude Code 에이전트가 일하는 모습을, 하늘에 뜬 작은 사무실로 보는 바탕화면 게임**
-나는 사장, 직원은 AI 에이전트예요.
+**Claude Code 세션이 직원이 되어 하늘에 뜬 사무실에서 일하고, 허락이 필요하면 노란 느낌표로 나를 불러요.**
 
-[**⬇ 받기 (릴리스)**](https://github.com/Dawnilove/Sky_Office/releases) · Windows 11 x64 · MIT · v0.4.0
+[**⬇ 받기 (v0.4.0)**](https://github.com/Dawnilove/Sky_Office/releases) &nbsp;&nbsp; [**소개 사이트에서 느낌표 눌러 보기**](https://dawnilove.github.io/Sky_Office/)
 
-<img src="images/office-day.png" alt="낮의 하늘 오피스 전경" width="720">
+Windows 11 x64용, MIT 라이선스예요. 나는 사장, 직원은 AI 에이전트예요.
 
 </div>
 
 > Claude Code 와 함께 쓰는 팬 게임이에요. Anthropic 과 제휴 · 보증 관계가 아니에요. (정식 지원은 **Claude Code**, Codex · Antigravity 는 관찰 모드 · Codex 는 선택 훅)
+
+**3단계로 시작해요**
+
+1. [릴리스](https://github.com/Dawnilove/Sky_Office/releases)에서 `SkyOffice-버전-windows-x64.zip`을 받고 모두 압축 풀기를 해요.
+2. `SkyOffice.exe`를 두 번 클릭하고 회사 이름을 정해요.
+3. 사장 책상의 전화기에서 **[개통하기]** 를 누르고, Claude Code에 일을 시켜요. 직원이 움직여요.
+
+<img src="images/office-day.png" alt="낮의 하늘 오피스 전경" width="720">
 
 ## 이런 게임이에요
 

@@ -5,239 +5,413 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>하늘 오피스 (Sky Office)</title>
 <meta name="description" content="Claude Code 에이전트가 일하는 모습을 하늘에 뜬 작은 사무실로 보는 바탕화면 게임. 나는 사장, 직원은 AI 에이전트예요.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%98%81%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%239db8d6'/%3E%3Crect x='13' y='5' width='6' height='15' rx='3' fill='%23f6c93b'/%3E%3Ccircle cx='16' cy='25' r='3.2' fill='%23f6c93b'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap" rel="stylesheet">
 <style>
+/* 색: 하늘 = 게임 화면의 하늘색. 노랑 = 게임에서처럼 "내 차례"에만 쓴다 */
 :root{
-  --bg:#eef6fd; --card:#ffffff; --text:#14304a; --muted:#587089; --line:#d6e6f5;
-  --accent:#2f8fe0; --accent-dark:#1f6fb8; --accent-soft:#dcedfc; --yellow:#f6c93b;
-  --radius:16px; --shadow:0 6px 24px rgba(31,111,184,.10);
+  --sky:#9db8d6; --ground:#e8f0f7; --paper:#ffffff; --paper-2:#f3f7fb;
+  --ink:#1b2f44; --muted:#4a5e73; --action:#1b2f44; --on-action:#ffffff;
+  --yellow:#f6c93b; --on-yellow:#3a2a00; --scene-filter:none;
+  --m:clamp(16px,3vw,40px); --r:14px;
+  --head:"Jua","Gowun Dodum","Malgun Gothic",sans-serif;
+  --body:"Gowun Dodum","Malgun Gothic","Apple SD Gothic Neo",sans-serif;
 }
 @media (prefers-color-scheme:dark){
-  :root{--bg:#0e1c2b; --card:#16293c; --text:#e6f0fa; --muted:#9bb3c9; --line:#254159;
-    --accent:#4aa3ee; --accent-dark:#7bbcf5; --accent-soft:#1c3550; --shadow:0 6px 24px rgba(0,0,0,.35)}
+  :root{
+    --ground:#121b25; --paper:#1b2836; --paper-2:#22313f;
+    --ink:#e8eef5; --muted:#aebdcc; --action:#e8eef5; --on-action:#121b25;
+    --scene-filter:brightness(.68) saturate(.85);
+  }
 }
 *{box-sizing:border-box}
-html{scroll-behavior:smooth;scroll-padding-top:64px}
-body{margin:0;background:var(--bg);color:var(--text);
-  font-family:"Pretendard","Noto Sans KR","Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;
-  line-height:1.65;-webkit-text-size-adjust:100%}
-a{color:var(--accent-dark)}
+html{scroll-padding-top:72px}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--body);
+  font-size:17px;line-height:1.6;-webkit-text-size-adjust:100%;word-break:keep-all;overflow-wrap:break-word}
+h1,h2,h3{font-family:var(--head);font-weight:400;line-height:1.1;letter-spacing:-.01em;margin:0}
+a{color:inherit;text-underline-offset:3px}
 img{max-width:100%;height:auto;display:block}
-code{background:var(--accent-soft);padding:.1em .4em;border-radius:6px;font-size:.92em}
-pre{background:#0f2336;color:#d8ecff;padding:14px 16px;border-radius:12px;overflow-x:auto;font-size:.9rem}
-pre code{background:none;padding:0;color:inherit}
-.wrap{max-width:1040px;margin:0 auto;padding:0 16px}
+code{font-size:.9em;background:var(--paper-2);padding:.1em .35em;border-radius:6px;word-break:break-all}
+pre{background:#0f1c29;color:#dcebfa;padding:14px 16px;border-radius:10px;overflow-x:auto;font-size:.88rem;line-height:1.5}
+pre code{background:none;padding:0;word-break:normal}
+:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}
+.btn{display:inline-flex;align-items:center;min-height:48px;padding:0 22px;border-radius:999px;border:0;
+  background:var(--action);color:var(--on-action);font:inherit;font-weight:700;text-decoration:none;cursor:pointer;
+  transition:transform .12s ease}
+.btn:active{transform:scale(.97)}
+.btn.soft{background:var(--paper-2);color:var(--ink)}
 
-/* 위쪽 메뉴 */
-nav{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);
-  backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
-nav .wrap{display:flex;gap:4px;align-items:center;overflow-x:auto;white-space:nowrap;height:52px}
-nav b{margin-right:10px}
-nav a{text-decoration:none;color:var(--muted);padding:6px 10px;border-radius:999px;font-size:.92rem}
-nav a:hover{background:var(--accent-soft);color:var(--text)}
+/* 위쪽 막대 */
+.bar{position:sticky;top:0;z-index:20;background:var(--ground);display:flex;align-items:center;gap:6px 18px;
+  padding:10px var(--m);flex-wrap:wrap}
+.bar b{font-family:var(--head);font-weight:400;font-size:1.35rem;margin-right:auto}
+.bar nav{display:flex;flex-wrap:wrap;gap:2px 14px}
+.bar nav a{text-decoration:none;color:var(--muted);padding:6px 0}
+.bar nav a:hover{color:var(--ink);text-decoration:underline}
+.bar .btn{min-height:40px;padding:0 18px}
 
-/* 첫 화면 */
-.hero{text-align:center;padding:56px 0 28px}
-.hero .cloud{font-size:3rem}
-.hero h1{font-size:clamp(1.9rem,5.2vw,3rem);line-height:1.25;margin:.2em 0 .3em;letter-spacing:-.02em}
-.hero p.lead{font-size:clamp(1.02rem,2.4vw,1.2rem);color:var(--muted);margin:0 auto 22px;max-width:640px}
-.btns{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
-.btn{display:inline-block;padding:13px 22px;border-radius:999px;background:var(--accent);color:#fff;
-  font-weight:700;text-decoration:none;box-shadow:var(--shadow)}
-.btn:hover{background:var(--accent-dark);color:#fff}
-.btn.ghost{background:var(--card);color:var(--accent-dark);border:1px solid var(--line);box-shadow:none}
-.btn.ghost:hover{background:var(--accent-soft);color:var(--text)}
-.meta{margin-top:12px;color:var(--muted);font-size:.9rem}
-.shot-main{margin:30px auto 0;width:100%;max-width:860px;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--line)}
-.note{max-width:760px;margin:22px auto 0;padding:12px 16px;background:var(--card);border:1px solid var(--line);
-  border-radius:12px;color:var(--muted);font-size:.9rem;text-align:left}
+/* 첫 화면: 왼쪽 글, 오른쪽 하늘 사무실 */
+.hero{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,8fr);gap:40px;align-items:center;
+  padding:28px var(--m) 64px}
+.hero h1{font-size:clamp(2.6rem,5vw,4.6rem);line-height:1.05}
+.hero .say{font-size:1.15rem;margin:24px 0 28px;max-width:30em}
+.hero .acts{display:flex;flex-wrap:wrap;gap:10px}
+.hero .fine{color:var(--muted);font-size:.95rem;margin:16px 0 0}
+.notice{margin:28px 0 0;padding:14px 16px;background:var(--paper);border-radius:var(--r);font-size:.95rem}
 
-/* 구역 */
-section{padding:44px 0 8px}
-h2{font-size:clamp(1.4rem,3.6vw,1.8rem);margin:0 0 6px;letter-spacing:-.01em}
-.sub{color:var(--muted);margin:0 0 22px}
-.grid{display:grid;gap:14px}
-.g3{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
-.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
-.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
-.card .ico{font-size:1.7rem}
-.card h3{margin:.3em 0 .2em;font-size:1.05rem}
-.card p{margin:0;color:var(--muted);font-size:.95rem}
-figure{margin:0;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
-figure img{width:100%}
-figcaption{padding:12px 16px;font-size:.94rem}
-figcaption b{display:block}
-figcaption span{color:var(--muted)}
+.stage{position:relative}
+.scene{position:relative;aspect-ratio:1150/810;overflow:hidden;border-radius:var(--r);background:var(--sky);filter:var(--scene-filter)}
+/* lunch.png(1512×1400)에서 사무실만 잘라 보인다 */
+.scene img{position:absolute;width:131.5%;max-width:none;left:-17.4%;top:-13.6%}
+.bang{position:absolute;left:61.3%;top:37.5%;transform:translate(-50%,-100%);width:48px;height:58px;padding:0;
+  border:0;border-radius:24px 24px 24px 24px;background:var(--yellow);color:var(--on-yellow);cursor:pointer;
+  font-family:var(--head);font-size:2.1rem;line-height:1;border-bottom:4px solid #c99a12}
+.bang:active{transform:translate(-50%,-96%)}
+.bang[hidden]{display:none}
+.plate{position:absolute;left:61.3%;top:39%;transform:translate(-50%,0);white-space:nowrap;
+  background:#1b2f44;color:#fff;font-family:var(--head);font-size:.95rem;padding:3px 10px;border-radius:999px}
+.plate.wait::before{content:"! ";color:var(--yellow)}
+.card{position:absolute;right:42%;top:7%;width:min(330px,44%);background:var(--paper);color:var(--ink);
+  border-radius:var(--r);padding:18px 18px 16px;box-shadow:0 14px 34px rgba(10,25,40,.28); /* 떠 있는 대화 상자 taste-skill-ignore */
+  transform-origin:100% 60%;animation:pop .16s ease-out}
+.card[hidden]{display:none}
+@keyframes pop{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}
+.card h2{font-size:1.35rem;margin-bottom:8px}
+.card .ask{background:var(--paper-2);border-left:6px solid var(--yellow);padding:10px 12px;border-radius:8px;margin:0 0 12px}
+.card .ask code{background:none;padding:0}
+.card .row{display:flex;gap:8px;flex-wrap:wrap}
+.card .yes{background:var(--yellow);color:var(--on-yellow)}
+.card small{display:block;color:var(--muted);font-size:.85rem;margin-top:12px;line-height:1.45}
+.done{margin:14px 0 0;min-height:1.6em;font-weight:700}
+.again{background:none;border:0;color:inherit;font:inherit;text-decoration:underline;cursor:pointer;padding:0;margin-left:6px}
 
-/* 표 · 단계 */
-.tbl{width:100%;border-collapse:collapse;background:var(--card);border-radius:var(--radius);overflow:hidden;
-  border:1px solid var(--line);font-size:.95rem}
-.tbl th,.tbl td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
-.tbl th{background:var(--accent-soft);width:28%}
-.tbl tr:last-child td,.tbl tr:last-child th{border-bottom:0}
-.tblwrap{overflow-x:auto}
-ol.steps{list-style:none;counter-reset:s;padding:0;margin:0;display:grid;gap:12px}
-ol.steps li{counter-increment:s;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
-  padding:14px 16px 14px 56px;position:relative;box-shadow:var(--shadow)}
-ol.steps li::before{content:counter(s);position:absolute;left:14px;top:12px;width:30px;height:30px;border-radius:50%;
-  background:var(--accent);color:#fff;font-weight:700;display:grid;place-items:center}
-ol.steps small{display:block;color:var(--muted)}
-.lamp{display:inline-block;width:.8em;height:.8em;border-radius:50%;margin-right:.4em;vertical-align:-.05em}
-.badge{display:inline-block;background:var(--yellow);color:#4a3600;font-weight:700;border-radius:999px;padding:1px 10px;font-size:.82rem}
-details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-top:12px}
-summary{cursor:pointer;font-weight:600}
+/* 구역 공통 */
+section{padding:120px var(--m) 0}
+section > h2{font-size:clamp(2rem,3.6vw,3.2rem)}
+.lead{max-width:34em;margin:16px 0 0}
 
-footer{margin-top:56px;padding:30px 0 44px;border-top:1px solid var(--line);color:var(--muted);font-size:.9rem;text-align:center}
-footer a{margin:0 8px}
-@media (max-width:520px){.hero{padding-top:36px}.tbl th{width:34%}}
+/* 화면: 사진 1장 + 고르는 칸 */
+.show{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.show figure{margin:0;background:var(--sky);border-radius:var(--r);overflow:hidden;aspect-ratio:1;filter:var(--scene-filter)}
+.show figure img{width:100%;height:100%;object-fit:contain}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:28px 0 18px}
+.tabs button{font:inherit;border:0;border-radius:999px;padding:10px 16px;background:var(--paper);color:var(--muted);cursor:pointer;min-height:44px}
+.tabs button[aria-pressed="true"]{background:var(--action);color:var(--on-action)}
+.show .cap{font-size:1.1rem;min-height:5em}
+
+/* 기능: 게시판 종이 */
+.board{background:var(--sky);border-radius:var(--r);padding:56px var(--m)}
+.sheet{max-width:760px;margin:0 auto;background:var(--paper);padding:48px clamp(20px,5vw,64px);
+  clip-path:polygon(0 12px,4% 0,8% 12px,12% 0,16% 12px,20% 0,24% 12px,28% 0,32% 12px,36% 0,40% 12px,44% 0,48% 12px,52% 0,56% 12px,60% 0,64% 12px,68% 0,72% 12px,76% 0,80% 12px,84% 0,88% 12px,92% 0,96% 12px,100% 0,100% 100%,0 100%)}
+.sheet h2{font-size:clamp(2rem,3.6vw,3.2rem);text-align:center;margin-bottom:8px}
+.sheet > p{text-align:center;margin:0 0 36px}
+.sheet h3{font-size:1.35rem;margin:40px 0 14px}
+.item{margin:0 0 18px}
+/* 이름 ····· 값: 게시판과 쪽지가 같이 쓴다 */
+.line{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;font-weight:700}
+.line span{white-space:nowrap}
+.line::after{content:"";order:2;flex:1;border-bottom:4px dotted var(--sky);transform:translateY(-4px);min-width:16px}
+.line span:last-child{order:3;font-weight:400;text-align:right}
+.item .line span:last-child{color:var(--muted)}
+.item p{margin:2px 0 0;max-width:40em}
+.sheet details{margin-top:28px;background:var(--paper-2);border-radius:10px;padding:12px 16px}
+.sheet summary{cursor:pointer;font-weight:700}
+
+/* 설치: 영수증 쪽지 */
+.install{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:48px;align-items:start}
+.slip{background:var(--paper);padding:32px 28px 48px;
+  clip-path:polygon(0 0,100% 0,100% calc(100% - 14px),95% 100%,90% calc(100% - 14px),85% 100%,80% calc(100% - 14px),75% 100%,70% calc(100% - 14px),65% 100%,60% calc(100% - 14px),55% 100%,50% calc(100% - 14px),45% 100%,40% calc(100% - 14px),35% 100%,30% calc(100% - 14px),25% 100%,20% calc(100% - 14px),15% 100%,10% calc(100% - 14px),5% 100%,0 calc(100% - 14px))}
+.slip ol{list-style:none;margin:0;padding:0}
+.slip li{margin:0 0 20px}
+.slip li p{margin:2px 0 0;color:var(--muted);font-size:.95rem}
+.slip .end{background:var(--action);color:var(--on-action);padding:12px 14px;border-radius:8px;font-weight:700}
+.lamps{width:100%;border-collapse:collapse;margin-top:24px;background:var(--paper);border-radius:var(--r);overflow:hidden}
+.lamps th,.lamps td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--paper-2)}
+.lamp{display:inline-block;width:.8em;height:.8em;border-radius:50%;margin-right:.45em;vertical-align:-.05em}
+
+/* 개인정보 */
+.safe{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;align-items:start}
+.safe figure{margin:0;background:var(--sky);border-radius:var(--r);overflow:hidden}
+.safe figure img{filter:var(--scene-filter)}
+.safe figcaption{background:var(--paper);color:var(--ink);padding:12px 16px}
+.tbl{width:100%;border-collapse:collapse;background:var(--paper);border-radius:var(--r);overflow:hidden;margin-top:24px}
+.tbl th,.tbl td{text-align:left;vertical-align:top;padding:12px 14px;border-bottom:1px solid var(--paper-2)}
+.tbl th{width:28%;white-space:nowrap}
+.safe details{margin-top:18px;background:var(--paper);border-radius:10px;padding:12px 16px}
+.safe summary{cursor:pointer;font-weight:700}
+
+/* 문제 해결, 다음 버전: 읽는 글 */
+.read{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,9fr);gap:32px 48px}
+.read h2{font-size:clamp(1.8rem,2.6vw,2.4rem)}
+.read .cols{columns:2;column-gap:56px}
+.read .cols p{margin:0 0 20px;break-inside:avoid}
+.read .cols b{font-weight:700}
+
+/* 끝: 바탕과 글자를 뒤집는다 */
+footer{margin-top:160px;background:var(--action);color:var(--on-action);padding:56px var(--m) 28px}
+footer .cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px;font-size:.95rem}
+footer ul{list-style:none;margin:0;padding:0}
+footer li{margin:0 0 6px}
+footer p{margin:0 0 8px}
+footer .word{font-family:var(--head);font-size:clamp(3.4rem,13vw,13rem);line-height:1;margin:72px 0 12px;letter-spacing:-.02em}
+footer .legal{font-size:.85rem;opacity:.85}
+
+@media (max-width:900px){
+  .hero,.show,.install,.safe,.read{grid-template-columns:1fr}
+  .hero{gap:28px}
+  .read .cols{columns:1}
+  footer .cols{grid-template-columns:1fr 1fr}
+  section{padding-top:88px}
+}
+@media (max-width:640px){
+  /* 좁은 화면: 메뉴가 2줄이 되므로 붙박이를 푼다. 허락 카드는 그림 아래에 놓는다 */
+  .bar{position:static}
+  .bar nav{order:3;width:100%}
+  .card{position:static;width:auto;margin-top:12px;box-shadow:none}
+  .bang{width:40px;height:48px;font-size:1.7rem}
+  .plate{font-size:.8rem}
+  footer .cols{grid-template-columns:1fr}
+  .tbl th{white-space:normal;width:34%}
+}
+@media (prefers-reduced-motion:reduce){
+  .card{animation:none}
+  .btn,.bang{transition:none}
+}
 </style>
 </head>
 <body>
 
-<nav><div class="wrap">
-  <b>☁️ 하늘 오피스</b>
-  <a href="#game">게임 소개</a><a href="#screens">화면</a><a href="#features">기능</a>
-  <a href="#install">설치</a><a href="#safe">개인정보</a><a href="#help">문제 해결</a><a href="#next">앞으로</a>
-</div></nav>
+<header class="bar">
+  <b>하늘 오피스</b>
+  <nav aria-label="쪽 안 메뉴">
+    <a href="#screens">화면</a><a href="#features">기능</a><a href="#install">설치</a>
+    <a href="#safe">개인정보</a><a href="#help">문제 해결</a><a href="#next">다음 버전</a>
+  </nav>
+  <a class="btn" href="https://github.com/Dawnilove/Sky_Office/releases/download/v0.4.0/SkyOffice-0.4.0-windows-x64.zip">받기</a>
+</header>
 
-<header class="hero"><div class="wrap">
-  <div class="cloud">☁️</div>
-  <h1>터미널을 계속 보지 않아도,<br>섬을 흘끗 보면 돼요.</h1>
-  <p class="lead">Claude Code 에이전트가 일하는 모습을, 하늘에 뜬 작은 사무실로 보는 바탕화면 게임.<br>나는 사장, 직원은 AI 에이전트예요.</p>
-  <div class="btns">
-    <a class="btn" href="https://github.com/Dawnilove/Sky_Office/releases/download/v0.4.0/SkyOffice-0.4.0-windows-x64.zip">⬇ Windows 용 받기 (v0.4.0)</a>
-    <a class="btn ghost" href="https://github.com/Dawnilove/Sky_Office/releases">릴리스 노트 · 이전 버전</a>
-    <a class="btn ghost" href="https://github.com/Dawnilove/Sky_Office">GitHub</a>
+<main>
+<div class="hero" id="game">
+  <div>
+    <h1>하늘에 뜬<br>내 AI 사무실</h1>
+    <p class="say">Claude Code 세션 하나가 직원 한 명이에요. 허락이나 질문이 오면 직원 머리 위에 노란 느낌표가 떠요. 그림의 느낌표를 눌러 보세요.</p>
+    <div class="acts">
+      <a class="btn" href="https://github.com/Dawnilove/Sky_Office/releases/download/v0.4.0/SkyOffice-0.4.0-windows-x64.zip">Windows용 받기 (v0.4.0)</a>
+      <a class="btn soft" href="https://github.com/Dawnilove/Sky_Office/releases">릴리스 노트와 이전 버전</a>
+      <a class="btn soft" href="https://github.com/Dawnilove/Sky_Office">GitHub</a>
+    </div>
+    <p class="fine">Windows 11 x64, MIT 라이선스, 무료. 서명 파일(.sig)도 함께 올라와 있어요.</p>
+    <p class="notice">Claude Code와 함께 쓰는 팬 게임이에요. Anthropic과 제휴하거나 보증받은 관계가 아니에요. 정식 지원은 <b>Claude Code</b>이고, Codex와 Antigravity는 관찰 모드예요 (Codex는 선택 훅).</p>
   </div>
-  <div class="meta">Windows 11 x64 · MIT · 무료 · 서명 파일(.sig)도 함께 올라와 있어요</div>
-  <img class="shot-main" src="images/office-day.png" alt="낮의 하늘 오피스 전경" width="1209" height="828">
-  <div class="note">Claude Code 와 함께 쓰는 팬 게임이에요. Anthropic 과 제휴 · 보증 관계가 아니에요. 정식 지원은 <b>Claude Code</b>, Codex · Antigravity 는 관찰 모드(Codex 는 선택 훅)예요.</div>
-</div></header>
 
-<main class="wrap">
+  <div class="stage">
+    <div class="scene">
+      <img src="images/lunch.png" width="1512" height="1400" alt="낮의 하늘 오피스. 직원 한 명은 책상에서 일하고, 세 명은 점심을 먹고, 사장은 오른쪽 아래 책상에 있어요.">
+    </div>
+    <button class="bang" id="bang" type="button" aria-expanded="false" aria-controls="ask" aria-label="PM 직원의 내 차례 알림 열기">!</button>
+    <span class="plate wait" id="plate">PM · 허락 기다림</span>
+    <div class="card" id="ask" role="dialog" aria-labelledby="ask-h" hidden>
+      <h2 id="ask-h">PM이 물어봐요</h2>
+      <p class="ask"><code>src/app.py</code> 파일을 고쳐도 될까요?</p>
+      <div class="row">
+        <button class="btn yes" id="yes" type="button">허락</button>
+        <button class="btn soft" id="later" type="button">나중에</button>
+      </div>
+      <small>이 카드는 소개용 흉내예요. 실제 게임에는 승인 버튼이 없어요. 허락은 늘 Claude Code 터미널에서 해요.</small>
+    </div>
+    <p class="done" id="done" role="status" aria-live="polite"></p>
+  </div>
+</div>
 
-<section id="game">
-  <h2>이런 게임이에요</h2>
-  <p class="sub">Claude Code 세션 하나가 직원 한 명이에요.</p>
-  <div class="grid g3">
-    <div class="card"><div class="ico">🧑‍💻</div><h3>일을 시키면 일해요</h3><p>직원이 책상에서 일하고, 끝나면 기지개를 켜고 쉬어요.</p></div>
-    <div class="card"><div class="ico">❗</div><h3>내 차례엔 노란 알림</h3><p>허락 · 질문이 오면 직원 머리 위에 노란 느낌표가 떠요. 노랑은 오직 “내 차례”예요.</p></div>
-    <div class="card"><div class="ico">🏢</div><h3>회사가 자라요</h3><p>근무일이 쌓이면 창업에서 대기업까지 사무실이 커져요.</p></div>
+<section id="screens" class="show" aria-labelledby="screens-h">
+  <figure><img id="shot" src="images/call-night.png" width="1209" height="828" alt="밤, 내 차례 알림"></figure>
+  <div>
+    <h2 id="screens-h">낮과 밤, 점심, 성장</h2>
+    <p class="lead">터미널을 계속 들여다보지 않아도 돼요. 섬을 흘끗 보면 누가 일하고 누가 나를 부르는지 보여요.</p>
+    <div class="tabs" role="group" aria-label="화면 고르기">
+      <button type="button" aria-pressed="true" data-src="images/call-night.png" data-w="1209" data-h="828" data-alt="밤, 내 차례 알림" data-cap="허락이나 질문이 오면 직원 머리 위에 노란 느낌표와 명패가 떠요. 노랑은 오직 내 차례예요.">내 차례 알림</button>
+      <button type="button" aria-pressed="false" data-src="images/lunch.png" data-w="1512" data-h="1400" data-alt="점심시간 휴게 코너" data-cap="아침 조회, 점심, 쉬는 직원의 잔잔한 움직임이 있어요. 설정에서 끌 수 있어요.">회사 생활</button>
+      <button type="button" aria-pressed="false" data-src="images/stage-up.png" data-w="1512" data-h="1400" data-alt="회사 단계 상승" data-cap="근무일이 쌓이면 회사 단계가 올라가고 사무실이 커져요.">회사 성장</button>
+      <button type="button" aria-pressed="false" data-src="images/board.png" data-w="864" data-h="592" data-alt="게시판" data-cap="게시판에서 근무일, 직원 수, 다음 단계까지 남은 날을 한눈에 봐요.">게시판</button>
+    </div>
+    <p class="cap" id="cap" aria-live="polite">허락이나 질문이 오면 직원 머리 위에 노란 느낌표와 명패가 떠요. 노랑은 오직 내 차례예요.</p>
   </div>
 </section>
 
-<section id="screens">
-  <h2>화면</h2>
-  <p class="sub">낮과 밤, 점심시간, 회사 성장까지.</p>
-  <div class="grid g2">
-    <figure><img src="images/call-night.png" alt="밤, 내 차례 알림" loading="lazy" width="1209" height="828">
-      <figcaption><b>내 차례 알림</b><span>허락 · 질문이 오면 직원 머리 위에 노랑 느낌표와 명패</span></figcaption></figure>
-    <figure><img src="images/lunch.png" alt="점심시간 휴게 코너" loading="lazy" width="1512" height="1400">
-      <figcaption><b>회사 생활</b><span>아침 조회 · 점심 · 쉬는 직원의 잔잔한 움직임 (끌 수 있어요)</span></figcaption></figure>
-    <figure><img src="images/stage-up.png" alt="회사 단계 상승" loading="lazy" width="1512" height="1400">
-      <figcaption><b>회사 성장</b><span>근무일이 쌓이면 6단계로 사무실이 커져요</span></figcaption></figure>
-    <figure><img src="images/board.png" alt="게시판" loading="lazy" width="864" height="592">
-      <figcaption><b>게시판</b><span>근무일 · 직원 · 다음 단계까지 한눈에</span></figcaption></figure>
+<section id="features" aria-labelledby="features-h">
+  <div class="board">
+    <div class="sheet">
+      <h2 id="features-h">사무실 게시판</h2>
+      <p>나는 사장, 직원은 AI 에이전트예요.</p>
+
+      <h3>일하는 모습</h3>
+      <div class="item"><div class="line"><span>직원</span><span>세션 1개 = 1명</span></div>
+        <p>일을 시키면 직원이 책상에서 일하고, 끝나면 기지개를 켜고 쉬어요.</p></div>
+      <div class="item"><div class="line"><span>호출 보드와 봉투</span><span>서브에이전트 끝</span></div>
+        <p>서브에이전트가 끝나면 봉투가 날아와요. 명패에 마우스를 올리면 직무와 하는 일 한 줄 (<code>PM · 고치는 중</code>), 부를 때는 작업 폴더가 보여요.</p></div>
+      <div class="item"><div class="line"><span>분업</span><span>PM과 전문가 손님</span></div>
+        <p>책상 직원은 PM, 일하는 서브에이전트는 전문가 손님이에요. 역할 이름은 <code>.claude/agents/*.md</code> 지침서 이름 그대로예요. 게임은 지침서를 읽지 않고 이름만 받아요.</p></div>
+      <div class="item"><div class="line"><span>도구별 장소 이동</span><span>같은 도구 3번</span></div>
+        <p>같은 도구를 3번 연속 쓰면 책장, 서버 랙, 망원경, 화이트보드 앞으로 가요. 조용히 모드에서는 꺼져요.</p></div>
+
+      <h3>회사 생활</h3>
+      <div class="item"><div class="line"><span>하루</span><span>Claude 5시간 창</span></div>
+        <p>낮에서 밤으로 바뀌어요. 합성 환경음, 조용히 모드, 자동 업데이트가 있어요.</p></div>
+      <div class="item"><div class="line"><span>쉬는 행동</span><span>설정에서 끄기</span></div>
+        <p>책장 읽기와 화이트보드 낙서를 해요. 명패 아래에 모델 이름 칩이 붙어요.</p></div>
+      <div class="item"><div class="line"><span>사무실 고양이</span><span>단계 64</span></div>
+        <p>침대, 밥그릇, 잠, 산책, 쓰다듬기.</p></div>
+      <div class="item"><div class="line"><span>프로젝트 완료</span><span>명예의 벽</span></div>
+        <p>직원 카드의 [프로젝트 완료]로 단골을 풀면 사장실 명예의 벽에 기념 액자가 걸려요 (날짜, 기간, 겉모습). 프로젝트 이름은 저장하지 않아요. 연혁 액자도 있어요.</p></div>
+
+      <h3>회사 성장</h3>
+      <div class="item"><div class="line"><span>18단계</span><span>창업에서 대기업까지</span></div>
+        <p>창업, 스타트업, 중소기업, 유니콘, 중견기업, 대기업. 단계 28, 54, 90, 140에서 다음에 켤 때 사무실이 커져요 (책상 6 → 8 → 10 → 12). 책상이 모자라면 단골 직원이 지원 근무를 해요.</p></div>
+      <div class="item"><div class="line"><span>새 가구와 공간</span><span>단계마다</span></div>
+        <p>탕비 코너 (냉온수기, 캡슐 커피), 카펫, 화분, 유리 간판, 복지 가구 (빈백, TV, 간식 냉장고), 라운지와 카페 코너, 유리 사장실, 서버 랙 3대, 복합기, 모니터 2대, 에스프레소 머신, 유리 진열장, 대형 간판, 전문가석, 사장 진열장 트로피.</p></div>
+
+      <h3>다른 도구</h3>
+      <div class="item"><div class="line"><span>Codex ◆, Antigravity ▲</span><span>관찰 모드</span></div>
+        <p>파일 수정 시각만 보고 직원이 일하는 모습을 보여 줘요. Codex는 전화 패널의 <b>Codex 연결</b> 칸에서 선택으로 훅을 연결할 수 있어요. 게임이 설정 파일을 직접 고치지 않고 복사 안내만 해요.</p></div>
+
+      <details>
+        <summary>선택 기능, 기본 꺼짐: 게임에서 Claude 부르기</summary>
+        <p>설정 &gt; 회사 탭에서 켜면 사장 책상 전화 패널에서 직원 있는 프로젝트 하나에 한 줄을 보낼 수 있어요.
+        게임이 내 PC의 <code>claude.exe</code>를 한 번 실행해요. <b>토큰이 쓰여요</b>. 보낼 때마다 확인 카드가 뜨고, 그 폴더 파일을 <b>읽기만</b> 해요 (최대 5턴, $0.50, 120초). 명령과 답은 <b>저장하지 않아요</b>.</p>
+      </details>
+    </div>
   </div>
 </section>
 
-<section id="features">
-  <h2>기능</h2>
-  <div class="grid g3">
-    <div class="card"><div class="ico">🔔</div><h3>호출 보드 · 봉투</h3><p>서브에이전트가 끝나면 봉투가 날아와요. 명패에 마우스를 올리면 직무와 하는 일 한 줄.</p></div>
-    <div class="card"><div class="ico">🧭</div><h3>분업</h3><p>책상 직원은 PM, 일하는 서브에이전트는 전문가 손님이에요. 역할 이름만 받고 지침서는 읽지 않아요.</p></div>
-    <div class="card"><div class="ico">🏗️</div><h3>18단계 성장</h3><p>창업 → 스타트업 → 중소기업 → 유니콘 → 중견기업 → 대기업. 책상 6 → 8 → 10 → 12.</p></div>
-    <div class="card"><div class="ico">🛋️</div><h3>새 가구 · 공간</h3><p>탕비 코너, 라운지 + 카페, 유리 사장실, 서버 랙, 전문가석, 트로피 진열장까지.</p></div>
-    <div class="card"><div class="ico">🐱</div><h3>사무실 고양이</h3><p>침대 · 밥그릇 · 잠 · 산책 · 쓰다듬기 (단계 64).</p></div>
-    <div class="card"><div class="ico">🏆</div><h3>프로젝트 완료</h3><p>사장실 명예의 벽에 기념 액자. 프로젝트 이름은 저장하지 않아요.</p></div>
-    <div class="card"><div class="ico">🔭</div><h3>도구별 장소 이동</h3><p>같은 도구를 3번 쓰면 책장 · 서버 랙 · 망원경 · 화이트보드 앞으로 가요.</p></div>
-    <div class="card"><div class="ico">🤝</div><h3>다른 도구</h3><p>Codex ◆ · Antigravity ▲ 직원도 관찰 모드로 보여요. 게임이 설정 파일을 직접 고치지 않아요.</p></div>
-    <div class="card"><div class="ico">🌙</div><h3>하루 · 조용히 모드</h3><p>하루 = Claude 5시간 창(낮 → 밤). 합성 환경음, 조용히 모드, 자동 업데이트.</p></div>
+<section id="install" class="install" aria-labelledby="install-h">
+  <div>
+    <h2 id="install-h">설치, 연결, 제거</h2>
+    <p class="lead">연결은 선택이에요. 약 1분이면 돼요. 개통 전에는 <b>관찰 모드</b>로 동작해요. 관찰 모드는 Claude Code 기록 파일의 수정 시각만 봐요.</p>
+    <table class="lamps">
+      <thead><tr><th>전화기</th><th>뜻</th></tr></thead>
+      <tbody>
+        <tr><td><span class="lamp" style="background:#9aa5b1"></span>회색 불</td><td>미개통 (관찰 모드)</td></tr>
+        <tr><td><span class="lamp" style="background:#4cc3ff"></span>하늘색 불</td><td>개통, 정상</td></tr>
+        <tr><td>수화기 내려감 + X</td><td>불통. 전화기를 누르면 원인 1줄</td></tr>
+      </tbody>
+    </table>
   </div>
-  <details>
-    <summary>선택 기능 · 기본 꺼짐: 게임에서 Claude 부르기</summary>
-    <p>설정 → 회사 탭에서 켜면 사장 책상 전화 패널에서 직원 있는 프로젝트 하나에 한 줄을 보낼 수 있어요.
-    게임이 내 PC 의 <code>claude.exe</code> 를 한 번 실행해요. <b>토큰이 쓰여요</b>. 보낼 때마다 확인 카드가 뜨고, 그 폴더 파일을 <b>읽기만</b> 해요 (최대 5턴 · $0.50 · 120초). 명령과 답은 <b>저장하지 않아요</b>.</p>
-  </details>
+  <div class="slip">
+    <ol>
+      <li><div class="line"><span>받기</span><span><a href="https://github.com/Dawnilove/Sky_Office/releases">릴리스</a></span></div>
+        <p><code>SkyOffice-버전-windows-x64.zip</code>을 받고 <b>모두 압축 풀기</b>를 해요.</p></li>
+      <li><div class="line"><span>켜기</span><span>SkyOffice.exe</span></div>
+        <p>두 번 클릭하고 회사 이름을 정해요.</p></li>
+      <li><div class="line"><span>연결 (선택)</span><span>전화기 → [개통하기]</span></div>
+        <p><code>claude 명령을 못 찾았어요</code>가 뜨면 [명령 복사]를 누르고, Claude Code를 쓰는 PowerShell에 붙여 넣고 Enter를 눌러요 (2줄). 열려 있던 Claude Code는 껐다 다시 켜요.</p></li>
+      <li><div class="line"><span>확인</span><span>아무 일이나 시키기</span></div>
+        <p>Claude Code에서 일을 시키면 직원이 움직여요.</p></li>
+      <li><div class="line"><span>제거</span><span>설정 → 회사 → 폐업 정리</span></div>
+        <p>플러그인, 저장, 자동 실행을 지워요. 게임 폴더는 직접 지워요.</p></li>
+    </ol>
+    <p class="end">하늘색 불이 들어오면 끝이에요</p>
+  </div>
 </section>
 
-<section id="install">
-  <h2>설치 · 연결 · 제거</h2>
-  <p class="sub">연결은 선택이고, 약 1분이면 돼요.</p>
-  <ol class="steps">
-    <li><b>받기</b> — 위의 <a href="https://github.com/Dawnilove/Sky_Office/releases">릴리스</a>에서 <code>SkyOffice-버전-windows-x64.zip</code> → <b>모두 압축 풀기</b></li>
-    <li><b>켜기</b> — <code>SkyOffice.exe</code> 두 번 클릭 → 회사 이름 정하기</li>
-    <li><b>연결</b> (선택) — 사장 책상의 <b>전화기</b> → <b>[개통하기]</b> → 하늘색 불이 들어오면 끝
-      <small><code>claude 명령을 못 찾았어요</code> → <b>[명령 복사]</b> → Claude Code 를 쓰는 PowerShell 에 붙여 넣고 Enter. 열려 있던 Claude Code 는 껐다 다시 켜세요.</small></li>
-    <li><b>확인</b> — Claude Code 에서 아무 일이나 시키면 직원이 움직여요</li>
-    <li><b>제거</b> — 설정 → 회사 → 맨 아래 <b>폐업 정리</b> (플러그인 · 저장 · 자동 실행 삭제) → 게임 폴더는 직접 삭제</li>
-  </ol>
-  <p style="margin-top:18px">개통 전에는 <b>관찰 모드</b>로 동작해요. Claude Code 기록 파일의 수정 시각만 봐요.</p>
-  <div class="tblwrap"><table class="tbl">
-    <tr><th>전화기</th><th>뜻</th></tr>
-    <tr><td><span class="lamp" style="background:#9aa5b1"></span>회색 불</td><td>미개통 (관찰 모드)</td></tr>
-    <tr><td><span class="lamp" style="background:#4cc3ff"></span>하늘색 불</td><td>개통 · 정상</td></tr>
-    <tr><td>수화기 내려감 + X</td><td>불통 — 전화기를 누르면 원인 1줄</td></tr>
-  </table></div>
-</section>
-
-<section id="safe">
-  <h2>개인정보 · 안전</h2>
-  <p class="sub">게임에는 <b>승인 버튼이 없어요.</b> 허락은 늘 터미널에서 해요.</p>
-  <div class="grid g2">
-    <figure><img src="images/phone-panel.png" alt="전화 연결 상태 패널" loading="lazy" width="1512" height="1036">
-      <figcaption><b>전화 연결 상태 패널</b><span>마지막 신호 · 최근 신호 · 연결 점검</span></figcaption></figure>
-    <div class="tblwrap"><table class="tbl">
-      <tr><th>받는 것</th><td>신호 종류 · 도구 이름 · 폴더 끝 이름 · 모델 이름 (Codex 훅)</td></tr>
-      <tr><th>안 받는 것</th><td>프롬프트 · 명령 · 파일 내용 · 대화 · 오류 문장 · 환경 변수</td></tr>
-      <tr><th>저장</th><td>내 PC 안에만 (<code>%USERPROFILE%\.skyoffice</code> · <code>%APPDATA%\SkyOffice</code>)</td></tr>
+<section id="safe" class="safe" aria-labelledby="safe-h">
+  <figure><img src="images/phone-panel.png" alt="전화 연결 상태 패널" loading="lazy" width="1512" height="1036">
+    <figcaption>전화 연결 상태 패널: 마지막 신호, 최근 신호, 연결 점검</figcaption></figure>
+  <div>
+    <h2 id="safe-h">개인정보와 안전</h2>
+    <p class="lead">게임에는 <b>승인 버튼이 없어요.</b> 허락은 늘 터미널에서 해요.</p>
+    <table class="tbl">
+      <tr><th>받는 것</th><td>신호 종류, 도구 이름, 폴더 끝 이름, 모델 이름 (Codex 훅)</td></tr>
+      <tr><th>안 받는 것</th><td>프롬프트, 명령, 파일 내용, 대화, 오류 문장, 환경 변수</td></tr>
+      <tr><th>저장</th><td>내 PC 안에만 (<code>%USERPROFILE%\.skyoffice</code>, <code>%APPDATA%\SkyOffice</code>)</td></tr>
       <tr><th>인터넷</th><td>안 써요 (게임은 업데이트 확인만)</td></tr>
-    </table></div>
-  </div>
-  <p>훅 12개 모두 <b>출력 없음 · 결정 권한 없음</b>. 켤 때마다 설치 파일 4개의 SHA-256 을 게임 안 원본과 비교하고, 다르면 불통 + 신호 처리 중단이에요.
-  소스와 해시는 <a href="https://github.com/Dawnilove/Sky_Office#개인정보--안전">README</a> 에 있어요.</p>
-  <details>
-    <summary>직접 개통 / 제거 (PowerShell)</summary>
+    </table>
+    <p>훅 12개는 모두 <b>출력 없음, 결정 권한 없음</b>이에요. 켤 때마다 설치 파일 4개의 SHA-256을 게임 안 원본과 비교해요. 다르면 불통이 되고 신호 처리를 멈춰요.
+    소스와 해시는 <a href="https://github.com/Dawnilove/Sky_Office#개인정보--안전">README</a>에 있어요.</p>
+    <details>
+      <summary>직접 개통과 제거 (PowerShell)</summary>
 <pre><code>claude plugin marketplace add "$env:USERPROFILE\.skyoffice\plugin\0.2.0"
 claude plugin install skyoffice-bell@skyoffice --scope user
 
 claude plugin uninstall skyoffice-bell@skyoffice
 claude plugin marketplace remove skyoffice</code></pre>
-  </details>
-</section>
-
-<section id="help">
-  <h2>문제 해결</h2>
-  <div class="tblwrap"><table class="tbl">
-    <tr><th>증상</th><th>해결</th></tr>
-    <tr><td>개통했는데 불이 안 들어옴</td><td>Claude Code 를 다시 켜고 일을 하나 시키기</td></tr>
-    <tr><td>불통 “신호가 안 와요”</td><td>Claude Code 다시 켜기 → 전화기 [연결 점검]</td></tr>
-    <tr><td>불통 “파일이 바뀌었어요”</td><td>전화기 → [개통하기] 로 다시 개통</td></tr>
-  </table></div>
-  <p>그래도 안 되면 <a href="https://github.com/Dawnilove/Sky_Office/issues">Issues</a> 에 알려 주세요.</p>
-</section>
-
-<section id="next">
-  <h2>앞으로</h2>
-  <div class="grid g3">
-    <div class="card"><h3>다음 버전 목표</h3><p>캐릭터 새 모델(뜨개 질감) · 새 배경음악</p></div>
-    <div class="card"><h3>연출</h3><p>망원경 연출 · 부두 벤치 · 창밖 연출</p></div>
-    <div class="card"><h3>검토 중 <span class="badge">미정</span></h3><p>Gemini/Antigravity 훅 연동 · 게임 안 명령 쓰기 권한</p></div>
+    </details>
   </div>
 </section>
 
+<section class="read" aria-labelledby="help">
+  <h2 id="help">문제 해결</h2>
+  <div class="cols">
+    <p><b>개통했는데 불이 안 들어와요?</b> Claude Code를 다시 켜고 일을 하나 시켜요.</p>
+    <p><b>불통 “신호가 안 와요”가 떠요?</b> Claude Code를 다시 켜고 전화기의 [연결 점검]을 눌러요.</p>
+    <p><b>불통 “파일이 바뀌었어요”가 떠요?</b> 전화기의 [개통하기]로 다시 개통해요.</p>
+    <p><b>그래도 안 되나요?</b> <a href="https://github.com/Dawnilove/Sky_Office/issues">Issues</a>에 알려 주세요.</p>
+  </div>
+  <h2 id="next">다음 버전</h2>
+  <div class="cols">
+    <p><b>목표.</b> 캐릭터 새 모델 (뜨개 질감), 새 배경음악.</p>
+    <p><b>연출.</b> 망원경 연출, 부두 벤치, 창밖 연출.</p>
+    <p><b>검토 중 (미정).</b> Gemini/Antigravity 훅 연동, 게임 안 명령 쓰기 권한.</p>
+  </div>
+</section>
 </main>
 
-<footer><div class="wrap">
-  <div>
-    <a href="https://github.com/Dawnilove/Sky_Office">GitHub</a>
-    <a href="https://github.com/Dawnilove/Sky_Office/releases">릴리스 노트</a>
-    <a href="https://github.com/Dawnilove/Sky_Office/issues">버그 신고</a>
-    <a href="https://github.com/Dawnilove/Sky_Office/blob/main/LICENSE">라이선스 (MIT)</a>
+<footer>
+  <div class="cols">
+    <ul>
+      <li><a href="https://github.com/Dawnilove/Sky_Office">GitHub</a></li>
+      <li><a href="https://github.com/Dawnilove/Sky_Office/releases">릴리스 노트</a></li>
+      <li><a href="https://github.com/Dawnilove/Sky_Office/issues">버그 신고</a></li>
+      <li><a href="https://github.com/Dawnilove/Sky_Office/blob/main/LICENSE">라이선스 (MIT)</a></li>
+    </ul>
+    <div>
+      <p>제3자 자료: Godot Engine (MIT), 주아 글꼴 (OFL 1.1), CC0 에셋.</p>
+      <p>가구 일부: <b>자료 kArchive, 출처 쓰레드 dogfooter</b>. MIT가 아니라 kArchive 조건이에요 (표기 필수, 원본 재판매 금지).</p>
+    </div>
+    <div>
+      <p>Claude Code와 함께 쓰는 팬 게임이에요. Anthropic과 제휴하거나 보증받은 관계가 아니에요.</p>
+    </div>
   </div>
-  <p>제3자 자료: Godot Engine (MIT) · 주아 글꼴 (OFL 1.1) · CC0 에셋.<br>
-  가구 일부 — <b>자료: kArchive · 출처: 쓰레드 dogfooter</b> (MIT 가 아니라 kArchive 조건: 표기 필수 · 원본 재판매 금지)</p>
-</div></footer>
+  <p class="word" aria-hidden="true">하늘 오피스</p>
+  <p class="legal">Sky Office v0.4.0, Windows 11 x64</p>
+</footer>
 
+<script>
+// 첫 화면: 느낌표 → 허락 카드 → 허락하면 다시 일한다 (상태 2개: 기다림, 일함)
+(() => {
+  const bang = document.getElementById('bang'), ask = document.getElementById('ask');
+  const plate = document.getElementById('plate'), done = document.getElementById('done');
+  const open = () => { ask.hidden = false; bang.setAttribute('aria-expanded', 'true'); document.getElementById('yes').focus(); };
+  const close = () => { ask.hidden = true; bang.setAttribute('aria-expanded', 'false'); };
+  const wait = () => {
+    bang.hidden = false; plate.textContent = 'PM · 허락 기다림'; plate.classList.add('wait');
+    done.textContent = ''; bang.focus();
+  };
+  bang.addEventListener('click', () => (ask.hidden ? open() : close()));
+  document.getElementById('later').addEventListener('click', () => { close(); bang.focus(); });
+  document.getElementById('yes').addEventListener('click', () => {
+    close(); bang.hidden = true; plate.textContent = 'PM · 고치는 중'; plate.classList.remove('wait');
+    done.textContent ='PM이 다시 일해요. 노란 느낌표가 사라졌어요.';
+    const again = document.createElement('button');
+    again.type = 'button'; again.className = 'again'; again.textContent = '다시 부르기';
+    again.addEventListener('click', wait);
+    done.append(again); again.focus();
+  });
+  ask.addEventListener('keydown', e => { if (e.key === 'Escape') { close(); bang.focus(); } });
+})();
+
+// 화면 구역: 칸을 고르면 그림과 설명이 바뀐다
+(() => {
+  const shot = document.getElementById('shot'), cap = document.getElementById('cap');
+  const tabs = document.querySelectorAll('.tabs button');
+  tabs.forEach(t => t.addEventListener('click', () => {
+    tabs.forEach(o => o.setAttribute('aria-pressed', String(o === t)));
+    shot.src = t.dataset.src; shot.width = t.dataset.w; shot.height = t.dataset.h;
+    shot.alt = t.dataset.alt; cap.textContent = t.dataset.cap;
+  }));
+})();
+</script>
 </body>
 </html>
